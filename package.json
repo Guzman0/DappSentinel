@@ -1,6 +1,6 @@
 {
   "name": "dappsentinel",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A pre-launch safety gate for dApp frontends. Kane CLI catches leaked RPC keys, testnet endpoints, wrong contract addresses, untrusted scripts and keys in storage, and your coding agent fixes them before you ship.",
   "bin": {
     "dappsentinel": "bin/dappsentinel.js"
@@ -10,15 +10,24 @@
     "sentinel": "node bin/dappsentinel.js check",
     "sentinel:headed": "node bin/dappsentinel.js check --headed",
     "checks": "node bin/dappsentinel.js list",
-    "deploy": "node bin/dappsentinel.js check && netlify deploy --prod --dir demo-dapp"
+    "deploy": "node bin/dappsentinel.js check && netlify deploy --prod --dir demo-dapp",
+    "test": "node test/analyzers.test.js"
   },
   "dependencies": {
+    "adm-zip": "^0.5.18",
     "cross-spawn": "^7.0.6"
   },
   "engines": {
     "node": ">=18"
   },
-  "keywords": ["web3", "dapp", "security", "kane-cli", "testing", "claude-code"],
+  "keywords": [
+    "web3",
+    "dapp",
+    "security",
+    "kane-cli",
+    "testing",
+    "claude-code"
+  ],
   "author": "Guzman",
   "license": "MIT"
 }

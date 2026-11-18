@@ -13,6 +13,8 @@ const fs = require("fs");
 const path = require("path");
 const http = require("http");
 const crypto = require("crypto");
+const analyzers = require("../lib/analyzers");
+const { readEvidence } = require("../lib/evidence");
 
 const ROOT = process.cwd();
 const CONFIG_PATH = path.join(ROOT, "sentinel.config.json");
@@ -71,7 +73,16 @@ function loadChecks() {
         const i = line.indexOf(":");
         if (i > 0) meta[line.slice(0, i).trim()] = line.slice(i + 1).trim();
       }
-      return { file, id: meta.id || file, name: meta.name || file, severity: meta.severity || "high", fix: meta.fix || "", body: m[2].trim() };
+      return {
+        file,
+        id: meta.id || file,
+        name: meta.name || file,
+        severity: meta.severity || "high",
+        kind: meta.kind || "assert",
+        recording: meta.recording || "",
+        fix: meta.fix || "",
+        body: m[2].trim(),
+      };
     });
 }
 
@@ -91,7 +102,7 @@ function templateValues(config, url) {
       .join(" "),
     allowedScriptHosts: list((config.allowedScriptHosts || ["self"]).map((h) => (h === "self" ? `${host} (the site itself)` : h))),
     testnetHints: (config.testnetHints || []).join(", ").replace(/, ([^,]*)$/, " or $1"),
-    rpcKeyExamples: (config.rpcKeyProviders || []).join(" or "),
+    rpcKeyProviders: list(config.rpcKeyProviders),
     secretKeyNames: (config.secretKeyNames || []).map((k) => `'${k}'`).join(", ").replace(/, ([^,]*)$/, " or $1"),
   };
 }
@@ -271,7 +282,12 @@ function writeReport(results, meta) {
     for (const r of failed) {
       lines.push(`### ❌ ${r.name} (\`${r.id}\`)`);
       lines.push("");
-      if (r.summary) lines.push(`**Kane says:** ${r.summary}`);
+      if (r.summary) lines.push(`**${r.kind === "assert" ? "Kane says" : "Finding"}:** ${r.summary}`);
+      if (r.findings && r.findings.length) {
+        lines.push("");
+        for (const f of r.findings) lines.push(`- \`${f}\``);
+      }
+      if (r.source) lines.push(`\n_Source: ${r.source}._`);
       if (r.reason && r.reason !== r.summary) lines.push(`\n**Reason:** ${r.reason}`);
       const failedSteps = (r.steps || []).filter((s) => s.status === "failed");
       if (failedSteps.length) {
@@ -300,14 +316,25 @@ async function cmdCheck(args) {
   const config = loadConfig();
   const url = args.url || config.url;
   const siteDir = path.join(ROOT, config.siteDir || "demo-dapp");
-  let checks = loadChecks();
+  const all = loadChecks();
+  let checks = all;
   if (args.only) {
-    const ids = String(args.only).split(",");
-    checks = checks.filter((c) => ids.includes(c.id));
+    const ids = String(args.only).split(",").map((x) => x.trim());
+    checks = all.filter((c) => ids.includes(c.id));
     if (!checks.length) die(`No checks match --only ${args.only}`);
+    // Network checks read the traffic Kane recorded during another check, so run that one too.
+    for (const c of [...checks]) {
+      if (c.kind === "network" && !checks.some((x) => x.id === c.recording)) {
+        const rec = all.find((x) => x.id === c.recording);
+        if (rec) checks.push(rec);
+      }
+    }
+    checks.sort((a, b) => all.indexOf(a) - all.indexOf(b));
   }
 
-  console.log(`\n🛡  DappSentinel: ${checks.length} checks against ${url}\n`);
+  const kaneChecks = checks.filter((c) => c.kind !== "network");
+  const networkChecks = checks.filter((c) => c.kind === "network");
+  console.log(`\n🛡  DappSentinel: ${checks.length} checks against ${url} (${kaneChecks.length} Kane runs)\n`);
 
   const version = await kaneAvailable();
   if (!version) die("kane-cli was not found. Install it with: npm install -g @testmuai/kane-cli   then sign in with: kane-cli login");
@@ -322,15 +349,18 @@ async function cmdCheck(args) {
   }
 
   const values = templateValues(config, url);
-  const results = [];
+  const siteHost = new URL(url).host;
+  const byId = {};
   const startedAt = new Date().toISOString();
+  let n = 0;
 
-  for (const [i, c] of checks.entries()) {
-    console.log(`[${i + 1}/${checks.length}] ${c.name}`);
+  for (const c of kaneChecks) {
+    n++;
+    console.log(`[${n}/${checks.length}] ${c.name}`);
     const objective = toObjective(fill(c.body, values));
     const r = await runKane(objective, {
       url,
-      timeout: config.timeoutSeconds || 240,
+      timeout: config.timeoutSeconds || 300,
       maxSteps: config.maxSteps || 30,
       headed: Boolean(args.headed),
     });
@@ -341,25 +371,76 @@ async function cmdCheck(args) {
     }
 
     const e = r.runEnd || {};
-    const status = r.code === 0 ? "passed" : r.code === 1 ? "failed" : "error";
-    results.push({
+    const ctx = typeof e.context === "object" && e.context ? e.context : {};
+    let status = r.code === 0 ? "passed" : r.code === 1 ? "failed" : "error";
+    let summary = e.summary || e.one_liner || (status === "error" ? "Timed out or cancelled." : "");
+    let findings = [];
+    let source = "Kane CLI assertion in a real browser";
+
+    // Storage: Kane copies localStorage from the real page; DappSentinel scans the copy.
+    if (c.kind === "storage") {
+      const a = analyzers.storageSecrets(ctx.memory || {}, config);
+      status = a.status;
+      summary = a.summary;
+      findings = a.findings;
+      source = "localStorage as read by Kane CLI from the live page";
+    }
+
+    byId[c.id] = {
       id: c.id,
       name: c.name,
       severity: c.severity,
+      kind: c.kind,
       status,
       exitCode: r.code,
-      summary: e.summary || e.one_liner || (status === "error" ? "Timed out or cancelled." : ""),
-      reason: e.reason || "",
-      finalState: e.final_state || {},
+      summary,
+      reason: c.kind === "storage" ? "" : e.reason || "",
+      findings,
+      source,
+      finalState: ctx.memory ? Object.fromEntries(Object.entries(ctx.memory).map(([k, v]) => [k, v && v.extracted_value !== undefined ? v.extracted_value : v])) : {},
       testUrl: e.test_url || "",
       sessionDir: e.session_dir || e.run_dir || "",
       credits: e.credits_consumed ?? e.credits ?? null,
       steps: r.steps,
       fix: fill(c.fix, values),
       objective,
-    });
-    console.log(`      → ${status === "passed" ? "✅ passed" : status === "error" ? "⚠️  error" : "❌ failed"}${e.summary ? ": " + String(e.summary).slice(0, 140) : ""}\n`);
+    };
+    const res = byId[c.id];
+    console.log(`      → ${res.status === "passed" ? "✅ passed" : res.status === "error" ? "⚠️  error" : "❌ failed"}${res.summary ? ": " + String(res.summary).slice(0, 140) : ""}\n`);
   }
+
+  // Network checks: scan the HAR network log from Kane's evidence pack for the recording run.
+  for (const c of networkChecks) {
+    n++;
+    console.log(`[${n}/${checks.length}] ${c.name}`);
+    const rec = byId[c.recording];
+    const ev = rec ? readEvidence(rec.sessionDir) : null;
+    let a;
+    if (!ev || !ev.har.log.entries.length) {
+      a = { status: "error", summary: `No network recording found from the "${c.recording}" Kane run, so this could not be checked.`, findings: [] };
+    } else {
+      const entries = analyzers.harEntries(ev.har);
+      a = analyzers.NETWORK[c.id] ? analyzers.NETWORK[c.id](entries, config, siteHost) : { status: "error", summary: `No analyzer for ${c.id}.`, findings: [] };
+    }
+    byId[c.id] = {
+      id: c.id,
+      name: c.name,
+      severity: c.severity,
+      kind: c.kind,
+      status: a.status,
+      summary: a.summary,
+      reason: "",
+      findings: a.findings,
+      source: `network log (HAR) Kane CLI recorded during the "${c.recording}" run`,
+      testUrl: rec ? rec.testUrl : "",
+      sessionDir: ev ? ev.file : "",
+      fix: fill(c.fix, values),
+    };
+    for (const f of a.findings) console.log(`      ✖ ${f.slice(0, 120)}`);
+    console.log(`      → ${a.status === "passed" ? "✅ passed" : a.status === "error" ? "⚠️  error" : "❌ failed"}: ${a.summary}\n`);
+  }
+
+  const results = checks.map((c) => byId[c.id]);
 
   if (server) server.close();
 

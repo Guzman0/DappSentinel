@@ -6,15 +6,27 @@ DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](
 
 These are the mistakes that look fine on screen and cost users money:
 
-| Check | What Kane catches | Why it matters |
+| Check | What gets caught | How Kane proves it |
 |---|---|---|
-| `rpc-key-leak` | RPC provider API keys (Alchemy, Infura, QuickNode…) visible in network requests | Anyone can copy the key and drain your quota or run up your bill |
-| `testnet-rpc` | A mainnet build still calling testnet, staging or localhost endpoints | Users see wrong balances and prices, or transactions fail |
-| `contract-address` | A displayed contract address that doesn't match the expected one | One wrong character sends users' funds to a different contract |
-| `chain-id` | The app pointing at the wrong chain | Users sign on the wrong network |
-| `unknown-scripts` | Scripts loaded from hosts you didn't approve | This is how drainers get injected into dApp frontends |
-| `storage-secrets` | Private keys or seed phrases in localStorage or sessionStorage | Any script on the page can read and steal them |
-| `swap-flow` | The core user flow breaking | It has to still work after the fixes |
+| `rpc-key-leak` | RPC provider API keys (Alchemy, Infura, QuickNode…) in network requests | Network log Kane records in the browser |
+| `testnet-rpc` | A mainnet build still calling testnet, staging or localhost endpoints | Network log Kane records in the browser |
+| `unknown-scripts` | Scripts loaded from hosts you didn't approve, the way drainers get injected | Network log Kane records in the browser |
+| `storage-secrets` | Private keys or seed phrases left in localStorage | Kane reads localStorage from the live page |
+| `contract-address` | A displayed contract address that doesn't match the real one | Kane asserts on the page |
+| `chain-id` | The app pointing at the wrong chain | Kane asserts on the page |
+| `swap-flow` | The core user flow breaking after the fixes | Kane runs the flow end to end |
+
+### Why two kinds of check?
+
+Kane is great at plain-English assertions about what's on the page, so the visible checks
+(`contract-address`, `chain-id`, `swap-flow`) are Kane assertions. The hidden problems live in
+traffic and storage. Asking an agent to reason over a whole network log in one assertion tends to
+time out, but Kane already records every request it sees in its evidence pack as a standard HAR
+file. So while Kane runs the swap flow, DappSentinel reads that recording and checks every request
+deterministically. Kane is still the one in the browser catching it; DappSentinel just reads the
+tape. Secrets are masked in the report.
+
+That's 4 Kane runs per round instead of 7, so each fix-and-verify loop is faster and cheaper.
 
 ## How the loop works
 
@@ -81,7 +93,7 @@ Want to watch Kane work? `npm run sentinel:headed` runs the checks in a visible 
 }
 ```
 
-3. Adjust the steps in `checks/*.md` to match your app's UI. Each check is plain English, so no test code is needed. `{{placeholders}}` are filled in from the config.
+3. Adjust the steps in `checks/*.md` to match your app's UI. Kane checks are plain English, so no test code is needed. `{{placeholders}}` are filled in from the config. Make sure `checks/07-swap-flow.md` walks through your main flow, because the network checks scan the traffic Kane records during it.
 
 ## Commands
 
@@ -100,7 +112,8 @@ Turn the Stop hook off for a session with `DAPPSENTINEL_HOOK=off`.
 
 ## Notes
 
-- Each check is one Kane CLI run and uses TestMu AI credits. New accounts get free credits.
+- A full round is 4 Kane CLI runs and uses TestMu AI credits. New accounts get free credits.
+- `npm test` runs the analyzers against a network log recorded by Kane, with no credits needed.
 - The demo's private key is a well-known public test key (Hardhat account #0). Never use it for real funds.
 - DappSentinel checks what a browser can see. It doesn't replace a smart contract audit.
 

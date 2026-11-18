@@ -13,22 +13,33 @@
     "sepolia",
     "goerli",
     "holesky",
+    "hoodi",
     "testnet",
+    "devnet",
     "staging",
-    "localhost"
+    "localhost",
+    "127.0.0.1"
   ],
   "rpcKeyProviders": [
-    "eth-mainnet.g.alchemy.com/v2/KEY",
-    "mainnet.infura.io/v3/KEY",
-    "NAME.quiknode.pro/KEY",
-    "rpc.ankr.com/eth/KEY"
+    "alchemy.com",
+    "infura.io",
+    "quiknode.pro",
+    "ankr.com",
+    "chainstack.com",
+    "drpc.org",
+    "blastapi.io",
+    "helius-rpc.com"
   ],
   "secretKeyNames": [
-    "wallet_pk",
+    "pk",
     "privateKey",
     "private_key",
+    "wallet_pk",
+    "secretKey",
     "mnemonic",
-    "seedPhrase"
+    "seed",
+    "seedPhrase",
+    "seed_phrase"
   ],
   "timeoutSeconds": 300,
   "maxSteps": 30
