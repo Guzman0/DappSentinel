@@ -11,7 +11,7 @@ These are the mistakes that look fine on screen and cost users money:
 | `rpc-key-leak` | RPC provider API keys (Alchemy, Infura, QuickNode…) in network requests | Network log Kane records in the browser |
 | `testnet-rpc` | A mainnet build still calling testnet, staging or localhost endpoints | Network log Kane records in the browser |
 | `unknown-scripts` | Scripts loaded from hosts you didn't approve, the way drainers get injected | Network log Kane records in the browser |
-| `storage-secrets` | Private keys or seed phrases left in localStorage | Kane reads localStorage from the live page |
+| `storage-secrets` | Private keys or seed phrases left in localStorage or sessionStorage | Kane drives a Chrome that DappSentinel watches live |
 | `contract-address` | A displayed contract address that doesn't match the real one | Kane asserts on the page |
 | `chain-id` | The app pointing at the wrong chain | Kane asserts on the page |
 | `swap-flow` | The core user flow breaking after the fixes | Kane runs the flow end to end |
@@ -24,7 +24,11 @@ traffic and storage. Asking an agent to reason over a whole network log in one a
 time out, but Kane already records every request it sees in its evidence pack as a standard HAR
 file. So while Kane runs the swap flow, DappSentinel reads that recording and checks every request
 deterministically. Kane is still the one in the browser catching it; DappSentinel just reads the
-tape. Secrets are masked in the report.
+tape.
+
+Storage works the same way. DappSentinel starts Chrome, Kane drives it (`kane-cli --cdp-endpoint`),
+and DappSentinel watches that browser's localStorage and sessionStorage live over the Chrome
+DevTools Protocol while Kane uses the page. Secrets are masked in the report.
 
 That's 4 Kane runs per round instead of 7, so each fix-and-verify loop is faster and cheaper.
 

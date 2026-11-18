@@ -53,3 +53,13 @@ assert.strictEqual(ok.status, "passed", JSON.stringify(ok));
 assert.strictEqual(a.storageSecrets({}, cfg).status, "error");
 
 console.log("✅ analyzer tests passed");
+
+// Storage seen live in the browser Kane drove (lib/browser-watch.js).
+const snapBad = a.storageSnapshot({ pages: 3, local: { wallet_pk: pk, session: JSON.stringify({ address: "0xf39F", wallet_pk: pk }) }, session: {} }, cfg);
+assert.strictEqual(snapBad.status, "failed", JSON.stringify(snapBad));
+assert.ok(snapBad.findings.some((f) => f.includes("wallet_pk")));
+assert.ok(snapBad.findings.every((f) => !f.includes(pk)));
+const snapOk = a.storageSnapshot({ pages: 3, local: { session: JSON.stringify({ address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" }) }, session: {} }, cfg);
+assert.strictEqual(snapOk.status, "passed", JSON.stringify(snapOk));
+assert.strictEqual(a.storageSnapshot({ pages: 0, local: {}, session: {} }, cfg).status, "error");
+console.log("✅ storage snapshot tests passed");

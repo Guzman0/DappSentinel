@@ -15,6 +15,7 @@ const http = require("http");
 const crypto = require("crypto");
 const analyzers = require("../lib/analyzers");
 const { readEvidence } = require("../lib/evidence");
+const { startWatchedChrome } = require("../lib/browser-watch");
 
 const ROOT = process.cwd();
 const CONFIG_PATH = path.join(ROOT, "sentinel.config.json");
@@ -214,10 +215,11 @@ function kaneAvailable() {
   });
 }
 
-function runKane(objective, { url, timeout, maxSteps, headed }) {
+function runKane(objective, { url, timeout, maxSteps, headed, cdpEndpoint }) {
   return new Promise((resolve) => {
     const args = ["run", objective, "--agent", "--url", url, "--timeout", String(timeout), "--max-steps", String(maxSteps)];
-    if (!headed) args.push("--headless");
+    if (cdpEndpoint) args.push("--cdp-endpoint", cdpEndpoint);
+    else if (!headed) args.push("--headless");
     const child = kaneSpawn(args, { stdio: ["ignore", "pipe", "pipe"] });
     let buf = "";
     let stderr = "";
@@ -358,14 +360,29 @@ async function cmdCheck(args) {
     n++;
     console.log(`[${n}/${checks.length}] ${c.name}`);
     const objective = toObjective(fill(c.body, values));
+
+    // Storage: Kane drives a Chrome that DappSentinel started, and DappSentinel watches that
+    // browser's storage live while Kane uses the page.
+    let watcher = null;
+    let seen = null;
+    if (c.kind === "storage") {
+      try {
+        watcher = await startWatchedChrome({ siteOrigin: new URL(url).origin, headed: Boolean(args.headed) });
+      } catch (err) {
+        console.log(`      ⚠️  Could not start a watched Chrome: ${err.message}`);
+      }
+    }
+
     const r = await runKane(objective, {
       url,
       timeout: config.timeoutSeconds || 300,
       maxSteps: config.maxSteps || 30,
       headed: Boolean(args.headed),
+      cdpEndpoint: watcher ? watcher.cdpEndpoint : null,
     });
+    if (watcher) seen = await watcher.stop();
 
-    if (!r.runEnd && r.code === 2) {
+    if (!r.runEnd && r.code === 2 && c.kind !== "storage") {
       if (server) server.close();
       die(`Kane could not start (sign-in, Chrome or network problem).\n${r.stderr.trim().slice(-800)}\nTry: kane-cli whoami   and   kane-cli balance`);
     }
@@ -379,11 +396,12 @@ async function cmdCheck(args) {
 
     // Storage: Kane copies localStorage from the real page; DappSentinel scans the copy.
     if (c.kind === "storage") {
-      const a = analyzers.storageSecrets(ctx.memory || {}, config);
+      const a = seen ? analyzers.storageSnapshot(seen, config) : analyzers.storageSecrets(ctx.memory || {}, config);
       status = a.status;
       summary = a.summary;
+      if (a.status === "error" && !r.runEnd) summary += ` Kane did not start with the watched browser: ${r.stderr.trim().split("\n").slice(-2).join(" ")}`;
       findings = a.findings;
-      source = "localStorage as read by Kane CLI from the live page";
+      source = seen ? "browser storage, watched live over the Chrome DevTools Protocol in the Chrome that Kane CLI drove" : "localStorage as read by Kane CLI";
     }
 
     byId[c.id] = {

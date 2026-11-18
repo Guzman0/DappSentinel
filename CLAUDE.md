@@ -8,7 +8,7 @@ wrong contract addresses, wrong chain IDs, untrusted scripts and private keys in
 - `demo-dapp/`: the site being guarded (SentinelSwap, a simulated ETH to USDC swap page).
 - `checks/`: one check per file. `kind: assert` and `kind: storage` are Kane runs; `kind: network` scans the traffic Kane recorded during the `recording` run.
 - `sentinel.config.json`: what "correct" means: chain ID, contract addresses, trusted script hosts.
-- `lib/analyzers.js`, `lib/evidence.js`: read the network log (HAR) and storage Kane recorded, and check them.
+- `lib/analyzers.js`, `lib/evidence.js`, `lib/browser-watch.js`: read the network log (HAR) Kane recorded and the storage of the Chrome Kane drives, and check them.
 - `bin/dappsentinel.js`: the gate. `npm run sentinel` runs every check and writes `.sentinel/report.md`.
 - `hooks/sentinel-stop.js`: the Claude Code Stop hook that closes the loop.
 
