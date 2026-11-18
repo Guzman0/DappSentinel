@@ -84,12 +84,15 @@ function templateValues(config, url) {
     chainId: String(config.chainId),
     networkName: config.networkName || "",
     contractsList: Object.entries(config.contracts || {})
-      .map(([name, addr]) => `${name} expected address ${addr}.`)
+      .map(([name, addr]) => {
+        const key = `${name.toLowerCase().replace(/\W+/g, "_")}_contract`;
+        return `Store the full ${name} contract address shown on the page as '${key}'. Assert: the stored ${key} is exactly ${addr}, ignoring letter case.`;
+      })
       .join(" "),
     allowedScriptHosts: list((config.allowedScriptHosts || ["self"]).map((h) => (h === "self" ? `${host} (the site itself)` : h))),
-    testnetHints: list(config.testnetHints),
-    rpcKeyProviders: list(config.rpcKeyProviders),
-    secretKeyNames: list(config.secretKeyNames),
+    testnetHints: (config.testnetHints || []).join(", ").replace(/, ([^,]*)$/, " or $1"),
+    rpcKeyExamples: (config.rpcKeyProviders || []).join(" or "),
+    secretKeyNames: (config.secretKeyNames || []).map((k) => `'${k}'`).join(", ").replace(/, ([^,]*)$/, " or $1"),
   };
 }
 

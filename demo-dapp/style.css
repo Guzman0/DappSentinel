@@ -64,6 +64,8 @@ h1, h2 { margin: 0 0 16px; font-size: 20px; }
 .details dt { color: #8b949e; }
 .details dd { margin: 0; text-align: right; word-break: break-all; }
 code { font-size: 12px; }
+.details .contract { flex-direction: column; gap: 4px; }
+.details .contract dd { text-align: left; word-break: normal; white-space: nowrap; overflow-x: auto; }
 button {
   width: 100%;
   padding: 14px;
