@@ -1,0 +1,7 @@
+node_modules/
+.sentinel/
+.testmuai/evidence/
+.netlify/
+.claude/settings.local.json
+.DS_Store
+Thumbs.db

@@ -1,0 +1,107 @@
+# 🛡 DappSentinel
+
+**Your dApp doesn't ship until Kane says it's safe.**
+
+DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
+
+These are the mistakes that look fine on screen and cost users money:
+
+| Check | What Kane catches | Why it matters |
+|---|---|---|
+| `rpc-key-leak` | RPC provider API keys (Alchemy, Infura, QuickNode…) visible in network requests | Anyone can copy the key and drain your quota or run up your bill |
+| `testnet-rpc` | A mainnet build still calling testnet, staging or localhost endpoints | Users see wrong balances and prices, or transactions fail |
+| `contract-address` | A displayed contract address that doesn't match the expected one | One wrong character sends users' funds to a different contract |
+| `chain-id` | The app pointing at the wrong chain | Users sign on the wrong network |
+| `unknown-scripts` | Scripts loaded from hosts you didn't approve | This is how drainers get injected into dApp frontends |
+| `storage-secrets` | Private keys or seed phrases in localStorage or sessionStorage | Any script on the page can read and steal them |
+| `swap-flow` | The core user flow breaking | It has to still work after the fixes |
+
+## How the loop works
+
+```
+ Claude Code edits the site
+          │
+          ▼
+ Stop hook runs DappSentinel ──► Kane CLI checks the site in a real browser
+          ▲                                   │
+          │                         all pass? ├── yes ──► ✅ clear to ship
+          │                                   │
+          └──── Kane's findings + fix hints ◄─┘ no
+```
+
+1. You (or Claude) change the site.
+2. When Claude finishes its turn, a Claude Code **Stop hook** (`hooks/sentinel-stop.js`) runs every check with Kane CLI.
+3. If anything fails, the hook **blocks Claude from finishing** and hands it Kane's report (`.sentinel/report.md`): what failed, the offending URLs or values, and how to fix it.
+4. Claude fixes the code and finishes again, which re-runs the checks. This repeats until everything passes (or 5 rounds).
+5. `npm run deploy` only deploys if every check passes.
+
+## Quick start
+
+You need [Node.js 18+](https://nodejs.org), Google Chrome and a free [TestMu AI](https://www.testmuai.com/kane-cli/) account.
+
+```bash
+# 1. Install Kane CLI and sign in
+npm install -g @testmuai/kane-cli
+kane-cli login
+
+# 2. Get DappSentinel
+git clone https://github.com/Guzman0/DappSentinel.git
+cd DappSentinel
+npm install
+
+# 3. Run the gate against the included demo dApp
+npm run sentinel
+```
+
+The demo dApp (`demo-dapp/`, a simulated ETH → USDC swap page) ships with real-world mistakes in it, so the first run fails and shows you what Kane catches. Open `.sentinel/report.md` to see the findings.
+
+### Close the loop with Claude Code
+
+```bash
+npx @testmuai/kane-cli-skill   # optional: teaches Claude Code how to use Kane
+claude                          # open Claude Code in this folder
+```
+
+Then ask: *"Run /sentinel and fix everything Kane catches."* Or change anything in `demo-dapp/` and let the Stop hook take over.
+
+Want to watch Kane work? `npm run sentinel:headed` runs the checks in a visible browser.
+
+## Use it on your own dApp
+
+1. Point `siteDir` in `sentinel.config.json` at your site's build folder, or set `url` to your staging URL.
+2. Set what "correct" means for your app:
+
+```json
+{
+  "url": "https://staging.yourdapp.xyz",
+  "chainId": 1,
+  "networkName": "Ethereum",
+  "contracts": { "USDC": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
+  "allowedScriptHosts": ["self", "cdn.yourdapp.xyz"]
+}
+```
+
+3. Adjust the steps in `checks/*.md` to match your app's UI. Each check is plain English, so no test code is needed. `{{placeholders}}` are filled in from the config.
+
+## Commands
+
+| Command | What it does |
+|---|---|
+| `npm run sentinel` | Run every check, write `.sentinel/report.md` and `.sentinel/report.json` |
+| `npm run sentinel:headed` | Same, with a visible browser |
+| `npm run sentinel -- --only rpc-key-leak,chain-id` | Run selected checks |
+| `npm run demo` | Serve the demo dApp at http://localhost:4173 |
+| `npm run checks` | List the checks |
+| `npm run deploy` | Run the gate, and deploy to Netlify only if it passes |
+
+Exit codes: `0` all passed, `1` a check failed, `2` setup problem (Kane not installed or not signed in).
+
+Turn the Stop hook off for a session with `DAPPSENTINEL_HOOK=off`.
+
+## Notes
+
+- Each check is one Kane CLI run and uses TestMu AI credits. New accounts get free credits.
+- The demo's private key is a well-known public test key (Hardhat account #0). Never use it for real funds.
+- DappSentinel checks what a browser can see. It doesn't replace a smart contract audit.
+
+Built for the [Kane CLI Online Hackathon](https://www.kaneclihack.sh/) with Claude Code. MIT licence.

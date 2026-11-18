@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentinelSwap — swap ETH for USDC</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- date formatting helper -->
+  <script src="https://unpkg.com/dayjs@1.11.13/dayjs.min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">⇄ SentinelSwap</div>
+    <div class="network" id="network-badge">
+      <span class="dot"></span>
+      <span id="network-name">Ethereum</span>
+      <span class="chain">Chain ID: <strong id="chain-id">…</strong></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" id="swap-card">
+      <h1>Swap</h1>
+
+      <label class="field">
+        <span class="label">You pay</span>
+        <div class="row">
+          <input id="pay-amount" type="number" min="0" step="any" placeholder="0.0" aria-label="You pay amount" />
+          <span class="token">ETH</span>
+        </div>
+      </label>
+
+      <div class="arrow">↓</div>
+
+      <label class="field">
+        <span class="label">You receive</span>
+        <div class="row">
+          <input id="receive-amount" type="text" placeholder="0.0" readonly aria-label="You receive amount" />
+          <span class="token">USDC</span>
+        </div>
+      </label>
+
+      <dl class="details">
+        <div><dt>Rate</dt><dd id="rate">1 ETH = 3,150.00 USDC</dd></div>
+        <div><dt>Fee (0.3%)</dt><dd id="fee">—</dd></div>
+        <div><dt>USDC contract</dt><dd><code id="usdc-contract">…</code></dd></div>
+      </dl>
+
+      <p class="error" id="pay-error" hidden></p>
+      <button id="review-btn" disabled>Review swap</button>
+    </section>
+
+    <section class="card" id="confirm-card" hidden>
+      <h2>Confirm swap</h2>
+      <p>You pay <strong id="confirm-pay">0</strong> ETH</p>
+      <p>You receive <strong id="confirm-receive">0</strong> USDC</p>
+      <p>Fee <strong id="confirm-fee">0</strong> USDC</p>
+      <div class="actions">
+        <button class="secondary" id="back-btn">Back</button>
+        <button id="confirm-btn">Confirm swap</button>
+      </div>
+    </section>
+
+    <section class="card" id="done-card" hidden>
+      <h2>Swap submitted</h2>
+      <p id="done-text"></p>
+      <p class="muted">Demo only — no real transaction was sent.</p>
+      <button id="again-btn">New swap</button>
+    </section>
+  </main>
+
+  <footer>
+    <span>Latest block: <strong id="block">—</strong></span>
+    <span>Gas: <strong id="gas">—</strong></span>
+    <span id="session">—</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
