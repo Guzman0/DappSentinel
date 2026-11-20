@@ -34,6 +34,18 @@ DevTools Protocol while Kane uses the page. Secrets are masked in the report.
 
 That's 4 Kane runs per round instead of 7, so each fix-and-verify loop is faster and cheaper.
 
+## Try it yourself in a minute
+
+The demo dApp is live with all six mistakes still in it: **https://sentinelswap-demo.netlify.app**
+
+It looks like a normal swap page. Open your browser's developer tools and you'll find the Alchemy key in the network tab, the unpkg script, the Sepolia RPC and `wallet_pk` in localStorage. Or let DappSentinel find them:
+
+```bash
+npm run sentinel -- --url https://sentinelswap-demo.netlify.app
+```
+
+Both secrets on that page are fake: the Alchemy key was made up and the private key is the public Hardhat test key.
+
 ## How the loop works
 
 ```
