@@ -146,4 +146,4 @@ Turn the Stop hook off for a session with `DAPPSENTINEL_HOOK=off`.
 - Kane CLI's own localStorage reading timed out in our tests (even on the cookbook's example), so DappSentinel reads storage from the Chrome that Kane drives instead. Kane still does the browsing; the storage is read from its browser.
 - DappSentinel checks what a browser can see. It doesn't replace a smart contract audit.
 
-Built for the [Kane CLI Online Hackathon](https://www.kaneclihack.sh/), lane 1: apps that prove themselves. Built with Claude Code; Kane CLI verifies it, and Kane's result drives the fix. MIT licence.
+Built for the [Kane CLI Online Hackathon](https://www.kaneclihack.sh/) with Claude Code; Kane CLI verifies it, and Kane's result drives the fix. MIT licence.
