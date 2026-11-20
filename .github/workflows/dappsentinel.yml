@@ -168,13 +168,20 @@ jobs:
 
       - name: Commit the fix to the pull request
         if: steps.round.outputs.stop != '1'
+        env:
+          PUSH_TOKEN: ${{ secrets.DAPPSENTINEL_PUSH_TOKEN }}
         run: |
           git config user.name "DappSentinel auto-fix"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add demo-dapp
           git commit -m "[dappsentinel-fix] Round ${{ steps.round.outputs.n }}: fix what Kane caught" \
                      -m "Claude Code fixed the failing checks from the gate run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Only demo-dapp/ changed."
-          git push origin "HEAD:$BRANCH"
+          # Push with your token when there is one (the Claude Code step resets git's login to its own).
+          if [ -n "$PUSH_TOKEN" ]; then
+            git push "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}.git" "HEAD:$BRANCH"
+          else
+            git push origin "HEAD:$BRANCH"
+          fi
 
       - name: Re-check with Kane
         if: steps.round.outputs.stop != '1'
