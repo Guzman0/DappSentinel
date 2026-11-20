@@ -429,6 +429,7 @@ async function cmdCheck(args) {
     if (c.kind === "storage") {
       const a = seen ? analyzers.storageSnapshot(seen, config) : analyzers.storageSecrets(ctx.memory || {}, config);
       status = a.status;
+      for (const f of a.findings) console.log(`      ✖ ${f.slice(0, 120)}`);
       summary = a.summary;
       if (a.status === "error" && !r.runEnd) summary += ` Kane did not start with the watched browser: ${r.stderr.trim().split("\n").slice(-2).join(" ")}`;
       findings = a.findings;

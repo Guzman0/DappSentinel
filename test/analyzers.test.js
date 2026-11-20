@@ -63,3 +63,12 @@ const snapOk = a.storageSnapshot({ pages: 3, local: { session: JSON.stringify({ 
 assert.strictEqual(snapOk.status, "passed", JSON.stringify(snapOk));
 assert.strictEqual(a.storageSnapshot({ pages: 0, local: {}, session: {} }, cfg).status, "error");
 console.log("✅ storage snapshot tests passed");
+
+// Real dApps store hashes (order IDs, tx hashes) and long text: those are not secrets.
+const hashes = a.storageSnapshot({ pages: 1, local: { orders: JSON.stringify({ id: "0x" + "ab".repeat(32), txHash: "0x" + "cd".repeat(32) }), note: "this is a long sentence of plain words that people write in apps all day long" }, session: {} }, cfg);
+assert.strictEqual(hashes.status, "passed", JSON.stringify(hashes));
+const named = a.storageSnapshot({ pages: 1, local: { wallet: JSON.stringify({ signerKey: "0x" + "ef".repeat(32) }) }, session: {} }, cfg);
+assert.strictEqual(named.status, "failed", JSON.stringify(named));
+const seedOnly = a.storageSnapshot({ pages: 1, local: { backup: "test test test test test test test test test test test junk" }, session: {} }, cfg);
+assert.strictEqual(seedOnly.status, "failed");
+console.log("✅ real-site storage tests passed");
