@@ -32,17 +32,17 @@ jobs:
     outputs:
       code: ${{ steps.gate.outputs.code }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0          # needed to compare the checks with the target branch
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
 
       - name: Install Chrome
         id: chrome
-        uses: browser-actions/setup-chrome@v1
+        uses: browser-actions/setup-chrome@v2
 
       - name: Install Kane CLI and DappSentinel
         run: |
@@ -75,7 +75,7 @@ jobs:
 
       - name: Keep the report and Kane's evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dappsentinel-report
           path: |
@@ -85,7 +85,7 @@ jobs:
 
       - name: Hand the report to the fixer
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gate-report
           path: .sentinel/report.md
@@ -111,7 +111,7 @@ jobs:
       BASE: ${{ github.base_ref || inputs.base }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
@@ -129,7 +129,7 @@ jobs:
             echo "stop=1" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         if: steps.round.outputs.stop != '1'
         with:
           name: gate-report
