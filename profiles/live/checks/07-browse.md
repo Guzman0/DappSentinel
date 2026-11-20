@@ -2,6 +2,7 @@
 id: browse
 name: The site loads and Kane can browse it
 severity: high
+gates: recording
 kind: assert
 fix: The page did not load in a real browser. Check that the URL is right and the site is up.
 ---

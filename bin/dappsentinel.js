@@ -96,6 +96,9 @@ function loadChecks() {
         severity: meta.severity || "high",
         kind: meta.kind || "assert",
         recording: meta.recording || "",
+        // A check that only exists to load the page: if it fails, the traffic recorded during it
+        // may not be the real page (a bot challenge, an error page), so clean scans don't count.
+        gatesRecording: meta.gates === "recording",
         fix: meta.fix || "",
         body: m[2].trim(),
       };
@@ -474,6 +477,7 @@ async function cmdCheck(args) {
     n++;
     console.log(`[${n}/${checks.length}] ${c.name}`);
     const rec = byId[c.recording];
+    const recCheck = all.find((x) => x.id === c.recording);
     const ev = rec ? readEvidence(rec.sessionDir) : null;
     let a;
     if (!ev || !ev.har.log.entries.length) {
@@ -482,7 +486,7 @@ async function cmdCheck(args) {
       const entries = analyzers.harEntries(ev.har);
       a = analyzers.NETWORK[c.id] ? analyzers.NETWORK[c.id](entries, config, siteHost) : { status: "error", summary: `No analyzer for ${c.id}.`, findings: [] };
       // A clean scan only counts if Kane actually got to use the page (e.g. not stuck on a bot check).
-      if (a.status === "passed" && rec.status !== "passed") {
+      if (a.status === "passed" && (rec.status === "error" || (rec.status !== "passed" && recCheck && recCheck.gatesRecording))) {
         a = { status: "error", summary: `Inconclusive: the "${c.recording}" run did not pass (${String(rec.summary || "").slice(0, 120)}), so the recording may not cover the real page.`, findings: [] };
       }
     }

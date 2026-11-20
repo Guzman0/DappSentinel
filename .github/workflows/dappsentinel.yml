@@ -171,17 +171,25 @@ jobs:
             Finish with a short list of what you changed and why.
 
       - name: Only the site may change
+        id: guard
         if: steps.round.outputs.stop != '1'
         run: |
           rm -rf gate-report
           changed=$(git status --porcelain | awk '{print $NF}')
-          if [ -z "$changed" ]; then echo "::error::Claude Code made no changes."; exit 1; fi
+          if [ -z "$changed" ]; then
+            # Nothing in the site needed fixing, so the failure came from somewhere else (for
+            # example a Kane run that went wrong). Leave it for a human, don't commit or loop.
+            echo "::notice::Claude Code found nothing to fix in the site. The failure needs a human look."
+            echo "Claude Code found nothing to fix in \`demo-dapp/\`, so nothing was committed. Read the gate report above: the failure may come from the check run itself." >> "$GITHUB_STEP_SUMMARY"
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           bad=$(echo "$changed" | grep -v '^demo-dapp/' || true)
           if [ -n "$bad" ]; then echo "::error::Refusing to commit changes outside demo-dapp/: $bad"; exit 1; fi
           echo "$changed"
 
       - name: Commit the fix to the pull request
-        if: steps.round.outputs.stop != '1'
+        if: steps.round.outputs.stop != '1' && steps.guard.outputs.skip != '1'
         env:
           PUSH_TOKEN: ${{ secrets.DAPPSENTINEL_PUSH_TOKEN }}
         run: |
@@ -198,7 +206,7 @@ jobs:
           fi
 
       - name: Re-check with Kane
-        if: steps.round.outputs.stop != '1'
+        if: steps.round.outputs.stop != '1' && steps.guard.outputs.skip != '1'
         env:
           HAS_PUSH_TOKEN: ${{ secrets.DAPPSENTINEL_PUSH_TOKEN != '' }}
           EXEC_FILE: ${{ steps.claude.outputs.execution_file }}
