@@ -36,6 +36,18 @@ DevTools Protocol while Kane uses the page. Secrets are masked in the report.
 
 That's 4 Kane runs per round instead of 7, so each fix-and-verify loop is faster and cheaper.
 
+## Why it matters
+
+The demo video opens with three attacks that hit dApp websites, not smart contracts. Together they took about $1.62 billion from users.
+
+| When | What happened | Lost | Source |
+|---|---|---|---|
+| Dec 2021 | BadgerDAO: a malicious script was injected into the website through a compromised Cloudflare API key | ~$120M | [The Block](https://www.theblock.co/post/126072/defi-protocol-badgerdao-exploited-for-120-million-in-front-end-attack) |
+| Dec 2023 | Ledger Connect Kit: a poisoned npm release shipped a wallet drainer into dApps that load the library | ~$600K | [Ledger's incident report](https://www.ledger.com/blog/security-incident-report), [SlowMist](https://slowmist.medium.com/supply-chain-attack-on-ledger-connect-kit-analyzing-the-impact-and-preventive-measures-1005e39422fd) |
+| Feb 2025 | Bybit: tampered JavaScript in the Safe{Wallet} web interface altered a multisig transaction | ~$1.5B | [The Block](https://www.theblock.co/post/343530/lazarus-appears-to-compromise-safe-developer-machine-in-lead-up-to-1-5-billion-bybit-hack-report), [SlowMist](https://slowmist.medium.com/bybits-1-5-billion-theft-unveiled-safe-wallet-front-end-code-tampered-84b78f0fa9c2) |
+
+Figures are approximate and in US dollars at the time of each attack.
+
 ## Try it yourself in a minute
 
 The demo dApp is live with all six mistakes still in it: **https://sentinelswap-demo.netlify.app**
