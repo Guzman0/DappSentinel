@@ -326,6 +326,12 @@ function writeReport(results, meta) {
   fs.writeFileSync(path.join(OUT_DIR, "report.md"), lines.join("\n") + "\n");
 }
 
+// Kane's summary can run to several lines; show the one that says what it actually saw.
+function keyLine(text) {
+  const lines = String(text).split(/\n+/).map((l) => l.trim()).filter(Boolean);
+  return lines.find((l) => /^(Confirmed|Verified|Found|Observed|The page (shows|showed|displays|displayed))/i.test(l)) || lines[0] || "";
+}
+
 // ---------- commands ----------
 
 async function cmdCheck(args) {
@@ -460,7 +466,7 @@ async function cmdCheck(args) {
       objective,
     };
     const res = byId[c.id];
-    console.log(`      → ${res.status === "passed" ? "✅ passed" : res.status === "error" ? "⚠️  error" : "❌ failed"}${res.summary ? ": " + String(res.summary).slice(0, 140) : ""}\n`);
+    console.log(`      → ${res.status === "passed" ? "✅ passed" : res.status === "error" ? "⚠️  error" : "❌ failed"}${res.summary ? ": " + keyLine(res.summary).slice(0, 200) : ""}\n`);
   }
 
   // Network checks: scan the HAR network log from Kane's evidence pack for the recording run.
