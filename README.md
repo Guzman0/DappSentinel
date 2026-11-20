@@ -4,9 +4,11 @@
 
 **The gate between your dApp and mainnet. Your dApp doesn't ship until Kane says it's safe.**
 
-▶ **[Watch the 3-minute demo](https://youtu.be/Z5SIdWPsH4g)**
+▶ **[Watch the demo video (3:39)](https://youtu.be/Z5SIdWPsH4g)**
 
 DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
+
+It blocks the release wherever it runs: Claude Code can't finish its turn while a check fails, a pull request gets a red check ([GitHub Action](#use-it-in-your-own-repo)), and `npm run deploy` only deploys when every check passes.
 
 These are the mistakes that look fine on screen and cost users money:
 
@@ -50,7 +52,9 @@ Figures are approximate and in US dollars at the time of each attack.
 
 ## Try it yourself in a minute
 
-The demo dApp is live with all six mistakes still in it: **https://sentinelswap-demo.netlify.app**
+**Live demo dApp (deliberately vulnerable, the scan target):** https://sentinelswap-demo.netlify.app
+
+This is SentinelSwap, the site DappSentinel checks, with all six mistakes still in it. It is not DappSentinel itself: DappSentinel runs from this repo, locally or in GitHub Actions.
 
 It looks like a normal swap page. Open your browser's developer tools and you'll find the Alchemy key in the network tab, the unpkg script, the Sepolia RPC and `wallet_pk` in localStorage. Or let DappSentinel find them:
 
@@ -206,6 +210,14 @@ The referee is protected in CI too. If a pull request changes the checks, a conf
 Exit codes: `0` all passed, `1` a check failed, `2` setup problem (Kane not installed or not signed in), `3` refused because the checks or the gate were changed.
 
 Turn the Stop hook off for a session with `DAPPSENTINEL_HOOK=off`.
+
+## What DappSentinel doesn't do
+
+- **A flagged RPC key isn't proof of a leak.** Many dApps ship keys that only work from their own domain. Treat the finding as a prompt to check the key's restrictions.
+- **A flagged script host isn't proof of an attack.** It means the host isn't on your allowlist. Look into it, then either trust it in your config or remove the script.
+- **It isn't a smart contract audit.** It checks the website, not the contracts behind it.
+- **It can't catch every frontend compromise.** It sees what the browser does while Kane uses the page. Malicious code that only wakes up for certain wallets or transactions, like the code in the Bybit attack, may stay quiet during a check.
+- **Some sites block automated browsers.** When Kane can't reach the real page, DappSentinel reports the network checks as inconclusive, never as clean.
 
 ## Notes
 
