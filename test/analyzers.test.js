@@ -72,3 +72,13 @@ assert.strictEqual(named.status, "failed", JSON.stringify(named));
 const seedOnly = a.storageSnapshot({ pages: 1, local: { backup: "test test test test test test test test test test test junk" }, session: {} }, cfg);
 assert.strictEqual(seedOnly.status, "failed");
 console.log("✅ real-site storage tests passed");
+
+// "self" covers the site's own domain, not look-alikes.
+const own = a.harEntries({ log: { entries: [
+  { request: { method: "GET", url: "https://matomo.lido.fi/matomo.js" }, response: { status: 200, content: { mimeType: "text/javascript" } } },
+  { request: { method: "GET", url: "https://lido.fi.evil.com/x.js" }, response: { status: 200, content: { mimeType: "text/javascript" } } },
+] } });
+const ownRes = a.unknownScripts(own, cfg, "stake.lido.fi");
+assert.strictEqual(ownRes.findings.length, 1, JSON.stringify(ownRes));
+assert.ok(ownRes.findings[0].includes("evil.com"));
+console.log("✅ own-domain script tests passed");
