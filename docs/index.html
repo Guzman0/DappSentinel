@@ -233,6 +233,7 @@
         <div class="card"><h3>Untrusted scripts</h3><p>Code loaded from any host you haven't allowed. The BadgerDAO problem.</p><div class="how">Kane's network recording</div></div>
         <div class="card"><h3>Keys in browser storage</h3><p>Private keys or seed phrases saved where any script on the page can read them.</p><div class="how">The browser Kane drives</div></div>
       </div>
+      <p class="note">Plus a seventh check that the main flow still works: Kane runs the swap from start to finish, so a fix can't pass by breaking the page. That run is also the one whose traffic the network checks read. On a live dApp DappSentinel doesn't know, it runs the five checks that need no inside knowledge: the four above that read traffic and storage, and a check that the page loads.</p>
     </section>
 
     <section id="loop">
@@ -272,7 +273,7 @@
           <tr><td>CoW Swap (live, mainnet)</td><td><span class="r">3 of 5</span>: an Alchemy RPC URL carrying a key, and scripts from 11 ad and analytics hosts</td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44762331502">1</a></td></tr>
         </tbody>
       </table>
-      <p class="note">A flagged key or script host is a prompt to look, not proof of an attack: many dApps ship keys that only work from their own domain. Keys are masked in every report. The full list, including the runs that don't count and why, is in the <a href="https://github.com/Guzman0/DappSentinel#track-record">README</a>.</p>
+      <p class="note">A flagged key or script host is a prompt to look, not proof of an attack: many dApps ship keys that only work from their own domain. Keys are masked in every report. The demo has 7 checks; live dApps get the 5 that need no inside knowledge of the site. PR #2's run is also the third run of the broken demo. The full list, including the runs that don't count and why, is in the <a href="https://github.com/Guzman0/DappSentinel#track-record">README</a>.</p>
     </section>
 
     <section id="install">
