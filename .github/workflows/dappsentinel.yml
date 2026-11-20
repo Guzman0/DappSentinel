@@ -1,9 +1,12 @@
 # DappSentinel in CI: Kane CLI checks the site in a real browser on every pull request.
 # The PR gets a red check while any check fails, and the report shows up in the run summary.
+# When the gate fails on a pull request, Claude Code fixes the site on GitHub, commits the fix
+# to the pull request, and the gate runs again. At most 3 fix rounds per pull request.
 #
-# Setup: add two repository secrets (Settings > Secrets and variables > Actions):
-#   LT_USERNAME    your TestMu AI username
-#   LT_ACCESS_KEY  your TestMu AI access key
+# Setup: add repository secrets (Settings > Secrets and variables > Actions):
+#   LT_USERNAME              your TestMu AI username
+#   LT_ACCESS_KEY            your TestMu AI access key
+#   CLAUDE_CODE_OAUTH_TOKEN  from `claude setup-token` (only needed for the auto-fix)
 name: DappSentinel
 
 on:
@@ -14,12 +17,18 @@ on:
         description: "Check a live dApp instead of the demo (leave empty for the demo)"
         required: false
         default: ""
+      base:
+        description: "Used by the auto-fix: the branch the pull request targets"
+        required: false
+        default: ""
 
 jobs:
   gate:
     name: ${{ inputs.url && format('gate ({0})', inputs.url) || 'gate' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    outputs:
+      code: ${{ steps.gate.outputs.code }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,17 +48,24 @@ jobs:
           npm install
 
       - name: Run the gate
+        id: gate
         env:
           LT_USERNAME: ${{ secrets.LT_USERNAME }}
           LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
           KANE_CLI_CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
           LIVE_URL: ${{ inputs.url }}
+          # A re-check started by the auto-fix still compares the checks with the PR's target branch.
+          DAPPSENTINEL_BASE_REF: ${{ inputs.base && format('origin/{0}', inputs.base) || '' }}
         run: |
+          set +e
           if [ -n "$LIVE_URL" ]; then
             node bin/dappsentinel.js check --config profiles/live --url "$LIVE_URL"
           else
             node bin/dappsentinel.js check
           fi
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit $code
 
       - name: Post the report to the run summary
         if: always()
@@ -64,3 +80,103 @@ jobs:
             .sentinel/
             ~/.testmuai/kaneai/sessions/
           if-no-files-found: ignore
+
+      - name: Hand the report to the fixer
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-report
+          path: .sentinel/report.md
+          if-no-files-found: ignore
+
+  # Kane's findings go straight to Claude Code. Only runs when checks failed (exit 1): not when the
+  # gate refused to run because the rules were changed (exit 3), and not on setup errors.
+  fix:
+    needs: gate
+    if: >-
+      always() && needs.gate.outputs.code == '1' && inputs.url == '' &&
+      ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) ||
+       (github.event_name == 'workflow_dispatch' && inputs.base != ''))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+      id-token: write
+    env:
+      BRANCH: ${{ github.head_ref || github.ref_name }}
+      BASE: ${{ github.base_ref || inputs.base }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Count fix rounds
+        id: round
+        run: |
+          n=$(git log "origin/$BASE..HEAD" --grep '\[dappsentinel-fix\]' --oneline | wc -l)
+          echo "n=$((n + 1))" >> "$GITHUB_OUTPUT"
+          if [ "$n" -ge 3 ]; then
+            echo "Stopping: Claude Code already made 3 fix rounds on this pull request." >> "$GITHUB_STEP_SUMMARY"
+            echo "stop=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/download-artifact@v4
+        if: steps.round.outputs.stop != '1'
+        with:
+          name: gate-report
+          path: gate-report
+
+      - name: Claude Code fixes the site
+        if: steps.round.outputs.stop != '1'
+        uses: anthropics/claude-code-action@v1
+        env:
+          DAPPSENTINEL_HOOK: "off"     # the gate runs in CI, not inside this session
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: "--max-turns 40 --allowedTools Read,Edit,Write,Glob,Grep"
+          prompt: |
+            Kane CLI checked this dApp in a real browser and DappSentinel's gate failed.
+            Read gate-report/report.md for every failing check, the evidence Kane recorded, and how to fix it.
+
+            Fix the site so every failing check passes:
+            - Edit only files in demo-dapp/. It is plain HTML, CSS and JavaScript with no build step; keep it that way.
+            - Never edit checks/, sentinel.config.json, bin/, lib/, hooks/, profiles/, .github/ or .claude/.
+              Changing the rules doesn't count as a fix, and the gate refuses to run if they change.
+            - Keep the swap flow working (checks/07-swap-flow.md).
+            - Don't run Kane or the gate yourself. CI re-checks the site after you finish.
+            Finish with a short list of what you changed and why.
+
+      - name: Only the site may change
+        if: steps.round.outputs.stop != '1'
+        run: |
+          rm -rf gate-report
+          changed=$(git status --porcelain | awk '{print $NF}')
+          if [ -z "$changed" ]; then echo "::error::Claude Code made no changes."; exit 1; fi
+          bad=$(echo "$changed" | grep -v '^demo-dapp/' || true)
+          if [ -n "$bad" ]; then echo "::error::Refusing to commit changes outside demo-dapp/: $bad"; exit 1; fi
+          echo "$changed"
+
+      - name: Commit the fix to the pull request
+        if: steps.round.outputs.stop != '1'
+        run: |
+          git config user.name "DappSentinel auto-fix"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add demo-dapp
+          git commit -m "[dappsentinel-fix] Round ${{ steps.round.outputs.n }}: fix what Kane caught" \
+                     -m "Claude Code fixed the failing checks from the gate run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Only demo-dapp/ changed."
+          git push origin "HEAD:$BRANCH"
+
+      - name: Re-check with Kane
+        if: steps.round.outputs.stop != '1'
+        run: |
+          # Commits pushed by this workflow don't start new runs on their own, so start the gate here.
+          gh workflow run dappsentinel.yml --ref "$BRANCH" -f base="$BASE"
+          pr=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
+          if [ -n "$pr" ]; then
+            gh pr comment "$pr" --body "🛡️ **DappSentinel:** Kane's checks failed, so Claude Code fixed the site (round ${{ steps.round.outputs.n }} of 3, only \`demo-dapp/\` changed). Kane is checking again now. [Gate run that failed](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          fi
