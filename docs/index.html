@@ -307,6 +307,7 @@ npm run sentinel</pre>
       <ul class="limits">
         <li><strong>It isn't a smart contract audit.</strong> It checks the website, not the contracts behind it.</li>
         <li><strong>It can't catch every frontend compromise.</strong> It sees what the browser does while Kane uses the page. Code that only wakes up for certain wallets, like the code in the Bybit attack, may stay quiet during a check.</li>
+        <li><strong>It keeps only a redacted report.</strong> Keys are masked everywhere in it, and Kane's raw network recording is never uploaded unless you opt in. <a href="https://github.com/Guzman0/DappSentinel/blob/main/SECURITY.md">Security and data handling</a>.</li>
         <li><strong>Some sites block automated browsers.</strong> When Kane can't reach the real page, DappSentinel reports the checks as inconclusive, never as clean.</li>
       </ul>
     </section>

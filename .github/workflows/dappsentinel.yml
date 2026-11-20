@@ -73,14 +73,26 @@ jobs:
         if: always()
         run: cat .sentinel/report.md >> "$GITHUB_STEP_SUMMARY" || echo "No report was written." >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Keep the report and Kane's evidence
+      # Only the masked report is kept. Kane's raw evidence (the full network recording) can hold the
+      # very secrets the checks find, so it is uploaded only if you opt in with the repository variable
+      # DAPPSENTINEL_KEEP_EVIDENCE=true, and then only for 3 days. Keep it off in public repos.
+      - name: Keep the report
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: dappsentinel-report
           path: |
-            .sentinel/
-            ~/.testmuai/kaneai/sessions/
+            .sentinel/report.md
+            .sentinel/report.json
+          if-no-files-found: ignore
+
+      - name: Keep Kane's raw evidence (opt-in)
+        if: always() && vars.DAPPSENTINEL_KEEP_EVIDENCE == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: kane-evidence-raw
+          path: ~/.testmuai/kaneai/sessions/
+          retention-days: 3
           if-no-files-found: ignore
 
       - name: Hand the report to the fixer

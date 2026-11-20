@@ -254,6 +254,8 @@ Turn the Stop hook off for a session with `DAPPSENTINEL_HOOK=off`.
 
 ## What DappSentinel doesn't do
 
+For what DappSentinel collects, masks and uploads, see [SECURITY.md](SECURITY.md). In short: only a redacted report is kept, and Kane's raw evidence is never uploaded unless you opt in.
+
 - **A flagged RPC key isn't proof of a leak.** Many dApps ship keys that only work from their own domain. Treat the finding as a prompt to check the key's restrictions.
 - **A flagged script host isn't proof of an attack.** It means the host isn't on your allowlist. Look into it, then either trust it in your config or remove the script.
 - **It isn't a smart contract audit.** It checks the website, not the contracts behind it.

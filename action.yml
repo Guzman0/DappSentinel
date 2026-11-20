@@ -18,6 +18,10 @@ inputs:
     description: Path to your own sentinel.config.json (chain ID, contracts, trusted script hosts). Default is the live profile, which works on any site.
     required: false
     default: ""
+  keep-evidence:
+    description: Also upload Kane's raw evidence (the full network recording) for 3 days. It can contain the secrets the checks find, so keep it off in public repos.
+    required: false
+    default: "false"
   lt-username:
     description: Your TestMu AI username (store it as a secret).
     required: true
@@ -93,7 +97,7 @@ runs:
         echo "result=$r" >> "$GITHUB_OUTPUT"
         echo "code=$code" >> "$GITHUB_OUTPUT"
         mkdir -p "$GITHUB_WORKSPACE/dappsentinel-report"
-        cp -r .sentinel/. "$GITHUB_WORKSPACE/dappsentinel-report/" 2>/dev/null || true
+        cp .sentinel/report.md .sentinel/report.json "$GITHUB_WORKSPACE/dappsentinel-report/" 2>/dev/null || true
         if [ -f .sentinel/report.md ]; then cat .sentinel/report.md >> "$GITHUB_STEP_SUMMARY"; fi
 
     - name: Keep the report
@@ -102,6 +106,15 @@ runs:
       with:
         name: dappsentinel-report
         path: dappsentinel-report/
+        if-no-files-found: ignore
+
+    - name: Keep Kane's raw evidence (opt-in)
+      if: always() && inputs.keep-evidence == 'true'
+      uses: actions/upload-artifact@v7
+      with:
+        name: kane-evidence-raw
+        path: ~/.testmuai/kaneai/sessions/
+        retention-days: 3
         if-no-files-found: ignore
 
     - name: Pass or fail

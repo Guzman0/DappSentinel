@@ -90,3 +90,12 @@ const blobs = a.harEntries({ log: { entries: [
 ] } });
 assert.strictEqual(a.unknownScripts(blobs, cfg, "stake.lido.fi").status, "passed");
 console.log("✅ blob/data script tests passed");
+
+// Nothing secret reaches a report file.
+const leaky = 'Kane saw https://eth-mainnet.g.alchemy.com/v2/aX7kP2qR9vLm4TnW8yZc3BdF6hJs1GuE and wallet_pk 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 and https://x.io/rpc?apikey=ABCDEFGHIJKLMNOPQRST';
+const scrubbed = a.redact(leaky, cfg);
+assert.ok(!scrubbed.includes("aX7kP2qR9vLm4TnW8yZc3BdF6hJs1GuE"), scrubbed);
+assert.ok(!scrubbed.includes("ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"), scrubbed);
+assert.ok(!scrubbed.includes("ABCDEFGHIJKLMNOPQRST"), scrubbed);
+assert.ok(scrubbed.includes("aX7k…GuE"), scrubbed);
+console.log("✅ redaction tests passed");

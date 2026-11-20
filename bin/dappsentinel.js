@@ -275,9 +275,9 @@ function runKane(objective, { url, timeout, maxSteps, headed, cdpEndpoint }) {
 
 // ---------- report ----------
 
-function writeReport(results, meta) {
+function writeReport(results, meta, config = {}) {
   fs.mkdirSync(OUT_DIR, { recursive: true });
-  fs.writeFileSync(path.join(OUT_DIR, "report.json"), JSON.stringify({ ...meta, results }, null, 2));
+  fs.writeFileSync(path.join(OUT_DIR, "report.json"), analyzers.redact(JSON.stringify({ ...meta, results }, null, 2), config));
 
   const failed = results.filter((r) => r.status !== "passed");
   const lines = [];
@@ -323,7 +323,7 @@ function writeReport(results, meta) {
   } else {
     lines.push(`All checks passed. This build is clear to ship.`);
   }
-  fs.writeFileSync(path.join(OUT_DIR, "report.md"), lines.join("\n") + "\n");
+  fs.writeFileSync(path.join(OUT_DIR, "report.md"), analyzers.redact(lines.join("\n") + "\n", config));
 }
 
 // Kane's summary can run to several lines; show the one that says what it actually saw.
@@ -509,7 +509,7 @@ async function cmdCheck(args) {
   if (server) server.close();
 
   const meta = { url, siteDir: config.siteDir, kaneVersion: version, startedAt, finishedAt: new Date().toISOString(), siteHash: hashDir(siteDir) };
-  writeReport(results, meta);
+  writeReport(results, meta, config);
 
   const failed = results.filter((r) => r.status !== "passed");
   if (failed.length === 0) {
