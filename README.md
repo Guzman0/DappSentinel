@@ -4,6 +4,14 @@
 
 **The gate between your dApp and mainnet. Your dApp doesn't ship until Kane says it's safe.**
 
+> [!TIP]
+> **TL;DR**
+> - **What:** a pre-launch gate for dApp websites. Kane CLI checks the site in a real browser for 6 mistakes you can't see on screen: leaked RPC keys, testnet endpoints, wrong contracts, wrong chain, untrusted scripts, keys in storage.
+> - **The loop:** Kane catches it → Claude Code fixes it → Kane checks again, until every check passes. The agent can't edit the checks to cheat.
+> - **Where it runs:** in Claude Code on your machine (`/sentinel`), and on GitHub, where it blocks the merge and fixes the pull request itself.
+> - **Proof, all public:** broken PR blocked ([#2](https://github.com/Guzman0/DappSentinel/pull/2)) · Claude fixes a PR on GitHub with no human ([#5](https://github.com/Guzman0/DappSentinel/pull/5)) · live runs on Lido, Aave and CoW Swap ([results](#real-world-runs)).
+> - **Install:** `uses: Guzman0/DappSentinel@v1` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:39](https://youtu.be/Z5SIdWPsH4g)
+
 ▶ **[Watch the demo video (3:39)](https://youtu.be/Z5SIdWPsH4g)**
 
 DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
