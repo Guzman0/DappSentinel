@@ -1,0 +1,54 @@
+# DappSentinel in CI: Kane CLI checks the site in a real browser on every pull request.
+# The PR gets a red check while any check fails, and the report shows up in the run summary.
+#
+# Setup: add two repository secrets (Settings > Secrets and variables > Actions):
+#   LT_USERNAME    your TestMu AI username
+#   LT_ACCESS_KEY  your TestMu AI access key
+name: DappSentinel
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # needed to compare the checks with the target branch
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Install Kane CLI and DappSentinel
+        run: |
+          npm install -g @testmuai/kane-cli
+          npm install
+
+      - name: Run the gate
+        env:
+          LT_USERNAME: ${{ secrets.LT_USERNAME }}
+          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+          KANE_CLI_CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+        run: node bin/dappsentinel.js check
+
+      - name: Post the report to the run summary
+        if: always()
+        run: cat .sentinel/report.md >> "$GITHUB_STEP_SUMMARY" || echo "No report was written." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the report and Kane's evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dappsentinel-report
+          path: |
+            .sentinel/
+            ~/.testmuai/kaneai/sessions/
+          if-no-files-found: ignore

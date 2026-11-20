@@ -11,7 +11,7 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.resolve(process.env.CLAUDE_PROJECT_DIR || process.cwd());
-const PROTECTED = ["checks", "sentinel.config.json", "bin", "lib", "hooks", ".claude", "package.json"];
+const PROTECTED = ["checks", "sentinel.config.json", "bin", "lib", "hooks", ".claude", "package.json", ".github", "profiles"];
 const REASON =
   "DappSentinel: blocked. The checks, the config and the gate itself are protected, so a failing " +
   "check can only be fixed by changing the site (see siteDir in sentinel.config.json). " +

@@ -2,6 +2,8 @@
 // DappSentinel: a pre-launch safety gate for dApp frontends, powered by Kane CLI.
 //
 //   dappsentinel check [--url <url>] [--only <id,id>] [--headed]   run every check, write a report
+//                      [--config <file>]                            use another config (and its checksDir),
+//                                                                   e.g. profiles/live for any public dApp URL
 //   dappsentinel serve [--port <n>]                                 serve the site folder locally
 //   dappsentinel list                                               list the checks
 //
@@ -20,8 +22,8 @@ const { startWatchedChrome } = require("../lib/browser-watch");
 const { tamperCheck } = require("../lib/integrity");
 
 const ROOT = process.cwd();
-const CONFIG_PATH = path.join(ROOT, "sentinel.config.json");
-const CHECKS_DIR = path.join(ROOT, "checks");
+let CONFIG_PATH = path.join(ROOT, "sentinel.config.json");
+let CHECKS_DIR = path.join(ROOT, "checks");
 const OUT_DIR = path.join(ROOT, ".sentinel");
 
 // ---------- helpers ----------
@@ -51,18 +53,25 @@ function parseArgs(argv) {
   return args;
 }
 
-function loadConfig() {
-  if (!fs.existsSync(CONFIG_PATH)) die("sentinel.config.json not found. Run this from the project folder.");
-  try {
-    return JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
-  } catch (e) {
-    die(`sentinel.config.json is not valid JSON: ${e.message}`);
+function loadConfig(args = {}) {
+  if (args.config) {
+    CONFIG_PATH = path.resolve(String(args.config));
+    if (fs.existsSync(CONFIG_PATH) && fs.statSync(CONFIG_PATH).isDirectory()) CONFIG_PATH = path.join(CONFIG_PATH, "sentinel.config.json");
   }
+  if (!fs.existsSync(CONFIG_PATH)) die(`${path.relative(ROOT, CONFIG_PATH)} not found. Run this from the project folder.`);
+  let config;
+  try {
+    config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
+  } catch (e) {
+    die(`${path.relative(ROOT, CONFIG_PATH)} is not valid JSON: ${e.message}`);
+  }
+  if (config.checksDir) CHECKS_DIR = path.join(ROOT, config.checksDir);
+  return config;
 }
 
 // A check file is simple frontmatter (key: value lines between ---) plus a plain-English objective.
 function loadChecks() {
-  if (!fs.existsSync(CHECKS_DIR)) die("checks/ folder not found.");
+  if (!fs.existsSync(CHECKS_DIR)) die(`${path.relative(ROOT, CHECKS_DIR)}/ folder not found.`);
   return fs
     .readdirSync(CHECKS_DIR)
     .filter((f) => f.endsWith(".md"))
@@ -220,6 +229,8 @@ function kaneAvailable() {
 function runKane(objective, { url, timeout, maxSteps, headed, cdpEndpoint }) {
   return new Promise((resolve) => {
     const args = ["run", objective, "--agent", "--url", url, "--timeout", String(timeout), "--max-steps", String(maxSteps)];
+    // In CI there is no browser for `kane-cli login`, so Kane takes a username and access key.
+    if (process.env.LT_USERNAME && process.env.LT_ACCESS_KEY) args.push("--username", process.env.LT_USERNAME, "--access-key", process.env.LT_ACCESS_KEY);
     if (cdpEndpoint) args.push("--cdp-endpoint", cdpEndpoint);
     else if (!headed) args.push("--headless");
     const child = kaneSpawn(args, { stdio: ["ignore", "pipe", "pipe"] });
@@ -317,7 +328,7 @@ function writeReport(results, meta) {
 // ---------- commands ----------
 
 async function cmdCheck(args) {
-  const config = loadConfig();
+  const config = loadConfig(args);
   const url = args.url || config.url;
   const siteDir = path.join(ROOT, config.siteDir || "demo-dapp");
   const all = loadChecks();
@@ -342,14 +353,14 @@ async function cmdCheck(args) {
     const msg = [
       "# DappSentinel report",
       "",
-      "- Result: **REFUSED**. The checks, the config or the gate itself were changed since the last commit:",
+      `- Result: **REFUSED**. The checks, the config or the gate itself were changed since ${tamper.base ? "`" + tamper.base + "`" : "the last commit"}:`,
       ...tamper.changed.map((f) => `  - \`${f}\``),
       "",
       "A check can only be made to pass by fixing the site. Revert these changes (for example `git checkout -- checks sentinel.config.json`) and run the gate again.",
     ].join("\n");
     fs.writeFileSync(path.join(OUT_DIR, "report.md"), msg + "\n");
     fs.writeFileSync(path.join(OUT_DIR, "report.json"), JSON.stringify({ refused: true, changed: tamper.changed }, null, 2));
-    console.error(`\n⛔ Refused: the referee was changed. These protected files differ from the last commit:\n${tamper.changed.map((f) => "   " + f).join("\n")}\n   DappSentinel won't run checks that were edited to pass. Fix the site instead.\n`);
+    console.error(`\n⛔ Refused: the referee was changed. These protected files differ from ${tamper.base || "the last commit"}:\n${tamper.changed.map((f) => "   " + f).join("\n")}\n   DappSentinel won't run checks that were edited to pass. Fix the site instead.\n`);
     process.exit(3);
   }
   if (tamper.skipped) console.log(`   (tamper check skipped: ${tamper.skipped})`);
@@ -487,7 +498,7 @@ async function cmdCheck(args) {
 
   const failed = results.filter((r) => r.status !== "passed");
   if (failed.length === 0) {
-    fs.writeFileSync(path.join(OUT_DIR, "last-pass-hash"), meta.siteHash);
+    if (!args.config) fs.writeFileSync(path.join(OUT_DIR, "last-pass-hash"), meta.siteHash);
     console.log(`✅ All ${results.length} checks passed. Clear to ship.\n   Report: .sentinel/report.md\n`);
     process.exit(0);
   }
@@ -496,13 +507,14 @@ async function cmdCheck(args) {
 }
 
 async function cmdServe(args) {
-  const config = loadConfig();
+  const config = loadConfig(args);
   const port = Number(args.port || new URL(config.url).port || 4173);
   await startServer(path.join(ROOT, config.siteDir || "demo-dapp"), port).catch((e) => die(e.message));
   console.log(`Serving ${config.siteDir} at http://localhost:${port}  (Ctrl+C to stop)`);
 }
 
-function cmdList() {
+function cmdList(args = {}) {
+  loadConfig(args);
   for (const c of loadChecks()) console.log(`${c.id.padEnd(18)} ${c.severity.padEnd(9)} ${c.name}`);
 }
 
@@ -513,6 +525,6 @@ module.exports = { hashDir, loadChecks, templateValues, fill, toObjective };
 if (require.main === module) {
   if (cmd === "check") cmdCheck(args);
   else if (cmd === "serve") cmdServe(args);
-  else if (cmd === "list") cmdList();
+  else if (cmd === "list") cmdList(args);
   else die(`Unknown command "${cmd}". Use: check, serve or list.`);
 }

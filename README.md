@@ -122,6 +122,25 @@ Want to watch Kane work? `npm run sentinel:headed` runs the checks in a visible 
 
 3. Adjust the steps in `checks/*.md` to match your app's UI. Kane checks are plain English, so no test code is needed. `{{placeholders}}` are filled in from the config. Make sure `checks/07-swap-flow.md` walks through your main flow, because the network checks scan the traffic Kane records during it.
 
+## Check any live dApp
+
+The `live` profile runs the checks that work on any public site, with no access to its code: leaked RPC keys, testnet endpoints, untrusted scripts and secrets in browser storage. Kane browses the page while DappSentinel reads the traffic and storage.
+
+```bash
+node bin/dappsentinel.js check --config profiles/live --url https://app.yourdapp.xyz
+```
+
+Add the hosts you trust to `allowedScriptHosts` in `profiles/live/sentinel.config.json`, or every third-party script will be flagged.
+
+## Run it in CI
+
+`.github/workflows/dappsentinel.yml` runs the gate on every pull request. The PR gets a red check while any check fails, the report appears in the run summary, and Kane's evidence is kept as an artifact.
+
+1. Add two repository secrets under **Settings > Secrets and variables > Actions**: `LT_USERNAME` (your TestMu AI username) and `LT_ACCESS_KEY` (your access key). In CI, Kane signs in with these instead of `kane-cli login`.
+2. Open a pull request.
+
+The referee is protected in CI too. If a pull request changes the checks, a config or the gate itself, DappSentinel compares them with the branch the PR targets and refuses to run, so a PR can't edit a check to pass its own gate.
+
 ## Commands
 
 | Command | What it does |
@@ -132,6 +151,7 @@ Want to watch Kane work? `npm run sentinel:headed` runs the checks in a visible 
 | `npm run demo` | Serve the demo dApp at http://localhost:4173 |
 | `npm run demo:reset` | Put the six planted mistakes back after a fix |
 | `npm run checks` | List the checks |
+| `node bin/dappsentinel.js check --config profiles/live --url <url>` | Check any public dApp URL |
 | `npm run deploy` | Run the gate, and deploy to Netlify only if it passes |
 
 Exit codes: `0` all passed, `1` a check failed, `2` setup problem (Kane not installed or not signed in), `3` refused because the checks or the gate were changed.
