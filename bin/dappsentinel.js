@@ -111,11 +111,8 @@ function templateValues(config, url) {
     chainId: String(config.chainId),
     networkName: config.networkName || "",
     contractsList: Object.entries(config.contracts || {})
-      .map(([name, addr]) => {
-        const key = `${name.toLowerCase().replace(/\W+/g, "_")}_contract`;
-        return `Store the full ${name} contract address shown on the page as '${key}'. Assert: the stored ${key} is exactly ${addr}, ignoring letter case.`;
-      })
-      .join(" "),
+      .map(([name, addr]) => `Assert: the ${name} contract address shown on the page is exactly ${addr}. Compare every character; letter case does not matter.`)
+      .join("\n"),
     allowedScriptHosts: list((config.allowedScriptHosts || ["self"]).map((h) => (h === "self" ? `${host} (the site itself)` : h))),
     testnetHints: (config.testnetHints || []).join(", ").replace(/, ([^,]*)$/, " or $1"),
     rpcKeyProviders: list(config.rpcKeyProviders),
