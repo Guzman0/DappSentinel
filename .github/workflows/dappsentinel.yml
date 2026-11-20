@@ -19,6 +19,10 @@ on:
         description: "Check a live dApp instead of the demo (leave empty for the demo)"
         required: false
         default: ""
+      profile:
+        description: "With a URL: the profile to use (live, lido, aave)"
+        required: false
+        default: "live"
       base:
         description: "Used by the auto-fix: the branch the pull request targets"
         required: false
@@ -56,12 +60,13 @@ jobs:
           LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
           KANE_CLI_CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
           LIVE_URL: ${{ inputs.url }}
+          PROFILE: ${{ inputs.profile || 'live' }}
           # A re-check started by the auto-fix still compares the checks with the PR's target branch.
           DAPPSENTINEL_BASE_REF: ${{ inputs.base && format('origin/{0}', inputs.base) || '' }}
         run: |
           set +e
           if [ -n "$LIVE_URL" ]; then
-            node bin/dappsentinel.js check --config profiles/live --url "$LIVE_URL"
+            node bin/dappsentinel.js check --config "profiles/$PROFILE" --url "$LIVE_URL"
           else
             node bin/dappsentinel.js check
           fi

@@ -1,0 +1,43 @@
+{
+  "_about": "Live profile for Aave's USDC market on Ethereum: the five outside checks, plus Kane using the market page. Run: node bin/dappsentinel.js check --config profiles/aave",
+  "url": "https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&marketName=proto_mainnet_v3",
+  "chainId": 1,
+  "allowedScriptHosts": [
+    "self"
+  ],
+  "testnetHints": [
+    "sepolia",
+    "goerli",
+    "holesky",
+    "hoodi",
+    "testnet",
+    "devnet",
+    "staging",
+    "localhost",
+    "127.0.0.1"
+  ],
+  "rpcKeyProviders": [
+    "alchemy.com",
+    "infura.io",
+    "quiknode.pro",
+    "ankr.com",
+    "chainstack.com",
+    "drpc.org",
+    "blastapi.io",
+    "helius-rpc.com"
+  ],
+  "secretKeyNames": [
+    "pk",
+    "privateKey",
+    "private_key",
+    "wallet_pk",
+    "secretKey",
+    "mnemonic",
+    "seed",
+    "seedPhrase",
+    "seed_phrase"
+  ],
+  "timeoutSeconds": 240,
+  "maxSteps": 20,
+  "checksDir": "checks"
+}

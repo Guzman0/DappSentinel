@@ -1,0 +1,43 @@
+{
+  "_about": "Live profile for Lido's staking app: the five outside checks, plus Kane using the stake screen. Run: node bin/dappsentinel.js check --config profiles/lido",
+  "url": "https://stake.lido.fi",
+  "chainId": 1,
+  "allowedScriptHosts": [
+    "self"
+  ],
+  "testnetHints": [
+    "sepolia",
+    "goerli",
+    "holesky",
+    "hoodi",
+    "testnet",
+    "devnet",
+    "staging",
+    "localhost",
+    "127.0.0.1"
+  ],
+  "rpcKeyProviders": [
+    "alchemy.com",
+    "infura.io",
+    "quiknode.pro",
+    "ankr.com",
+    "chainstack.com",
+    "drpc.org",
+    "blastapi.io",
+    "helius-rpc.com"
+  ],
+  "secretKeyNames": [
+    "pk",
+    "privateKey",
+    "private_key",
+    "wallet_pk",
+    "secretKey",
+    "mnemonic",
+    "seed",
+    "seedPhrase",
+    "seed_phrase"
+  ],
+  "timeoutSeconds": 240,
+  "maxSteps": 20,
+  "checksDir": "checks"
+}
