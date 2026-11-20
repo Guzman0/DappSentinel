@@ -2,7 +2,8 @@
 // DappSentinel: a pre-launch safety gate for dApp frontends, powered by Kane CLI.
 //
 //   dappsentinel check [--url <url>] [--only <id,id>] [--headed]   run every check, write a report
-//                      [--config <file>]                            use another config (and its checksDir),
+//                      [--config <file>] [--site <folder>]          use another config (and its checksDir),
+//                                                                   serve and check a built folder,
 //                                                                   e.g. profiles/live for any public dApp URL
 //   dappsentinel serve [--port <n>]                                 serve the site folder locally
 //   dappsentinel list                                               list the checks
@@ -65,7 +66,10 @@ function loadConfig(args = {}) {
   } catch (e) {
     die(`${path.relative(ROOT, CONFIG_PATH)} is not valid JSON: ${e.message}`);
   }
-  if (config.checksDir) CHECKS_DIR = path.join(ROOT, config.checksDir);
+  // checksDir is relative to the config file. A config of your own with no checksDir gets the
+  // checks that work on any site (profiles/live/checks).
+  if (config.checksDir) CHECKS_DIR = path.resolve(path.dirname(CONFIG_PATH), config.checksDir);
+  else if (args.config) CHECKS_DIR = path.join(__dirname, "..", "profiles", "live", "checks");
   return config;
 }
 
@@ -329,8 +333,11 @@ function writeReport(results, meta) {
 
 async function cmdCheck(args) {
   const config = loadConfig(args);
-  const url = args.url || config.url;
-  const siteDir = path.join(ROOT, config.siteDir || "demo-dapp");
+  // --site serves a folder you built (e.g. ./dist) and checks it locally.
+  const siteDir = args.site ? path.resolve(String(args.site)) : path.join(ROOT, config.siteDir || "demo-dapp");
+  if (args.site) config.siteDir = path.relative(ROOT, siteDir) || ".";
+  if (args.site && !fs.existsSync(siteDir)) die(`--site ${args.site} not found.`);
+  const url = args.url || (args.site ? "http://localhost:4173" : config.url);
   const all = loadChecks();
   let checks = all;
   if (args.only) {

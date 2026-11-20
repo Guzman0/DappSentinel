@@ -1,6 +1,7 @@
 {
   "url": "http://localhost:4173",
   "siteDir": "demo-dapp",
+  "checksDir": "checks",
   "chainId": 1,
   "networkName": "Ethereum",
   "contracts": {

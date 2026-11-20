@@ -132,6 +132,25 @@ node bin/dappsentinel.js check --config profiles/live --url https://app.yourdapp
 
 Add the hosts you trust to `allowedScriptHosts` in `profiles/live/sentinel.config.json`, or every third-party script will be flagged.
 
+## Use it in your own repo
+
+DappSentinel is a GitHub Action. Add your TestMu AI username and access key as repository secrets (`LT_USERNAME`, `LT_ACCESS_KEY`), then add one step to a workflow:
+
+```yaml
+- uses: Guzman0/DappSentinel@v1
+  with:
+    url: https://staging.yourdapp.xyz
+    lt-username: ${{ secrets.LT_USERNAME }}
+    lt-access-key: ${{ secrets.LT_ACCESS_KEY }}
+```
+
+The step fails while any check fails, writes the report to the run summary and keeps it as an artifact. Other inputs:
+
+- `site-dir`: check a folder you built (for example `dist`) instead of a URL. DappSentinel serves it locally.
+- `config`: your own `sentinel.config.json`, with your chain ID, contract addresses and trusted script hosts, plus a `checksDir` for checks written for your UI. Without it, the `live` checks run, which work on any site.
+
+If you pass `config` and check out with `fetch-depth: 0`, a pull request that changes your config or checks is refused, so a PR can't loosen the rules it is checked against.
+
 ## Real-world runs
 
 The `live` profile, run from GitHub Actions on three live mainnet dApps on 20 Nov 2026. Each run is public: open it to see Kane's output.

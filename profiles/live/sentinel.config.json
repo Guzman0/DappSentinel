@@ -39,5 +39,5 @@
   ],
   "timeoutSeconds": 240,
   "maxSteps": 20,
-  "checksDir": "profiles/live/checks"
+  "checksDir": "checks"
 }
