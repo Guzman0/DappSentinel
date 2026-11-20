@@ -7,6 +7,8 @@
 #   LT_USERNAME              your TestMu AI username
 #   LT_ACCESS_KEY            your TestMu AI access key
 #   CLAUDE_CODE_OAUTH_TOKEN  from `claude setup-token` (only needed for the auto-fix)
+#   DAPPSENTINEL_PUSH_TOKEN  optional: a fine-grained token (Contents + Pull requests: write) so the
+#                            fix commit starts the pull request's checks with no approval click
 name: DappSentinel
 
 on:
@@ -113,6 +115,9 @@ jobs:
         with:
           ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
+          # A push with your own token starts the pull request's checks like any push of yours.
+          # Without it, GitHub's built-in token is used and the re-check is started by hand below.
+          token: ${{ secrets.DAPPSENTINEL_PUSH_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Count fix rounds
         id: round
@@ -173,9 +178,14 @@ jobs:
 
       - name: Re-check with Kane
         if: steps.round.outputs.stop != '1'
+        env:
+          HAS_PUSH_TOKEN: ${{ secrets.DAPPSENTINEL_PUSH_TOKEN != '' }}
         run: |
-          # Commits pushed by this workflow don't start new runs on their own, so start the gate here.
-          gh workflow run dappsentinel.yml --ref "$BRANCH" -f base="$BASE"
+          # With DAPPSENTINEL_PUSH_TOKEN the push itself starts the pull request's gate.
+          # Commits pushed with GitHub's built-in token don't, so start the gate here instead.
+          if [ "$HAS_PUSH_TOKEN" != "true" ]; then
+            gh workflow run dappsentinel.yml --ref "$BRANCH" -f base="$BASE"
+          fi
           pr=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
           if [ -n "$pr" ]; then
             gh pr comment "$pr" --body "🛡️ **DappSentinel:** Kane's checks failed, so Claude Code fixed the site (round ${{ steps.round.outputs.n }} of 3, only \`demo-dapp/\` changed). Kane is checking again now. [Gate run that failed](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
