@@ -82,3 +82,11 @@ const ownRes = a.unknownScripts(own, cfg, "stake.lido.fi");
 assert.strictEqual(ownRes.findings.length, 1, JSON.stringify(ownRes));
 assert.ok(ownRes.findings[0].includes("evil.com"));
 console.log("✅ own-domain script tests passed");
+
+// Scripts the page makes itself (blob:, data:) are not from another host.
+const blobs = a.harEntries({ log: { entries: [
+  { request: { method: "GET", url: "blob:https://stake.lido.fi/53ebc042" }, response: { status: 200, content: { mimeType: "text/javascript" } } },
+  { request: { method: "GET", url: "data:text/javascript;base64,AAAA" }, response: { status: 200, content: { mimeType: "text/javascript" } } },
+] } });
+assert.strictEqual(a.unknownScripts(blobs, cfg, "stake.lido.fi").status, "passed");
+console.log("✅ blob/data script tests passed");

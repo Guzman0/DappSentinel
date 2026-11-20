@@ -478,6 +478,10 @@ async function cmdCheck(args) {
     } else {
       const entries = analyzers.harEntries(ev.har);
       a = analyzers.NETWORK[c.id] ? analyzers.NETWORK[c.id](entries, config, siteHost) : { status: "error", summary: `No analyzer for ${c.id}.`, findings: [] };
+      // A clean scan only counts if Kane actually got to use the page (e.g. not stuck on a bot check).
+      if (a.status === "passed" && rec.status !== "passed") {
+        a = { status: "error", summary: `Inconclusive: the "${c.recording}" run did not pass (${String(rec.summary || "").slice(0, 120)}), so the recording may not cover the real page.`, findings: [] };
+      }
     }
     byId[c.id] = {
       id: c.id,
