@@ -5,7 +5,8 @@
 //   dappsentinel serve [--port <n>]                                 serve the site folder locally
 //   dappsentinel list                                               list the checks
 //
-// Exit codes: 0 all checks passed, 1 at least one check failed, 2 setup error.
+// Exit codes: 0 all checks passed, 1 at least one check failed, 2 setup error,
+//             3 refused: the checks, config or gate were changed since the last commit.
 
 "use strict";
 
@@ -16,6 +17,7 @@ const crypto = require("crypto");
 const analyzers = require("../lib/analyzers");
 const { readEvidence } = require("../lib/evidence");
 const { startWatchedChrome } = require("../lib/browser-watch");
+const { tamperCheck } = require("../lib/integrity");
 
 const ROOT = process.cwd();
 const CONFIG_PATH = path.join(ROOT, "sentinel.config.json");
@@ -333,6 +335,24 @@ async function cmdCheck(args) {
     }
     checks.sort((a, b) => all.indexOf(a) - all.indexOf(b));
   }
+
+  const tamper = tamperCheck(ROOT);
+  if (!tamper.ok) {
+    fs.mkdirSync(OUT_DIR, { recursive: true });
+    const msg = [
+      "# DappSentinel report",
+      "",
+      "- Result: **REFUSED**. The checks, the config or the gate itself were changed since the last commit:",
+      ...tamper.changed.map((f) => `  - \`${f}\``),
+      "",
+      "A check can only be made to pass by fixing the site. Revert these changes (for example `git checkout -- checks sentinel.config.json`) and run the gate again.",
+    ].join("\n");
+    fs.writeFileSync(path.join(OUT_DIR, "report.md"), msg + "\n");
+    fs.writeFileSync(path.join(OUT_DIR, "report.json"), JSON.stringify({ refused: true, changed: tamper.changed }, null, 2));
+    console.error(`\n⛔ Refused: the referee was changed. These protected files differ from the last commit:\n${tamper.changed.map((f) => "   " + f).join("\n")}\n   DappSentinel won't run checks that were edited to pass. Fix the site instead.\n`);
+    process.exit(3);
+  }
+  if (tamper.skipped) console.log(`   (tamper check skipped: ${tamper.skipped})`);
 
   const kaneChecks = checks.filter((c) => c.kind !== "network");
   const networkChecks = checks.filter((c) => c.kind === "network");

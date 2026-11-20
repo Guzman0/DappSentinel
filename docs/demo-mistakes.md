@@ -12,7 +12,8 @@ DappSentinel has something to catch. Each one has caused real incidents on live 
 | 5 | A "date helper" script loaded from a third-party CDN | `index.html`, unpkg script tag | `unknown-scripts` |
 | 6 | A private key saved to localStorage as a "session" | `app.js`, `restoreSession()` | `storage-secrets` |
 
-The API key in mistake 1 is fake, and the private key in mistake 6 is the public Hardhat
-test key. Neither controls anything real.
+**Both secrets are fake on purpose.** The Alchemy key in mistake 1 was made up for this demo, and the private
+key in mistake 6 is the public Hardhat test key (account #0). Neither controls anything real, so there is
+nothing to rotate. In a real project, a key found by `rpc-key-leak` should be treated as leaked and rotated.
 
-To reset the demo after Claude has fixed it, run `git checkout -- demo-dapp`.
+To put the mistakes back after Claude has fixed them, run `npm run demo:reset`.

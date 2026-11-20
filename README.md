@@ -1,6 +1,8 @@
-# 🛡 DappSentinel
+<p><img src="assets/logo-gate-closed.svg" width="180" alt="DappSentinel barrier gate logo"></p>
 
-**Your dApp doesn't ship until Kane says it's safe.**
+# DappSentinel
+
+**The gate between your dApp and mainnet. Your dApp doesn't ship until Kane says it's safe.**
 
 DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
 
@@ -50,6 +52,15 @@ That's 4 Kane runs per round instead of 7, so each fix-and-verify loop is faster
 3. If anything fails, the hook **blocks Claude from finishing** and hands it Kane's report (`.sentinel/report.md`): what failed, the offending URLs or values, and how to fix it.
 4. Claude fixes the code and finishes again, which re-runs the checks. This repeats until everything passes (or 5 rounds).
 5. `npm run deploy` only deploys if every check passes.
+
+## The agent can't cheat
+
+The coding agent is allowed to fix the site. It is not allowed to touch the referee.
+
+- A Claude Code **PreToolUse hook** (`hooks/guard-checks.js`) blocks any edit to `checks/`, `sentinel.config.json`, `bin/`, `lib/`, `hooks/` or `.claude/`, whether through the edit tools or a shell command like `sed -i` or `Set-Content`.
+- The gate runs a **tamper check** first: if any of those files differ from the last commit, it refuses to run (exit code `3`) and lists them, and the Stop hook tells the agent to revert them.
+
+So a red check can only turn green by changing the site.
 
 ## Quick start
 
@@ -107,10 +118,11 @@ Want to watch Kane work? `npm run sentinel:headed` runs the checks in a visible 
 | `npm run sentinel:headed` | Same, with a visible browser |
 | `npm run sentinel -- --only rpc-key-leak,chain-id` | Run selected checks |
 | `npm run demo` | Serve the demo dApp at http://localhost:4173 |
+| `npm run demo:reset` | Put the six planted mistakes back after a fix |
 | `npm run checks` | List the checks |
 | `npm run deploy` | Run the gate, and deploy to Netlify only if it passes |
 
-Exit codes: `0` all passed, `1` a check failed, `2` setup problem (Kane not installed or not signed in).
+Exit codes: `0` all passed, `1` a check failed, `2` setup problem (Kane not installed or not signed in), `3` refused because the checks or the gate were changed.
 
 Turn the Stop hook off for a session with `DAPPSENTINEL_HOOK=off`.
 
@@ -118,7 +130,8 @@ Turn the Stop hook off for a session with `DAPPSENTINEL_HOOK=off`.
 
 - A full round is 4 Kane CLI runs and uses TestMu AI credits. New accounts get free credits.
 - `npm test` runs the analyzers against a network log recorded by Kane, with no credits needed.
-- The demo's private key is a well-known public test key (Hardhat account #0). Never use it for real funds.
+- Both secrets in the demo are fake on purpose: the Alchemy key was made up, and the private key is the public Hardhat test key (account #0). Never use it for real funds.
+- Kane CLI's own localStorage reading timed out in our tests (even on the cookbook's example), so DappSentinel reads storage from the Chrome that Kane drives instead. Kane still does the browsing; the storage is read from its browser.
 - DappSentinel checks what a browser can see. It doesn't replace a smart contract audit.
 
-Built for the [Kane CLI Online Hackathon](https://www.kaneclihack.sh/) with Claude Code. MIT licence.
+Built for the [Kane CLI Online Hackathon](https://www.kaneclihack.sh/), lane 1: apps that prove themselves. Built with Claude Code; Kane CLI verifies it, and Kane's result drives the fix. MIT licence.

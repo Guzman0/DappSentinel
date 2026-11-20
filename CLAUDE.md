@@ -18,7 +18,9 @@ If Kane catches anything, the hook blocks and gives you the failures. Read `.sen
 fix the site, and finish your turn again to re-verify. You can also run `/sentinel` at any time.
 
 ## Rules
-- Never edit `checks/` or `sentinel.config.json` to make a failing check pass. Fix the app.
+- The checks, `sentinel.config.json`, `bin/`, `lib/`, `hooks/` and `.claude/` are protected. A PreToolUse hook blocks edits to them, and the gate refuses to run if they differ from the last commit.
+- The demo's Alchemy key and private key are fake test values (see `docs/demo-mistakes.md`). Don't advise rotating them.
+- Never try to make a failing check pass by changing anything but the site. Fix the app.
 - Keep the swap flow working (`checks/07-swap-flow.md`).
 - The site is plain HTML, CSS and JavaScript with no build step. Keep it that way.
 - Commit messages: no AI co-author trailers.

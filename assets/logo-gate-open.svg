@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="200" viewBox="0 -10 420 210">
+<defs><pattern id="st" width="56" height="56" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="28" height="56" fill="#D7263D"/><rect x="28" width="28" height="56" fill="#EFEAE0"/></pattern></defs>
+<g transform="rotate(-62 52 92)"><rect x="40" y="78" width="330" height="28" rx="14" fill="url(#st)"/></g>
+<rect x="22" y="60" width="60" height="140" rx="10" fill="#46423A"/>
+<circle cx="52" cy="92" r="17" fill="#1F1E1B"/>
+<circle cx="52" cy="38" r="34" fill="#2FBF71" opacity=".18"/><circle cx="52" cy="38" r="22" fill="#2FBF71"/></svg>

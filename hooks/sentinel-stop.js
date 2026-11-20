@@ -76,6 +76,15 @@ fs.writeFileSync(STATE, JSON.stringify(state, null, 2));
 if (run.status === 0) {
   allowStop(`DappSentinel: all checks passed on round ${s.rounds}. Clear to ship.`);
 }
+if (run.status === 3) {
+  const report = readJson(path.join(OUT_DIR, "report.json"), { changed: [] });
+  process.stdout.write(JSON.stringify({
+    decision: "block",
+    reason: `DappSentinel refused to run: protected files were changed (${(report.changed || []).join(", ")}). ` +
+      "The checks and the gate can't be edited to make them pass. Revert those files and fix the site instead.",
+  }));
+  process.exit(0);
+}
 if (run.status !== 1) {
   allowStop("DappSentinel could not run Kane (setup problem). See .sentinel/last-run.log.");
 }
