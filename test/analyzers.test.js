@@ -63,3 +63,30 @@ const snapOk = a.storageSnapshot({ pages: 3, local: { session: JSON.stringify({ 
 assert.strictEqual(snapOk.status, "passed", JSON.stringify(snapOk));
 assert.strictEqual(a.storageSnapshot({ pages: 0, local: {}, session: {} }, cfg).status, "error");
 console.log("✅ storage snapshot tests passed");
+
+// Real dApps store hashes (order IDs, tx hashes) and long text: those are not secrets.
+const hashes = a.storageSnapshot({ pages: 1, local: { orders: JSON.stringify({ id: "0x" + "ab".repeat(32), txHash: "0x" + "cd".repeat(32) }), note: "this is a long sentence of plain words that people write in apps all day long" }, session: {} }, cfg);
+assert.strictEqual(hashes.status, "passed", JSON.stringify(hashes));
+const named = a.storageSnapshot({ pages: 1, local: { wallet: JSON.stringify({ signerKey: "0x" + "ef".repeat(32) }) }, session: {} }, cfg);
+assert.strictEqual(named.status, "failed", JSON.stringify(named));
+const seedOnly = a.storageSnapshot({ pages: 1, local: { backup: "test test test test test test test test test test test junk" }, session: {} }, cfg);
+assert.strictEqual(seedOnly.status, "failed");
+console.log("✅ real-site storage tests passed");
+
+// "self" covers the site's own domain, not look-alikes.
+const own = a.harEntries({ log: { entries: [
+  { request: { method: "GET", url: "https://matomo.lido.fi/matomo.js" }, response: { status: 200, content: { mimeType: "text/javascript" } } },
+  { request: { method: "GET", url: "https://lido.fi.evil.com/x.js" }, response: { status: 200, content: { mimeType: "text/javascript" } } },
+] } });
+const ownRes = a.unknownScripts(own, cfg, "stake.lido.fi");
+assert.strictEqual(ownRes.findings.length, 1, JSON.stringify(ownRes));
+assert.ok(ownRes.findings[0].includes("evil.com"));
+console.log("✅ own-domain script tests passed");
+
+// Scripts the page makes itself (blob:, data:) are not from another host.
+const blobs = a.harEntries({ log: { entries: [
+  { request: { method: "GET", url: "blob:https://stake.lido.fi/53ebc042" }, response: { status: 200, content: { mimeType: "text/javascript" } } },
+  { request: { method: "GET", url: "data:text/javascript;base64,AAAA" }, response: { status: 200, content: { mimeType: "text/javascript" } } },
+] } });
+assert.strictEqual(a.unknownScripts(blobs, cfg, "stake.lido.fi").status, "passed");
+console.log("✅ blob/data script tests passed");

@@ -2,7 +2,8 @@
 // DappSentinel: a pre-launch safety gate for dApp frontends, powered by Kane CLI.
 //
 //   dappsentinel check [--url <url>] [--only <id,id>] [--headed]   run every check, write a report
-//                      [--config <file>]                            use another config (and its checksDir),
+//                      [--config <file>] [--site <folder>]          use another config (and its checksDir),
+//                                                                   serve and check a built folder,
 //                                                                   e.g. profiles/live for any public dApp URL
 //   dappsentinel serve [--port <n>]                                 serve the site folder locally
 //   dappsentinel list                                               list the checks
@@ -65,7 +66,10 @@ function loadConfig(args = {}) {
   } catch (e) {
     die(`${path.relative(ROOT, CONFIG_PATH)} is not valid JSON: ${e.message}`);
   }
-  if (config.checksDir) CHECKS_DIR = path.join(ROOT, config.checksDir);
+  // checksDir is relative to the config file. A config of your own with no checksDir gets the
+  // checks that work on any site (profiles/live/checks).
+  if (config.checksDir) CHECKS_DIR = path.resolve(path.dirname(CONFIG_PATH), config.checksDir);
+  else if (args.config) CHECKS_DIR = path.join(__dirname, "..", "profiles", "live", "checks");
   return config;
 }
 
@@ -107,11 +111,8 @@ function templateValues(config, url) {
     chainId: String(config.chainId),
     networkName: config.networkName || "",
     contractsList: Object.entries(config.contracts || {})
-      .map(([name, addr]) => {
-        const key = `${name.toLowerCase().replace(/\W+/g, "_")}_contract`;
-        return `Store the full ${name} contract address shown on the page as '${key}'. Assert: the stored ${key} is exactly ${addr}, ignoring letter case.`;
-      })
-      .join(" "),
+      .map(([name, addr]) => `Assert: the ${name} contract address shown on the page is exactly ${addr}. Compare every character; letter case does not matter.`)
+      .join("\n"),
     allowedScriptHosts: list((config.allowedScriptHosts || ["self"]).map((h) => (h === "self" ? `${host} (the site itself)` : h))),
     testnetHints: (config.testnetHints || []).join(", ").replace(/, ([^,]*)$/, " or $1"),
     rpcKeyProviders: list(config.rpcKeyProviders),
@@ -329,8 +330,11 @@ function writeReport(results, meta) {
 
 async function cmdCheck(args) {
   const config = loadConfig(args);
-  const url = args.url || config.url;
-  const siteDir = path.join(ROOT, config.siteDir || "demo-dapp");
+  // --site serves a folder you built (e.g. ./dist) and checks it locally.
+  const siteDir = args.site ? path.resolve(String(args.site)) : path.join(ROOT, config.siteDir || "demo-dapp");
+  if (args.site) config.siteDir = path.relative(ROOT, siteDir) || ".";
+  if (args.site && !fs.existsSync(siteDir)) die(`--site ${args.site} not found.`);
+  const url = args.url || (args.site ? "http://localhost:4173" : config.url);
   const all = loadChecks();
   let checks = all;
   if (args.only) {
@@ -429,6 +433,7 @@ async function cmdCheck(args) {
     if (c.kind === "storage") {
       const a = seen ? analyzers.storageSnapshot(seen, config) : analyzers.storageSecrets(ctx.memory || {}, config);
       status = a.status;
+      for (const f of a.findings) console.log(`      ✖ ${f.slice(0, 120)}`);
       summary = a.summary;
       if (a.status === "error" && !r.runEnd) summary += ` Kane did not start with the watched browser: ${r.stderr.trim().split("\n").slice(-2).join(" ")}`;
       findings = a.findings;
@@ -470,6 +475,10 @@ async function cmdCheck(args) {
     } else {
       const entries = analyzers.harEntries(ev.har);
       a = analyzers.NETWORK[c.id] ? analyzers.NETWORK[c.id](entries, config, siteHost) : { status: "error", summary: `No analyzer for ${c.id}.`, findings: [] };
+      // A clean scan only counts if Kane actually got to use the page (e.g. not stuck on a bot check).
+      if (a.status === "passed" && rec.status !== "passed") {
+        a = { status: "error", summary: `Inconclusive: the "${c.recording}" run did not pass (${String(rec.summary || "").slice(0, 120)}), so the recording may not cover the real page.`, findings: [] };
+      }
     }
     byId[c.id] = {
       id: c.id,

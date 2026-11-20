@@ -1,0 +1,111 @@
+name: DappSentinel
+description: Pre-launch safety gate for dApp frontends. Kane CLI checks the site in a real browser for leaked RPC keys, testnet endpoints, untrusted scripts and keys in storage.
+author: Guzman
+branding:
+  icon: shield
+  color: orange
+
+inputs:
+  url:
+    description: The dApp URL to check, e.g. your staging deploy. Leave empty when you use site-dir.
+    required: false
+    default: ""
+  site-dir:
+    description: A built folder in your repo (e.g. dist) to serve locally and check, instead of a URL.
+    required: false
+    default: ""
+  config:
+    description: Path to your own sentinel.config.json (chain ID, contracts, trusted script hosts). Default is the live profile, which works on any site.
+    required: false
+    default: ""
+  lt-username:
+    description: Your TestMu AI username (store it as a secret).
+    required: true
+  lt-access-key:
+    description: Your TestMu AI access key (store it as a secret).
+    required: true
+
+outputs:
+  result:
+    description: passed, failed or refused
+    value: ${{ steps.gate.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install Chrome
+      id: chrome
+      uses: browser-actions/setup-chrome@v1
+
+    - name: Install Kane CLI and DappSentinel
+      shell: bash
+      run: |
+        npm install -g @testmuai/kane-cli
+        cd "$GITHUB_ACTION_PATH" && npm install --omit=dev --no-audit --no-fund
+
+    # Anti-cheat for your repo: in a pull request, your config and checks must match the branch
+    # the PR targets, so a PR can't loosen the rules it is checked against.
+    - name: Protect the referee
+      if: inputs.config != '' && github.base_ref != ''
+      shell: bash
+      env:
+        CONFIG: ${{ inputs.config }}
+        BASE: origin/${{ github.base_ref }}
+      run: |
+        cd "$GITHUB_WORKSPACE"
+        git fetch --quiet origin "${GITHUB_BASE_REF}" 2>/dev/null || true
+        dir=$(dirname "$CONFIG")
+        checks=$(node -e "const c=require(require('path').resolve(process.argv[1]));if(c.checksDir)console.log(require('path').join(process.argv[2],c.checksDir))" "$CONFIG" "$dir")
+        changed=$(git diff --name-only "$BASE...HEAD" -- "$CONFIG" $checks) || { echo "::error::Could not compare with $BASE. Use actions/checkout with fetch-depth: 0."; exit 3; }
+        if [ -n "$changed" ]; then
+          echo "::error::DappSentinel refused: this PR changes the rules it is checked against: $changed"
+          { echo "## DappSentinel: refused"; echo; echo "This pull request changes the DappSentinel config or checks:"; echo "$changed" | sed 's/^/- /'; echo; echo "Fix the site instead, or change the rules in a separate PR."; } >> "$GITHUB_STEP_SUMMARY"
+          exit 3
+        fi
+
+    - name: Run the gate
+      id: gate
+      shell: bash
+      env:
+        LT_USERNAME: ${{ inputs.lt-username }}
+        LT_ACCESS_KEY: ${{ inputs.lt-access-key }}
+        KANE_CLI_CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+        DAPPSENTINEL_ALLOW_EDITS: "1"
+        IN_URL: ${{ inputs.url }}
+        IN_SITE: ${{ inputs.site-dir }}
+        IN_CONFIG: ${{ inputs.config }}
+      run: |
+        if [ -z "$IN_URL" ] && [ -z "$IN_SITE" ]; then echo "::error::Set url or site-dir."; exit 2; fi
+        args=(check)
+        if [ -n "$IN_CONFIG" ]; then args+=(--config "$GITHUB_WORKSPACE/$IN_CONFIG"); else args+=(--config "$GITHUB_ACTION_PATH/profiles/live"); fi
+        [ -n "$IN_URL" ] && args+=(--url "$IN_URL")
+        [ -n "$IN_SITE" ] && args+=(--site "$GITHUB_WORKSPACE/$IN_SITE")
+        cd "$GITHUB_ACTION_PATH"
+        set +e
+        node bin/dappsentinel.js "${args[@]}"
+        code=$?
+        set -e
+        case $code in 0) r=passed;; 1) r=failed;; 3) r=refused;; *) r=error;; esac
+        echo "result=$r" >> "$GITHUB_OUTPUT"
+        echo "code=$code" >> "$GITHUB_OUTPUT"
+        mkdir -p "$GITHUB_WORKSPACE/dappsentinel-report"
+        cp -r .sentinel/. "$GITHUB_WORKSPACE/dappsentinel-report/" 2>/dev/null || true
+        if [ -f .sentinel/report.md ]; then cat .sentinel/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+    - name: Keep the report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: dappsentinel-report
+        path: dappsentinel-report/
+        if-no-files-found: ignore
+
+    - name: Pass or fail
+      shell: bash
+      env:
+        CODE: ${{ steps.gate.outputs.code }}
+      run: exit "${CODE:-2}"
