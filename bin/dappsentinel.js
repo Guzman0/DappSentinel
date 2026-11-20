@@ -486,7 +486,10 @@ async function cmdCheck(args) {
       const entries = analyzers.harEntries(ev.har);
       a = analyzers.NETWORK[c.id] ? analyzers.NETWORK[c.id](entries, config, siteHost) : { status: "error", summary: `No analyzer for ${c.id}.`, findings: [] };
       // A clean scan only counts if Kane actually got to use the page (e.g. not stuck on a bot check).
-      if (a.status === "passed" && (rec.status === "error" || (rec.status !== "passed" && recCheck && recCheck.gatesRecording))) {
+      // When the page itself never loaded, findings are as unreliable as clean results (a bot
+      // challenge page loads its own scripts), so both become inconclusive.
+      const pageNeverLoaded = rec.status !== "passed" && recCheck && recCheck.gatesRecording;
+      if ((a.status === "passed" && rec.status === "error") || pageNeverLoaded) {
         a = { status: "error", summary: `Inconclusive: the "${c.recording}" run did not pass (${String(rec.summary || "").slice(0, 120)}), so the recording may not cover the real page.`, findings: [] };
       }
     }
