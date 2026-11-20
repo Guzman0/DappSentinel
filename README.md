@@ -1,4 +1,4 @@
-<p><img src="assets/logo-gate-closed.svg" width="180" alt="DappSentinel barrier gate logo"></p>
+<p><img src="assets/logo-eye.svg" width="120" alt="DappSentinel logo: a sentinel eye in a hexagon"></p>
 
 # DappSentinel
 
