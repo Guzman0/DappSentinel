@@ -9,9 +9,15 @@ name: DappSentinel
 on:
   pull_request:
   workflow_dispatch:
+    inputs:
+      url:
+        description: "Check a live dApp instead of the demo (leave empty for the demo)"
+        required: false
+        default: ""
 
 jobs:
   gate:
+    name: ${{ inputs.url && format('gate ({0})', inputs.url) || 'gate' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -37,7 +43,13 @@ jobs:
           LT_USERNAME: ${{ secrets.LT_USERNAME }}
           LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
           KANE_CLI_CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
-        run: node bin/dappsentinel.js check
+          LIVE_URL: ${{ inputs.url }}
+        run: |
+          if [ -n "$LIVE_URL" ]; then
+            node bin/dappsentinel.js check --config profiles/live --url "$LIVE_URL"
+          else
+            node bin/dappsentinel.js check
+          fi
 
       - name: Post the report to the run summary
         if: always()
