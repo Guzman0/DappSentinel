@@ -148,6 +148,7 @@ jobs:
           path: gate-report
 
       - name: Claude Code fixes the site
+        id: claude
         if: steps.round.outputs.stop != '1'
         uses: anthropics/claude-code-action@v1
         env:
@@ -156,6 +157,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: "--max-turns 40 --allowedTools Read,Edit,Write,Glob,Grep"
+          display_report: "true"       # Claude's steps go to this run's summary, as evidence
           prompt: |
             Kane CLI checked this dApp in a real browser and DappSentinel's gate failed.
             Read gate-report/report.md for every failing check, the evidence Kane recorded, and how to fix it.
@@ -199,6 +201,7 @@ jobs:
         if: steps.round.outputs.stop != '1'
         env:
           HAS_PUSH_TOKEN: ${{ secrets.DAPPSENTINEL_PUSH_TOKEN != '' }}
+          EXEC_FILE: ${{ steps.claude.outputs.execution_file }}
         run: |
           # With DAPPSENTINEL_PUSH_TOKEN the push itself starts the pull request's gate.
           # Commits pushed with GitHub's built-in token don't, so start the gate here instead.
@@ -207,5 +210,14 @@ jobs:
           fi
           pr=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
           if [ -n "$pr" ]; then
-            gh pr comment "$pr" --body "🛡️ **DappSentinel:** Kane's checks failed, so Claude Code fixed the site (round ${{ steps.round.outputs.n }} of 3, only \`demo-dapp/\` changed). Kane is checking again now. [Gate run that failed](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            # Claude's own summary of its fix, redacted like every report.
+            summary=$(jq -r '[.[] | select(.type == "result")] | last | .result // empty' "$EXEC_FILE" 2>/dev/null \
+              | node -e 'const a=require("./lib/analyzers");const c=require("./sentinel.config.json");let t="";process.stdin.on("data",d=>t+=d).on("end",()=>process.stdout.write(a.redact(t,c)))')
+            {
+              echo "🛡️ **DappSentinel:** Kane's checks failed, so Claude Code fixed the site (round ${{ steps.round.outputs.n }} of 3, only \`demo-dapp/\` changed). Kane is checking again now."
+              echo
+              echo "[Gate run that failed and Claude's fix](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · [The fix commit](${{ github.server_url }}/${{ github.repository }}/commit/$(git rev-parse HEAD))"
+              if [ -n "$summary" ]; then echo; echo "**Claude Code's summary:**"; echo; echo "$summary"; fi
+            } > comment.md
+            gh pr comment "$pr" --body-file comment.md
           fi
