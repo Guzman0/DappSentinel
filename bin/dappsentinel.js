@@ -399,6 +399,7 @@ async function cmdCheck(args) {
 
   const values = templateValues(config, url);
   const siteHost = new URL(url).host;
+  let landedOn = ""; // where the site really ended up, if it forwards to another address
   const byId = {};
   const startedAt = new Date().toISOString();
   let n = 0;
@@ -428,6 +429,7 @@ async function cmdCheck(args) {
       cdpEndpoint: watcher ? watcher.cdpEndpoint : null,
     });
     if (watcher) seen = await watcher.stop();
+    if (seen) landedOn = landingFromWatch(seen, url) || landedOn;
 
     if (!r.runEnd && r.code === 2 && c.kind !== "storage") {
       if (server) server.close();
@@ -476,6 +478,7 @@ async function cmdCheck(args) {
   }
 
   // Network checks: scan the HAR network log from Kane's evidence pack for the recording run.
+  let forwardNoted = false;
   for (const c of networkChecks) {
     n++;
     console.log(`[${n}/${checks.length}] ${c.name}`);
@@ -487,7 +490,17 @@ async function cmdCheck(args) {
       a = { status: "error", summary: `No network recording found from the "${c.recording}" Kane run, so this could not be checked.`, findings: [] };
     } else {
       const entries = analyzers.harEntries(ev.har);
-      a = analyzers.NETWORK[c.id] ? analyzers.NETWORK[c.id](entries, config, siteHost) : { status: "error", summary: `No analyzer for ${c.id}.`, findings: [] };
+      const landHost = landedOn || landingFromHar(ev.har.log.entries, url);
+      // When the site forwards elsewhere, its own scripts and RPCs come from the new address too.
+      const cfg = landHost && landHost !== siteHost && (config.allowedScriptHosts || ["self"]).includes("self")
+        ? { ...config, allowedScriptHosts: [...(config.allowedScriptHosts || ["self"]), analyzers.ownDomain(landHost)] }
+        : config;
+      if (landHost && landHost !== siteHost && !forwardNoted) {
+        console.log(`      ↪ ${siteHost} forwarded to ${landHost}; both count as the site itself.`);
+        forwardNoted = true;
+      }
+      a = analyzers.NETWORK[c.id] ? analyzers.NETWORK[c.id](entries.filter((e) => !landHost || c.id !== "testnet-rpc" || analyzers.hostOf(e.url) !== landHost), cfg, siteHost) : { status: "error", summary: `No analyzer for ${c.id}.`, findings: [] };
+      if (landHost && landHost !== siteHost) a.summary += ` (${siteHost} forwarded to ${landHost}, which counts as the site itself.)`;
       a.trace = traceFindings(a.findings, ev.har.log.entries);
       // A clean scan only counts if Kane actually got to use the page (e.g. not stuck on a bot check).
       // When the page itself never loaded, findings are as unreliable as clean results (a bot
@@ -534,6 +547,31 @@ async function cmdCheck(args) {
   process.exit(1);
 }
 
+// Where the site really landed, when the configured address forwards to another one.
+// From the watched browser: the http(s) origin the tab sat on most.
+function landingFromWatch(seen, url) {
+  const o = Object.entries(seen.origins || {}).sort((a, b) => b[1] - a[1])[0];
+  if (!o) return "";
+  const host = new URL(o[0]).host;
+  return host !== new URL(url).host ? host : "";
+}
+
+// From Kane's network recording: follow HTTP redirects from the configured address.
+function landingFromHar(raw, url) {
+  const norm = (u) => u.replace(/\/$/, "");
+  let cur = url;
+  for (let hop = 0; hop < 6; hop++) {
+    const e = raw.find((x) => x.request && norm(x.request.url) === norm(cur));
+    const st = e && e.response ? e.response.status : 0;
+    if (!e || st < 300 || st > 399) break;
+    const loc = e.response.redirectURL || ((e.response.headers || []).find((h) => /^location$/i.test(h.name)) || {}).value;
+    if (!loc) break;
+    cur = new URL(loc, cur).href;
+  }
+  const host = new URL(cur).host;
+  return host !== new URL(url).host ? host : "";
+}
+
 // For each finding from Kane's network recording, say where in Kane's run it happened:
 // which request it was and how many seconds into the run, so it can be found in Kane's replay.
 function traceFindings(findings, raw) {
@@ -566,7 +604,7 @@ function cmdList(args = {}) {
 
 const args = parseArgs(process.argv.slice(2));
 const cmd = args._[0] || "check";
-module.exports = { hashDir, loadChecks, templateValues, fill, toObjective, traceFindings };
+module.exports = { hashDir, loadChecks, templateValues, fill, toObjective, traceFindings, landingFromHar, landingFromWatch };
 
 const HELP = `DappSentinel: a pre-launch safety gate for dApp frontends, run by Kane CLI in a real browser.
 
