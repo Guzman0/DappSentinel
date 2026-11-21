@@ -332,7 +332,25 @@ The `live` profile, run from GitHub Actions on three live mainnet dApps on 20 No
 | [Aave](https://app.aave.com) | 4 of 5 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44760476608)) | 222 requests with no RPC keys or testnet endpoints. Scripts load from `app.family.co` and Cloudflare Insights. Family is Aave's own embedded-wallet infrastructure, so this flag only means it isn't on the allowlist. |
 | [CoW Swap](https://swap.cow.fi) | 3 of 5 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44762331502)) | One request goes to an Alchemy RPC URL with an API key in it (masked in the report). Frontends often ship domain-restricted keys on purpose, so this is a prompt to check the key's restrictions, not proof of a leak. 14 scripts come from 11 outside hosts, mostly ads and analytics. |
 
-Running on real sites made DappSentinel better: an early storage check mistook order hashes for private keys, and "self" now trusts a site's own subdomains (`matomo.lido.fi` for `stake.lido.fi`).
+**A wider sweep, 21 Nov 2026:** 8 more dApps whose website code is open source, same `live` profile.
+
+| dApp | Result | What Kane's recording showed |
+|---|---|---|
+| [Spark](https://app.spark.fi) | 4 of 5 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44952359583)) | A request to an Alchemy RPC URL with the full API key in it (masked here), first seen as request 28 of 80. The same key is written into Spark's frontend code, which was public on GitHub under an MIT licence in 2024. |
+| [Yearn](https://yearn.fi) | ✅ 5 of 5 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44951344497)) | 80 requests and 29 scripts, all clean |
+| [Curve](https://www.curve.finance/dex/ethereum/swap) | ✅ 5 of 5 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44951350211)) | 199 requests and 177 scripts, all clean |
+| [Uniswap](https://app.uniswap.org/swap) | 4 of 5 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44951361382)) | 1,002 requests with no keys or testnets. One script from Cloudflare Turnstile, its bot protection |
+| [ENS](https://app.ens.domains) | 4 of 5 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44951371955)) | Clean traffic. Scripts from Cloudflare Insights and Intercom (support chat) |
+| [Revoke.cash](https://revoke.cash) | 4 of 5 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44951383161)) | Clean traffic. Scripts from Cloudflare Insights and Crisp (support chat) |
+| [Balancer](https://balancer.fi/swap/ethereum) | ⚠️ inconclusive ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44951366707)) | The site's bot protection blocked the automated browser, so the network checks were marked inconclusive instead of passed |
+| [Sushi](https://www.sushi.com/ethereum/swap) | ⚠️ inconclusive ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44951355988)) | Kane stopped because the page couldn't scroll, which our browse instruction made conditional. Inconclusive, not passed |
+
+Analytics, support-chat and bot-protection scripts are flagged because they aren't on the allowlist, not because they're malicious: a team adds the hosts it trusts to `allowedScriptHosts`.
+
+Running on real sites made DappSentinel better:
+- An early storage check mistook order hashes for private keys.
+- "self" now trusts a site's own subdomains (`matomo.lido.fi` for `stake.lido.fi`).
+- `app.spark.fi` forwards to `app.spark.finance`. The [first Spark run](https://github.com/Guzman0/DappSentinel/actions/runs/44951377736) flagged all 24 of Spark's own scripts and missed its storage. DappSentinel now follows the forward and counts the new address as the site itself; the [re-run](https://github.com/Guzman0/DappSentinel/actions/runs/44952359583) flags only the real key.
 
 The demo itself also runs in CI: [`main` with the six mistakes](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669) fails 6 of 7, and [the fix in PR #1](https://github.com/Guzman0/DappSentinel/actions/runs/44756869916) passes 7 of 7.
 
