@@ -233,6 +233,8 @@ function kaneAvailable() {
   });
 }
 
+let REDACT_CFG = {};
+
 function runKane(objective, { url, timeout, maxSteps, headed, cdpEndpoint }) {
   return new Promise((resolve) => {
     const args = ["run", objective, "--agent", "--url", url, "--timeout", String(timeout), "--max-steps", String(maxSteps)];
@@ -258,7 +260,8 @@ function runKane(objective, { url, timeout, maxSteps, headed, cdpEndpoint }) {
       if (ev.type === "run_end") runEnd = ev;
       else if (!ev.type && ev.step !== undefined && ev.status && ev.status !== "running") {
         steps.push({ step: ev.step, status: ev.status, remark: ev.remark });
-        process.stdout.write(`      ${ev.status === "failed" ? "✖" : "·"} ${String(ev.remark || "").slice(0, 110)}\n`);
+        // Kane's remarks can quote a URL with a key in it, and CI logs are public: mask first.
+        process.stdout.write(`      ${ev.status === "failed" ? "✖" : "·"} ${analyzers.redact(String(ev.remark || ""), REDACT_CFG).slice(0, 110)}\n`);
       }
     };
 
@@ -305,6 +308,7 @@ function writeReport(results, meta, config = {}) {
       lines.push(`### ❌ ${r.name} (\`${r.id}\`)`);
       lines.push("");
       if (r.summary) lines.push(`**${r.kind === "assert" ? "Kane says" : "Finding"}:** ${r.summary}`);
+      if (r.kane) lines.push(`\n**Kane's own DevTools verdict:** ${r.kane.status === "passed" ? "✅ passed" : r.kane.status === "failed" ? "❌ failed" : "⚠️ inconclusive"}${r.kane.remark ? `: ${r.kane.remark}` : ""}${r.kane.testUrl ? ` ([Kane's run](${r.kane.testUrl}))` : ""}\n\n_${r.agreement}_`);
       if (r.findings && r.findings.length) {
         lines.push("");
         r.findings.forEach((f, i) => lines.push(`- \`${f}\`${r.trace && r.trace[i] ? `  (${r.trace[i]})` : ""}`));
@@ -342,6 +346,7 @@ function keyLine(text) {
 
 async function cmdCheck(args) {
   const config = loadConfig(args);
+  REDACT_CFG = config;
   // --site serves a folder you built (e.g. ./dist) and checks it locally.
   const siteDir = args.site ? path.resolve(String(args.site)) : path.join(ROOT, config.siteDir || "demo-dapp");
   if (args.site) config.siteDir = path.relative(ROOT, siteDir) || ".";
@@ -477,6 +482,31 @@ async function cmdCheck(args) {
     console.log(`      → ${res.status === "passed" ? "✅ passed" : res.status === "error" ? "⚠️  error" : "❌ failed"}${res.summary ? ": " + keyLine(res.summary).slice(0, 200) : ""}\n`);
   }
 
+  // Kane's own DevTools verdicts on the hidden checks: one extra Kane run that loads the page and
+  // asserts on the network traffic and localStorage Kane captured itself. DappSentinel's code then
+  // reads Kane's recording as a second, exact check, and the report shows both verdicts.
+  const devtools = {};
+  const hiddenIds = ["rpc-key-leak", "testnet-rpc", "unknown-scripts", "storage-secrets"];
+  if (process.env.DAPPSENTINEL_KANE_DEVTOOLS !== "off" && checks.some((c) => hiddenIds.includes(c.id))) {
+    n++;
+    console.log(`[${n}/${checks.length + 1}] Kane's own DevTools verdicts on the hidden checks`);
+    const v = templateValues(config, url);
+    const lines = [`Go to ${url} and wait until the page has fully loaded.`];
+    const want = (id) => checks.some((c) => c.id === id);
+    if (want("rpc-key-leak")) lines.push(`Assert: no network request URL contains an RPC provider API key, such as a long key after /v2/ on an alchemy.com host or after /v3/ on an infura.io host.`);
+    if (want("testnet-rpc")) lines.push(`Assert: no network request was made to a testnet, staging or local endpoint, meaning a host containing ${v.testnetHints}, other than ${v.siteHost} itself.`);
+    if (want("unknown-scripts")) lines.push(`Assert: every request with resource type script was loaded from one of these hosts or their subdomains: ${v.allowedScriptHosts}.`);
+    if (want("storage-secrets")) lines.push(`Assert: no localStorage value is a private key (64 hexadecimal characters, with or without 0x) or a seed phrase of 12 or 24 lowercase words.`);
+    const r = await runKane(lines.join("\n"), { url, timeout: config.timeoutSeconds || 300, maxSteps: 12, headed: Boolean(args.headed) });
+    const e = r.runEnd || {};
+    const match = { "rpc-key-leak": /api key/i, "testnet-rpc": /testnet/i, "unknown-scripts": /resource type script|script/i, "storage-secrets": /localstorage/i };
+    for (const id of hiddenIds) {
+      const st = r.steps.find((x) => /assert/i.test(String(x.step)) && match[id].test(String(x.step)));
+      if (st) devtools[id] = { status: st.status === "passed" ? "passed" : st.status === "failed" ? "failed" : "error", remark: String(st.remark || "").trim(), testUrl: e.test_url || "" };
+      else if (want(id)) devtools[id] = { status: "error", remark: r.runEnd ? "Kane did not report this assertion." : "Kane's DevTools run did not finish.", testUrl: e.test_url || "" };
+    }
+  }
+
   // Network checks: scan the HAR network log from Kane's evidence pack for the recording run.
   let forwardNoted = false;
   for (const c of networkChecks) {
@@ -528,6 +558,23 @@ async function cmdCheck(args) {
     a.findings.forEach((f, i) => console.log(`      ✖ ${f.slice(0, 120)}${a.trace && a.trace[i] ? `\n        ${a.trace[i]}` : ""}`));
     if (a.status === "failed" && rec && rec.testUrl) console.log(`        Watch Kane's run: ${rec.testUrl}`);
     console.log(`      → ${a.status === "passed" ? "✅ passed" : a.status === "error" ? "⚠️  error" : "❌ failed"}: ${a.summary}\n`);
+  }
+
+  // Put Kane's DevTools verdict next to DappSentinel's exact check. Mode "either" (the default)
+  // fails a check when either one finds the problem: a security gate fails closed.
+  const mode = process.env.DAPPSENTINEL_KANE_DEVTOOLS || "either";
+  for (const [id, k] of Object.entries(devtools)) {
+    const r = byId[id];
+    if (!r) continue;
+    r.kane = k;
+    const code = r.status;
+    if (k.status === "failed" && code === "passed") {
+      r.agreement = "Kane's DevTools assertion failed; DappSentinel's exact check found nothing.";
+      if (mode === "either") r.status = "failed";
+    } else if (k.status === "passed" && code === "failed") r.agreement = "DappSentinel's exact check found it; Kane's DevTools assertion passed.";
+    else if (k.status === code && code !== "error") r.agreement = code === "failed" ? "Kane and DappSentinel both found it." : "Kane and DappSentinel both passed it.";
+    else r.agreement = `Kane's DevTools verdict: ${k.status}.`;
+    console.log(`   ${id}: Kane ${k.status === "passed" ? "✅" : k.status === "failed" ? "❌" : "⚠️"}  DappSentinel ${code === "passed" ? "✅" : code === "failed" ? "❌" : "⚠️"}  ${r.agreement}`);
   }
 
   const results = checks.map((c) => byId[c.id]);
