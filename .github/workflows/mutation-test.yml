@@ -1,9 +1,9 @@
-# Known-answer test: does DappSentinel catch mistakes it was never tuned for?
+# Mutation test (known-answer): does DappSentinel catch mistakes it was never tuned for?
 # Runs the full gate (Kane CLI in a real browser) on the fixed site and on 7 copies of it,
 # each with one new mistake planted (see mutants/mutants.json). The clean site must pass
 # everything; each mutant must fail exactly its own check and nothing else.
 # Manual only: each variant is a full Kane run and uses TestMu AI credits.
-name: Known-answer test
+name: Mutation test
 
 on:
   workflow_dispatch:

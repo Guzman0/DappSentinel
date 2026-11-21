@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Known-answer test for DappSentinel (see mutants/mutants.json).
+// Mutation test (known-answer) for DappSentinel (see mutants/mutants.json).
 //
 //   node scripts/mutants.js list                    print the variant ids (JSON, for a CI matrix)
 //   node scripts/mutants.js build <id> [outDir]     write that variant of the site to outDir (default .mutants/<id>)
@@ -77,7 +77,7 @@ function summary(dir) {
   }
   const ok = rows.filter((r) => r.verdict === "correct").length;
   const lines = [
-    `# DappSentinel known-answer test`,
+    `# DappSentinel mutation test`,
     ``,
     `**${ok} of ${rows.length} variants judged correctly.** The clean site must pass every check; each mutant has one new mistake and must fail exactly that check.`,
     ``,

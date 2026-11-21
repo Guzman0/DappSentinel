@@ -1,5 +1,5 @@
 {
-  "about": "Known-answer test for DappSentinel. 'clean' is the fixed SentinelSwap and must pass every check. Each mutant is the clean site with exactly one new mistake planted, and must fail exactly the check listed in 'expect' and nothing else. None of these mistakes is the same as the ones in demo-dapp/, so the checks are not just tuned to the demo. All keys and seed phrases below are fake.",
+  "about": "Mutation test (known-answer) for DappSentinel. 'clean' is the fixed SentinelSwap and must pass every check. Each mutant is the clean site with exactly one new mistake planted, and must fail exactly the check listed in 'expect' and nothing else. None of these mistakes is the same as the ones in demo-dapp/, so the checks are not just tuned to the demo. All keys and seed phrases below are fake.",
   "variants": [
     {
       "id": "clean",
