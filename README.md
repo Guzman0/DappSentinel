@@ -21,7 +21,7 @@ Every judging rule, and where to see the proof. Everything below is public; noth
 | Judging rule | Where to see it |
 |---|---|
 | **Bar: it works end to end** | [Reproduce it yourself](#reproduce-it-yourself) in 7 steps, each with a public run. The published action, used exactly as another repo would, on Lido: [run](https://github.com/Guzman0/DappSentinel/actions/runs/44909812956), 5 of 5, "Clear to ship" |
-| **Bar: Kane caught or proved something** | Kane's own verdicts on 3 checks and its recording for the other 4 ([who catches what](#who-catches-what-kane-and-dappsentinel)). A real bug in code we didn't write: Kane failed Spark's open-source frontend, whose hardcoded, domain-locked Alchemy key leaves it on an error screen ([real-world loop](#real-world-loop-a-bug-in-code-we-didnt-write)). 6 planted mistakes caught on the demo ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669), [video at 1:26](https://youtu.be/FiErWhY495U?t=86)). 7 new mistakes it was never tuned for, [8 of 8 twice](#mutation-test-known-answer-mistakes-it-was-never-tuned-for). A keyed Alchemy RPC URL found on CoW Swap's live site ([real-world runs](#real-world-runs)) |
+| **Bar: Kane caught or proved something** | Kane gives its own verdict on all 7 checks: by reading the page, and with its DevTools assertions on network traffic and localStorage. On the demo it failed all 4 hidden checks by itself ([who catches what](#who-catches-what-kane-and-dappsentinel)). A real bug in code we didn't write: Kane failed Spark's open-source frontend, whose hardcoded, domain-locked Alchemy key leaves it on an error screen ([real-world loop](#real-world-loop-a-bug-in-code-we-didnt-write)). 6 planted mistakes caught on the demo ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669), [video at 1:26](https://youtu.be/FiErWhY495U?t=86)). 7 new mistakes it was never tuned for, [8 of 8 twice](#mutation-test-known-answer-mistakes-it-was-never-tuned-for). A keyed Alchemy RPC URL found on CoW Swap's live site ([real-world runs](#real-world-runs)) |
 | **Bar: the agent and Kane talk** | Kane's findings go straight to Claude Code, and a Stop hook won't let Claude finish while a check fails ([how the loop works](#how-the-loop-works), [video at 1:52](https://youtu.be/FiErWhY495U?t=112)). On GitHub, the fix job hands Claude Kane's report, and the pull request gets a comment with what Claude changed ([PR #7](https://github.com/Guzman0/DappSentinel/pull/7#issuecomment-7052572418)) |
 | **Ships** (25%) | Runs in Claude Code (`/sentinel`), from the command line, and as a GitHub Action ([`@v1.1.0`](https://github.com/Guzman0/DappSentinel/releases/tag/v1.1.0)). A required check blocks merging a broken pull request ([PR #2](https://github.com/Guzman0/DappSentinel/pull/2)) |
 | **Verified** (25%) | Spark: Kane caught a real bug, Claude fixed it, Kane proved the fix ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44953030392), [record](evidence/realworld-spark/)). [Mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) with [Kane's own screenshots](#what-kane-saw-its-own-screenshots) and the full record in [`evidence/mutation-test/`](evidence/mutation-test/). Live mainnet dApps: Lido 6 of 6, Aave 5 of 6, CoW Swap 3 of 5 ([results](#real-world-runs)). Kane's own words are quoted in every report |
@@ -32,21 +32,24 @@ Every judging rule, and where to see the proof. Everything below is public; noth
 
 ## Who catches what: Kane and DappSentinel
 
-Kane checks what a user can see. Its recording captures what a user can't. DappSentinel reads that recording line by line.
+Every check gets a verdict from Kane itself. Kane checks what a user can see by reading and using the page. For what a user can't see, Kane uses its own [DevTools assertions](https://www.testmuai.com/docs/kane-cli-checkpoint-devtools) on the network traffic and localStorage it captured. DappSentinel's code then reads Kane's recording line by line as a second, exact check. A check fails if either one finds the problem: a security gate fails closed.
 
-| Check | Who spots it | The proof |
+| Check | Kane's own verdict | DappSentinel's exact check |
 |---|---|---|
-| Wrong contract address | **Kane**, reading the page | Kane's own verdict, in its words, and its screenshot |
-| Wrong chain ID | **Kane**, reading the network badge | Kane's verdict and screenshot |
-| Main flow broken | **Kane**, using the swap like a person | Kane's verdict and screenshot |
-| RPC key leaked | DappSentinel, reading **Kane's network recording** | The exact request, where it sits in Kane's run, and a link to Kane's replay |
-| Testnet endpoint | DappSentinel, reading **Kane's network recording** | The same |
-| Untrusted script | DappSentinel, reading **Kane's network recording** | The same |
-| Keys in browser storage | DappSentinel, reading **the browser Kane drove** | The storage entry, masked |
+| Wrong contract address | **Kane**, reading the page | |
+| Wrong chain ID | **Kane**, reading the network badge | |
+| Main flow broken | **Kane**, using the swap like a person | |
+| RPC key leaked | **Kane**, DevTools network assertion | Every request in Kane's recording |
+| Testnet endpoint | **Kane**, DevTools network assertion | Every request in Kane's recording |
+| Untrusted script | **Kane**, DevTools network assertion | Every script in Kane's recording |
+| Keys in browser storage | **Kane**, DevTools localStorage assertion | localStorage and sessionStorage of the browser Kane drove |
 
-Why the last four are read by code: a page can send 200 requests, and none of them appear on screen. Plain code checks every one, the same way every time, and masks a real key before anything is saved. An AI skimming that much could miss one, and a missed key is the worst result a security gate can give. Kane's job is what only a real browser can do: use the dApp like a person, so the traffic it records is the traffic real users would cause.
+**How the two verdicts compare, measured, not claimed:**
+- **Demo with the six mistakes:** Kane's DevTools assertions failed all 4 hidden checks on their own, and DappSentinel agreed on all 4 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44961742573)).
+- **Mutation test, run 3:** Kane's assertions caught the Infura key and the Holesky RPC. They missed the jsDelivr script and the seed phrase in sessionStorage (Kane's storage assertion reads localStorage only). DappSentinel's exact check caught all four, so the gate still judged 8 of 8 correctly ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44962415067)).
+- **No false alarms from Kane:** on the clean site, and on Lido's live site, every Kane DevTools verdict matched DappSentinel's ([Lido run](https://github.com/Guzman0/DappSentinel/actions/runs/44962410214)).
 
-Every report says where each network finding happened in Kane's run, for example *"first seen in Kane's recording as request 5 of 6"*, and links Kane's own step-by-step replay of that run ([a run showing it](https://github.com/Guzman0/DappSentinel/actions/runs/44950691350)).
+That's why both run: Kane's verdicts come from Kane, and the exact check makes sure nothing slips past either. Every report shows both side by side, with a link to Kane's own replay. Each network finding also says where it sits in Kane's run, for example *"first seen in Kane's recording as request 5 of 6"*.
 
 DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
 
@@ -302,7 +305,7 @@ The same key is still in Spark's production traffic: DappSentinel's [live scan o
 
 A gate is only useful if it's right. So we took the fixed site and made 7 copies, each with **one new mistake** that is different from the demo's (Infura instead of Alchemy, Holesky instead of Sepolia, a swapped digit in the middle of the address instead of the last one, and so on). The clean site must pass everything; each copy must fail exactly its own check and nothing else.
 
-**Two runs, same verdict both times: 8 of 8.** [Run 1](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698) · [Run 2](https://github.com/Guzman0/DappSentinel/actions/runs/44884542975)
+**Three runs, same verdict every time: 8 of 8.** Run 3 also shows Kane's own DevTools verdicts next to DappSentinel's ([run 3](https://github.com/Guzman0/DappSentinel/actions/runs/44962415067)). [Run 1](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698) · [Run 2](https://github.com/Guzman0/DappSentinel/actions/runs/44884542975)
 
 ![Mutation test results: the clean site passes 7 of 7, and each of the 7 copies fails exactly its own check](assets/mutation-test.jpg)
 

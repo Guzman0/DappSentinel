@@ -12,6 +12,7 @@ None of the mistakes is the same as the ones in the demo, so the checks were not
 |---|---|---|---|
 | [44847434698](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698) | 21 Nov 2026, 01:00 | 8 of 8 correct | [`run-44847434698/`](run-44847434698/): the results table and each variant's gate log, taken from the GitHub log (this run predates the evidence collector) |
 | [44884542975](https://github.com/Guzman0/DappSentinel/actions/runs/44884542975) | 21 Nov 2026, 08:22 | 8 of 8 correct | [`run-44884542975/`](run-44884542975/): per variant, the report, Kane's steps, Kane's screenshots and the masked network log. Committed by the workflow itself to branch [`mutation-evidence-44884542975`](https://github.com/Guzman0/DappSentinel/tree/mutation-evidence-44884542975) |
+| [44962415067](https://github.com/Guzman0/DappSentinel/actions/runs/44962415067) | 22 Nov 2026 | 8 of 8 correct | [`run-44962415067/`](run-44962415067/): as run 2, plus Kane's own DevTools verdicts on the 4 hidden checks. Kane's assertions caught m1 (Infura key) and m2 (Holesky RPC) themselves and missed m5 (jsDelivr script) and m6 (seed in sessionStorage, which Kane's storage assertion doesn't read); DappSentinel's exact check caught all four. No false alarms from Kane on any other check |
 
 ## The matrix
 
