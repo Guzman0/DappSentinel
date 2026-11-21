@@ -491,19 +491,32 @@ async function cmdCheck(args) {
     n++;
     console.log(`[${n}/${checks.length + 1}] Kane's own DevTools verdicts on the hidden checks`);
     const v = templateValues(config, url);
-    const lines = [`Go to ${url} and wait until the page has fully loaded.`];
+    const own = analyzers.ownDomain(v.siteHost);
+    const hosts = (config.allowedScriptHosts || ["self"]).map((h) => (h === "self" ? own : h)).join(", ");
     const want = (id) => checks.some((c) => c.id === id);
-    if (want("rpc-key-leak")) lines.push(`Assert: no network request URL contains an RPC provider API key, such as a long key after /v2/ on an alchemy.com host or after /v3/ on an infura.io host.`);
-    if (want("testnet-rpc")) lines.push(`Assert: no network request was made to a testnet, staging or local endpoint, meaning a host containing ${v.testnetHints}, other than ${v.siteHost} itself.`);
-    if (want("unknown-scripts")) lines.push(`Assert: every request with resource type script was loaded from one of these hosts or their subdomains: ${v.allowedScriptHosts}.`);
-    if (want("storage-secrets")) lines.push(`Assert: no localStorage value is a private key (64 hexadecimal characters, with or without 0x) or a seed phrase of 12 or 24 lowercase words.`);
-    const r = await runKane(lines.join("\n"), { url, timeout: config.timeoutSeconds || 300, maxSteps: 12, headed: Boolean(args.headed) });
-    const e = r.runEnd || {};
-    const match = { "rpc-key-leak": /api key/i, "testnet-rpc": /testnet/i, "unknown-scripts": /resource type script|script/i, "storage-secrets": /localstorage/i };
-    for (const id of hiddenIds) {
-      const st = r.steps.find((x) => /assert/i.test(String(x.step)) && match[id].test(String(x.step)));
-      if (st) devtools[id] = { status: st.status === "passed" ? "passed" : st.status === "failed" ? "failed" : "error", remark: String(st.remark || "").trim(), testUrl: e.test_url || "" };
-      else if (want(id)) devtools[id] = { status: "error", remark: r.runEnd ? "Kane did not report this assertion." : "Kane's DevTools run did not finish.", testUrl: e.test_url || "" };
+    const asserts = {
+      "rpc-key-leak": "Assert: no network request URL contains an RPC provider API key, such as a long key after /v2/ on an alchemy.com host or after /v3/ on an infura.io host.",
+      "testnet-rpc": `Assert: no network request was made to a testnet, staging or local endpoint, meaning a host containing ${v.testnetHints}, other than ${v.siteHost} itself.`,
+      "unknown-scripts": `Assert: every request with resource type script was loaded from one of these domains or their subdomains: ${hosts}.`,
+      "storage-secrets": "Assert: no localStorage value is a private key (64 hexadecimal characters, with or without 0x) or a seed phrase of 12 or 24 lowercase words.",
+    };
+    const match = { "rpc-key-leak": /api key/i, "testnet-rpc": /testnet/i, "unknown-scripts": /resource type script/i, "storage-secrets": /localstorage/i };
+    // Kane stops at the first failed assertion, so the ones it never reached get a run of their own.
+    let todo = hiddenIds.filter(want);
+    for (let round = 0; todo.length && round < 4; round++) {
+      const lines = [`Go to ${url} and wait until the page has fully loaded.`, ...todo.map((id) => asserts[id])];
+      const r = await runKane(lines.join("\n"), { url, timeout: config.timeoutSeconds || 300, maxSteps: 12, headed: Boolean(args.headed) });
+      const e = r.runEnd || {};
+      for (const id of todo) {
+        const st = r.steps.find((x) => /^\s*assert/i.test(String(x.remark)) && match[id].test(String(x.remark)));
+        if (st) devtools[id] = { status: st.status === "passed" ? "passed" : st.status === "failed" ? "failed" : "error", remark: String(st.remark || "").trim(), testUrl: e.test_url || "" };
+      }
+      const left = todo.filter((id) => !devtools[id]);
+      if (!r.runEnd || left.length === todo.length) {
+        for (const id of left) devtools[id] = { status: "error", remark: r.runEnd ? "Kane did not report this assertion." : "Kane's DevTools run did not finish.", testUrl: e.test_url || "" };
+        break;
+      }
+      todo = left;
     }
   }
 
