@@ -278,6 +278,15 @@ A gate is only useful if it's right. So we took the fixed site and made 7 copies
 | `m6-seed-in-session` | Seed phrase in sessionStorage as `backup` | fail `storage-secrets` only | ✅ | ✅ | `sessionStorage["backup"]` holds a seed phrase |
 | `m7-wrong-confirm-amount` | Confirm screen shows a tenth of the amount | fail `swap-flow` only | ✅ | ✅ | The decimal point is in the wrong place; received amount and fee still match 0.5 ETH |
 
+### What Kane saw (its own screenshots)
+
+Cropped from Kane's step screenshots in run 2. The full, uncropped sets are in [`evidence/mutation-test/run-44884542975/`](evidence/mutation-test/run-44884542975/).
+
+| | |
+|---|---|
+| <img src="assets/kane-saw/m3-address.jpg" alt="Kane's screenshot: USDC contract 0xA0b86991c6218b63c1d19D4a2e9Eb0cE3606eB48, two characters swapped" width="420"><br><sub>**m3:** the USDC address on the page reads `…c6218b63c1…`. The real one is `…c6218b36c1…`. Kane failed the address check.</sub> | <img src="assets/kane-saw/m4-chain.jpg" alt="Kane's screenshot: network badge reading Ethereum, Chain ID 137" width="420"><br><sub>**m4:** the badge says Ethereum but Chain ID 137. Kane: "showing the chain ID for a different network while keeping the Ethereum name."</sub> |
+| <img src="assets/kane-saw/m7-confirm.jpg" alt="Kane's screenshot: Confirm swap, You pay 0.05 ETH, You receive 1,570.28 USDC" width="420"><br><sub>**m7:** the user typed 0.5 ETH, the confirmation says 0.05, while the 1,570.28 USDC received still matches 0.5. Kane failed the swap flow.</sub> | <img src="assets/kane-saw/clean-submitted.jpg" alt="Kane's screenshot: Swap submitted, swapped 0.5 ETH for 1,570.28 USDC" width="420"><br><sub>**clean:** the fixed site. Kane completed the swap: "Swapped 0.5 ETH for 1,570.28 USDC."</sub> |
+
 **Honest note on m3:** the verdict is right and repeatable (fail on the swapped address, pass on the clean one, twice each), but Kane never wrote "these two characters differ". Both times it said its own comparison step hadn't stored the value it read. We count the verdict, not the explanation.
 
 **The full record**, kept in the repo after GitHub's artifacts expire: [`evidence/mutation-test/`](evidence/mutation-test/) has, for every variant, the report, every step Kane took, Kane's screenshots and the masked network log. Run 2's record was committed by the workflow itself. Run it yourself from the **Mutation test (known-answer)** workflow, or one variant at a time with `node scripts/mutants.js build <id>` and `node bin/dappsentinel.js check --site .mutants/<id>`.
