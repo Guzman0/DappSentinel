@@ -10,7 +10,7 @@
 > - **The loop:** Kane catches it → Claude Code fixes it → Kane checks again, until every check passes. The agent can't edit the checks to cheat.
 > - **Where it runs:** in Claude Code on your machine (`/sentinel`), and on GitHub, where it blocks the merge and fixes the pull request itself.
 > - **Proof, all public:** broken PR blocked ([#2](https://github.com/Guzman0/DappSentinel/pull/2)) · Claude fixes a PR on GitHub with no human ([#5](https://github.com/Guzman0/DappSentinel/pull/5)) · cheating refused ([#6](https://github.com/Guzman0/DappSentinel/pull/6)) · 8 of 8 on a [mutation test (known-answer)](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) with mistakes it was never tuned for · [forensic trail](#forensic-trail-the-loop-on-github-step-by-step) · live runs on Lido, Aave and CoW Swap ([results](#real-world-runs)).
-> - **Install:** `uses: Guzman0/DappSentinel@v1` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:39](https://youtu.be/Z5SIdWPsH4g)
+> - **Install:** `uses: Guzman0/DappSentinel@v1.1.0` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:39](https://youtu.be/Z5SIdWPsH4g)
 
 ▶ **[Watch the demo video (3:39)](https://youtu.be/Z5SIdWPsH4g)**
 
@@ -163,7 +163,7 @@ Add the hosts you trust to `allowedScriptHosts` in `profiles/live/sentinel.confi
 DappSentinel is a GitHub Action. Add your TestMu AI username and access key as repository secrets (`LT_USERNAME`, `LT_ACCESS_KEY`), then add one step to a workflow:
 
 ```yaml
-- uses: Guzman0/DappSentinel@v1
+- uses: Guzman0/DappSentinel@v1.1.0
   with:
     url: https://staging.yourdapp.xyz
     lt-username: ${{ secrets.LT_USERNAME }}
