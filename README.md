@@ -9,7 +9,7 @@
 > - **What:** a pre-launch gate for dApp websites. Kane CLI checks the site in a real browser for 6 mistakes you can't see on screen: leaked RPC keys, testnet endpoints, wrong contracts, wrong chain, untrusted scripts, keys in storage.
 > - **The loop:** Kane catches it → Claude Code fixes it → Kane checks again, until every check passes. The agent can't edit the checks to cheat.
 > - **Where it runs:** in Claude Code on your machine (`/sentinel`), and on GitHub, where it blocks the merge and fixes the pull request itself.
-> - **Proof, all public:** broken PR blocked ([#2](https://github.com/Guzman0/DappSentinel/pull/2)) · Claude fixes a PR on GitHub with no human ([#5](https://github.com/Guzman0/DappSentinel/pull/5)) · cheating refused ([#6](https://github.com/Guzman0/DappSentinel/pull/6)) · [forensic trail](#forensic-trail-the-loop-on-github-step-by-step) · live runs on Lido, Aave and CoW Swap ([results](#real-world-runs)).
+> - **Proof, all public:** broken PR blocked ([#2](https://github.com/Guzman0/DappSentinel/pull/2)) · Claude fixes a PR on GitHub with no human ([#5](https://github.com/Guzman0/DappSentinel/pull/5)) · cheating refused ([#6](https://github.com/Guzman0/DappSentinel/pull/6)) · 8 of 8 on a [known-answer test](#known-answer-test-mistakes-it-was-never-tuned-for) with mistakes it was never tuned for · [forensic trail](#forensic-trail-the-loop-on-github-step-by-step) · live runs on Lido, Aave and CoW Swap ([results](#real-world-runs)).
 > - **Install:** `uses: Guzman0/DappSentinel@v1` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:39](https://youtu.be/Z5SIdWPsH4g)
 
 ▶ **[Watch the demo video (3:39)](https://youtu.be/Z5SIdWPsH4g)**
@@ -235,12 +235,30 @@ Every CI run so far, unfiltered. Same input, same verdict.
 | Demo with the six mistakes (`main`, PR #2) | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44777482670), [3](https://github.com/Guzman0/DappSentinel/actions/runs/44794168901) | ❌ 6 of 7 failed, every time |
 | Demo with the fixes (PR #1) | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44756869916), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44777479949) | ✅ 7 of 7 passed, every time |
 | Demo fixed by Claude Code on GitHub (PR #3, PR #5) | [#3 red](https://github.com/Guzman0/DappSentinel/actions/runs/44812319363) → [#3 green](https://github.com/Guzman0/DappSentinel/actions/runs/44813042427), [#5 red](https://github.com/Guzman0/DappSentinel/actions/runs/44819169522) → [#5 green](https://github.com/Guzman0/DappSentinel/actions/runs/44819910638) | ❌ 6 of 7, then ✅ 7 of 7 after Claude's fix, both times |
+| Known-answer test: fixed site + 7 new mistakes | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698) | ✅ 8 of 8 judged correctly |
 | An edited check (PR #6) | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44831572149) | ⛔ refused to run, auto-fix not started |
 | Lido | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44762327264), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44771371726), [3](https://github.com/Guzman0/DappSentinel/actions/runs/44776723947) | ✅ 5 of 5, every time since the "self" fix |
 | CoW Swap | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44760471120), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44762331502) | ❌ keyed RPC URL and outside script hosts, both times |
 | Aave | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44759641283), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44760476608) | ❌ scripts from `app.family.co` and Cloudflare Insights, both times |
 
 Not counted above, and why: one Lido run ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44770797794)) hit Cloudflare bot protection, which led to the "inconclusive" rule; one action test ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44770752102)) ran before the `v1` tag existed; the first runs on Lido, CoW Swap and Aave ([1](https://github.com/Guzman0/DappSentinel/actions/runs/44759647200), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44759652548)) were before two false-alarm fixes, described in [Real-world runs](#real-world-runs).
+
+## Known-answer test: mistakes it was never tuned for
+
+A gate is only useful if it's right. So we took the fixed site and made 7 copies, each with **one new mistake** that is different from the demo's (Infura instead of Alchemy, Holesky instead of Sepolia, a swapped digit in the middle of the address instead of the last one, and so on). The clean site must pass everything; each copy must fail exactly its own check and nothing else. [One run, 8 of 8 correct](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698).
+
+| Variant | Planted mistake | Should fail | Kane failed |
+|---|---|---|---|
+| `clean` | None: the fixed site | nothing | ✅ nothing |
+| `m1-infura-key` | An Infura RPC URL with an API key in it | `rpc-key-leak` | ✅ `rpc-key-leak` |
+| `m2-holesky-rpc` | A Holesky testnet RPC in the mainnet build | `testnet-rpc` | ✅ `testnet-rpc` |
+| `m3-swapped-digits` | Two characters swapped in the middle of the USDC address | `contract-address` | ✅ `contract-address` |
+| `m4-polygon-chain` | Chain ID 137 (Polygon) under an Ethereum label | `chain-id` | ✅ `chain-id` |
+| `m5-jsdelivr-script` | A script from the jsDelivr CDN | `unknown-scripts` | ✅ `unknown-scripts` |
+| `m6-seed-in-session` | A seed phrase in sessionStorage under the harmless name `backup` | `storage-secrets` | ✅ `storage-secrets` |
+| `m7-wrong-confirm-amount` | The confirmation shows a tenth of what the user typed | `swap-flow` | ✅ `swap-flow` |
+
+On `m7`, Kane didn't just see a wrong number: it noted that the received amount and fee still matched 0.5 ETH, so only the displayed payment was off. The variants are in [`mutants/mutants.json`](mutants/mutants.json); run them yourself from the **Known-answer test** workflow, or one at a time with `node scripts/mutants.js build <id>` and `node bin/dappsentinel.js check --site .mutants/<id>`.
 
 ## Real-world runs
 
