@@ -1,0 +1,155 @@
+{
+  "url": "http://localhost:4173",
+  "siteDir": "spark-dist",
+  "kaneVersion": "0.10.7",
+  "startedAt": "2026-11-21T21:45:08.243Z",
+  "finishedAt": "2026-11-21T21:47:13.198Z",
+  "siteHash": "3a44ad1e2bf7cce28a5a42ef2f9af5b0b5098eeab9e3eff5e0ccd54fb421b6da",
+  "results": [
+    {
+      "id": "rpc-key-leak",
+      "name": "No RPC API keys in network requests",
+      "severity": "critical",
+      "kind": "network",
+      "status": "error",
+      "summary": "Inconclusive: the \"browse\" run did not pass (The page tries to use an external Ethereum data service from the browser, but that service does not allow requests from ), so the recording may not cover the real page.",
+      "reason": "",
+      "findings": [],
+      "trace": [],
+      "source": "network log (HAR) Kane CLI recorded during the \"browse\" run",
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M80167R0Z3X0W314NSXNMJNS/dashboard/share/US_IW97RZM9D6SIBSO1A80RI2NC2IW5BLSFZ5UUZZ3QLMKZWO6MZU9J973SDQN3V0LG?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/7370188e-6452-437b-8e43-b3018e7e3807/evidence/9d2c92ac-fbfe-4940-92a6-8dfad1ede23d.evidence",
+      "fix": "Remove provider API keys from frontend code. Use a keyless public RPC for read calls, or route keyed calls through a server-side proxy. Treat any key that was shipped as leaked and rotate it."
+    },
+    {
+      "id": "testnet-rpc",
+      "name": "No testnet, staging or local endpoints in a mainnet build",
+      "severity": "critical",
+      "kind": "network",
+      "status": "error",
+      "summary": "Inconclusive: the \"browse\" run did not pass (The page tries to use an external Ethereum data service from the browser, but that service does not allow requests from ), so the recording may not cover the real page.",
+      "reason": "",
+      "findings": [],
+      "trace": [],
+      "source": "network log (HAR) Kane CLI recorded during the \"browse\" run",
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M80167R0Z3X0W314NSXNMJNS/dashboard/share/US_IW97RZM9D6SIBSO1A80RI2NC2IW5BLSFZ5UUZZ3QLMKZWO6MZU9J973SDQN3V0LG?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/7370188e-6452-437b-8e43-b3018e7e3807/evidence/9d2c92ac-fbfe-4940-92a6-8dfad1ede23d.evidence",
+      "fix": "Point every RPC and API call at production endpoints for  (chain ID 1). Load endpoints from one config per environment so testnet URLs cannot ship to production."
+    },
+    {
+      "id": "unknown-scripts",
+      "name": "Scripts only load from trusted hosts",
+      "severity": "critical",
+      "kind": "network",
+      "status": "error",
+      "summary": "Inconclusive: the \"browse\" run did not pass (The page tries to use an external Ethereum data service from the browser, but that service does not allow requests from ), so the recording may not cover the real page.",
+      "reason": "",
+      "findings": [],
+      "trace": [],
+      "source": "network log (HAR) Kane CLI recorded during the \"browse\" run",
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M80167R0Z3X0W314NSXNMJNS/dashboard/share/US_IW97RZM9D6SIBSO1A80RI2NC2IW5BLSFZ5UUZZ3QLMKZWO6MZU9J973SDQN3V0LG?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/7370188e-6452-437b-8e43-b3018e7e3807/evidence/9d2c92ac-fbfe-4940-92a6-8dfad1ede23d.evidence",
+      "fix": "Remove scripts loaded from third-party CDNs, or bundle them with the app. Every script that runs on a dApp page can read and change what the user signs, so drainers are often injected this way."
+    },
+    {
+      "id": "storage-secrets",
+      "name": "No private keys or seed phrases in browser storage",
+      "severity": "critical",
+      "kind": "storage",
+      "status": "passed",
+      "exitCode": 1,
+      "summary": "While Kane used the page, the site saved 8 items in browser storage and none is a private key or seed phrase.",
+      "reason": "",
+      "findings": [],
+      "source": "browser storage, watched live over the Chrome DevTools Protocol in the Chrome that Kane CLI drove",
+      "finalState": {
+        "page_fits_in_window": "true",
+        "page_taller_than_window": "false",
+        "main_content_visible": "false",
+        "error_page_visible": "true"
+      },
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M801418PHZTFYDAR3D5B8D75/dashboard/share/US_P6O2G7HI7QR40BZBP85XWTJ5ABU3GC3BVU8DZI39X6ES400KBNSSQ54CW3FPTIB0?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/d6c0e6b7-7370-4fad-b4d9-56e7f9248504",
+      "credits": 17.28288,
+      "steps": [
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://localhost:4173"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait until the page has fully loaded"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: The page does not show an error page."
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "wait: Waiting skip scrolling"
+        },
+        {
+          "step": 6,
+          "status": "failed",
+          "remark": "assert: the page shows its main content and not an error page."
+        }
+      ],
+      "fix": "Never store private keys, seed phrases or signing secrets in localStorage or sessionStorage. Any script on the page can read them. Keep only public data, such as the wallet address, and leave signing to the wallet.",
+      "objective": "Go to http://localhost:4173 and wait until the page has fully loaded. If the page is taller than the window, scroll down and back up. If it fits in the window, skip scrolling. Assert: the page shows its main content and not an error page."
+    },
+    {
+      "id": "browse",
+      "name": "The site loads and Kane can browse it",
+      "severity": "high",
+      "kind": "assert",
+      "status": "failed",
+      "exitCode": 1,
+      "summary": "The page tries to use an external Ethereum data service from the browser, but that service does not allow requests from this page's address. The app cannot load its required data and shows an error screen.\nConfigure the external data service or a same-origin server-side proxy to allow the app's requests, then verify that the page renders its normal content when that service is unavailable or blocked.\nevidence: console_error: Access to fetch at 'https://eth-mainnet.g.alchemy.com/v2/WVOC…-9L' from origin 'http://localhost\nevidence: objective_contradiction: check FAILED: the page shows its main content — expected: true | observed: {{main_content_shown}}\nevidence: objective_contradiction: check FAILED: the page does not show an error page — expected: false | observed: {{error_page_shown}}",
+      "reason": "Final verification failed: \"the page shows its main content and not an error page\"",
+      "findings": [],
+      "source": "Kane CLI assertion in a real browser",
+      "finalState": {
+        "page_fits_in_window": "true",
+        "main_content_shown": "true",
+        "error_page_shown": "true",
+        "page_taller_than_window": "false"
+      },
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M80167R0Z3X0W314NSXNMJNS/dashboard/share/US_IW97RZM9D6SIBSO1A80RI2NC2IW5BLSFZ5UUZZ3QLMKZWO6MZU9J973SDQN3V0LG?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/7370188e-6452-437b-8e43-b3018e7e3807",
+      "credits": 12.85784,
+      "steps": [
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://localhost:4173"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait until the page has fully loaded"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: the page is taller than the window"
+        },
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "wait: Waiting skip scrolling because the page fits in the window"
+        },
+        {
+          "step": 6,
+          "status": "failed",
+          "remark": "assert: the page shows its main content and not an error page"
+        }
+      ],
+      "fix": "The page did not load in a real browser. Check that the URL is right and the site is up.",
+      "objective": "Go to http://localhost:4173 and wait until the page has fully loaded. If the page is taller than the window, scroll down and back up. If it fits in the window, skip scrolling. Assert: the page shows its main content and not an error page."
+    }
+  ]
+}
