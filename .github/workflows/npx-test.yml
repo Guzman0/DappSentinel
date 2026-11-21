@@ -23,6 +23,14 @@ jobs:
         uses: browser-actions/setup-chrome@v2
       - name: Install Kane CLI
         run: npm install -g @testmuai/kane-cli
+      - name: Which install routes work (no Kane needed)
+        working-directory: ${{ runner.temp }}
+        continue-on-error: true
+        run: |
+          npm -v
+          echo "--- npx github:"; npx -y github:Guzman0/DappSentinel#${{ github.sha }} --help | head -2 || true
+          echo "--- npx tarball:"; npx -y https://codeload.github.com/Guzman0/DappSentinel/tar.gz/${{ github.sha }} --help | head -2 || true
+          echo "--- npm i -g github:"; npm i -g github:Guzman0/DappSentinel#${{ github.sha }} && dappsentinel --help | head -2 || true
       - name: One command, in an empty folder
         working-directory: ${{ runner.temp }}
         env:
@@ -30,6 +38,4 @@ jobs:
           LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
           KANE_CLI_CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
           URL: ${{ inputs.url }}
-        run: |
-          ls -A
-          npx -y github:Guzman0/DappSentinel#${{ github.sha }} check --url "$URL"
+        run: npx -y https://codeload.github.com/Guzman0/DappSentinel/tar.gz/${{ github.sha }} check --url "$URL"
