@@ -21,7 +21,7 @@ Every judging rule, and where to see the proof. Everything below is public; noth
 | Judging rule | Where to see it |
 |---|---|
 | **Bar: it works end to end** | [Reproduce it yourself](#reproduce-it-yourself) in 7 steps, each with a public run. The published action, used exactly as another repo would, on Lido: [run](https://github.com/Guzman0/DappSentinel/actions/runs/44909812956), 5 of 5, "Clear to ship" |
-| **Bar: Kane caught or proved something** | 6 planted mistakes caught on the demo ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669), [video at 1:26](https://youtu.be/FiErWhY495U?t=86)). 7 new mistakes it was never tuned for, [8 of 8 twice](#mutation-test-known-answer-mistakes-it-was-never-tuned-for). A keyed Alchemy RPC URL found on CoW Swap's live site ([real-world runs](#real-world-runs)) |
+| **Bar: Kane caught or proved something** | Kane's own verdicts on 3 checks and its recording for the other 4 ([who catches what](#who-catches-what-kane-and-dappsentinel)). 6 planted mistakes caught on the demo ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669), [video at 1:26](https://youtu.be/FiErWhY495U?t=86)). 7 new mistakes it was never tuned for, [8 of 8 twice](#mutation-test-known-answer-mistakes-it-was-never-tuned-for). A keyed Alchemy RPC URL found on CoW Swap's live site ([real-world runs](#real-world-runs)) |
 | **Bar: the agent and Kane talk** | Kane's findings go straight to Claude Code, and a Stop hook won't let Claude finish while a check fails ([how the loop works](#how-the-loop-works), [video at 1:52](https://youtu.be/FiErWhY495U?t=112)). On GitHub, the fix job hands Claude Kane's report, and the pull request gets a comment with what Claude changed ([PR #7](https://github.com/Guzman0/DappSentinel/pull/7#issuecomment-7052572418)) |
 | **Ships** (25%) | Runs in Claude Code (`/sentinel`), from the command line, and as a GitHub Action ([`@v1.1.0`](https://github.com/Guzman0/DappSentinel/releases/tag/v1.1.0)). A required check blocks merging a broken pull request ([PR #2](https://github.com/Guzman0/DappSentinel/pull/2)) |
 | **Verified** (25%) | [Mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) with [Kane's own screenshots](#what-kane-saw-its-own-screenshots) and the full record in [`evidence/mutation-test/`](evidence/mutation-test/). Live mainnet dApps: Lido 6 of 6, Aave 5 of 6, CoW Swap 3 of 5 ([results](#real-world-runs)). Kane's own words are quoted in every report |
@@ -29,6 +29,24 @@ Every judging rule, and where to see the proof. Everything below is public; noth
 | **Craft** (25%) | Two commands from any folder, with no clone ([try it on any dApp](#try-it-on-any-dapp-from-any-folder)). One line in a workflow: `uses: Guzman0/DappSentinel@v1.1.0` ([use it in your own repo](#use-it-in-your-own-repo)). One config file for your own dApp. Reports mask keys, and raw evidence is never uploaded by default ([SECURITY.md](SECURITY.md)). Honest limits in [what DappSentinel doesn't do](#what-dappsentinel-doesnt-do) |
 | **Check it without credits** | `npm test` runs the analyzers on recorded fixtures. The [forensic trail](#forensic-trail-the-loop-on-github-step-by-step), the [track record](#track-record) and [`evidence/mutation-test/`](evidence/mutation-test/) are readable as they are |
 | **Dates** | First commit `ed622c0`, 18 Nov 2026, after the 12 Nov start. The history is as written |
+
+## Who catches what: Kane and DappSentinel
+
+Kane checks what a user can see. Its recording captures what a user can't. DappSentinel reads that recording line by line.
+
+| Check | Who spots it | The proof |
+|---|---|---|
+| Wrong contract address | **Kane**, reading the page | Kane's own verdict, in its words, and its screenshot |
+| Wrong chain ID | **Kane**, reading the network badge | Kane's verdict and screenshot |
+| Main flow broken | **Kane**, using the swap like a person | Kane's verdict and screenshot |
+| RPC key leaked | DappSentinel, reading **Kane's network recording** | The exact request, where it sits in Kane's run, and a link to Kane's replay |
+| Testnet endpoint | DappSentinel, reading **Kane's network recording** | The same |
+| Untrusted script | DappSentinel, reading **Kane's network recording** | The same |
+| Keys in browser storage | DappSentinel, reading **the browser Kane drove** | The storage entry, masked |
+
+Why the last four are read by code: a page can send 200 requests, and none of them appear on screen. Plain code checks every one, the same way every time, and masks a real key before anything is saved. An AI skimming that much could miss one, and a missed key is the worst result a security gate can give. Kane's job is what only a real browser can do: use the dApp like a person, so the traffic it records is the traffic real users would cause.
+
+Every report says where each network finding happened in Kane's run, for example *"first seen in Kane's recording as request 3 of 54, 6.2 s into Kane's run"*, and links Kane's own step-by-step replay of that run.
 
 DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
 

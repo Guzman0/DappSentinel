@@ -307,7 +307,7 @@ function writeReport(results, meta, config = {}) {
       if (r.summary) lines.push(`**${r.kind === "assert" ? "Kane says" : "Finding"}:** ${r.summary}`);
       if (r.findings && r.findings.length) {
         lines.push("");
-        for (const f of r.findings) lines.push(`- \`${f}\``);
+        r.findings.forEach((f, i) => lines.push(`- \`${f}\`${r.trace && r.trace[i] ? `  (${r.trace[i]})` : ""}`));
       }
       if (r.source) lines.push(`\n_Source: ${r.source}._`);
       if (r.reason && r.reason !== r.summary) lines.push(`\n**Reason:** ${r.reason}`);
@@ -320,7 +320,7 @@ function writeReport(results, meta, config = {}) {
       if (r.finalState && Object.keys(r.finalState).length) lines.push(`\nValues Kane read from the page: \`${JSON.stringify(r.finalState)}\``);
       lines.push("");
       lines.push(`**How to fix:** ${r.fix}`);
-      if (r.testUrl) lines.push(`\nEvidence: ${r.testUrl}`);
+      if (r.testUrl) lines.push(`\nWatch Kane's run, step by step: ${r.testUrl}`);
       if (r.sessionDir) lines.push(`\nLocal evidence: \`${r.sessionDir}\``);
       lines.push("");
     }
@@ -488,6 +488,7 @@ async function cmdCheck(args) {
     } else {
       const entries = analyzers.harEntries(ev.har);
       a = analyzers.NETWORK[c.id] ? analyzers.NETWORK[c.id](entries, config, siteHost) : { status: "error", summary: `No analyzer for ${c.id}.`, findings: [] };
+      a.trace = traceFindings(a.findings, ev.har.log.entries);
       // A clean scan only counts if Kane actually got to use the page (e.g. not stuck on a bot check).
       // When the page itself never loaded, findings are as unreliable as clean results (a bot
       // challenge page loads its own scripts), so both become inconclusive.
@@ -505,6 +506,7 @@ async function cmdCheck(args) {
       summary: a.summary,
       reason: "",
       findings: a.findings,
+      trace: a.trace || [],
       source: `network log (HAR) Kane CLI recorded during the "${c.recording}" run`,
       testUrl: rec ? rec.testUrl : "",
       sessionDir: ev ? ev.file : "",
@@ -531,6 +533,22 @@ async function cmdCheck(args) {
   process.exit(1);
 }
 
+// For each finding from Kane's network recording, say where in Kane's run it happened:
+// which request it was and how many seconds into the run, so it can be found in Kane's replay.
+function traceFindings(findings, raw) {
+  const t0 = raw.length ? Date.parse(raw[0].startedDateTime) : NaN;
+  return (findings || []).map((f) => {
+    const i = raw.findIndex((e) => {
+      const host = analyzers.hostOf((e.request && e.request.url) || "");
+      return host && f.includes(host);
+    });
+    if (i < 0) return "";
+    const dt = (Date.parse(raw[i].startedDateTime) - t0) / 1000;
+    const when = Number.isFinite(dt) ? `, ${dt.toFixed(1)} s into Kane's run` : "";
+    return `first seen in Kane's recording as request ${i + 1} of ${raw.length}${when}`;
+  });
+}
+
 async function cmdServe(args) {
   const config = loadConfig(args);
   const port = Number(args.port || new URL(config.url).port || 4173);
@@ -545,7 +563,7 @@ function cmdList(args = {}) {
 
 const args = parseArgs(process.argv.slice(2));
 const cmd = args._[0] || "check";
-module.exports = { hashDir, loadChecks, templateValues, fill, toObjective };
+module.exports = { hashDir, loadChecks, templateValues, fill, toObjective, traceFindings };
 
 const HELP = `DappSentinel: a pre-launch safety gate for dApp frontends, run by Kane CLI in a real browser.
 
