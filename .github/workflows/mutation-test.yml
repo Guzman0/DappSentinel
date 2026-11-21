@@ -1,0 +1,88 @@
+# Known-answer test: does DappSentinel catch mistakes it was never tuned for?
+# Runs the full gate (Kane CLI in a real browser) on the fixed site and on 7 copies of it,
+# each with one new mistake planted (see mutants/mutants.json). The clean site must pass
+# everything; each mutant must fail exactly its own check and nothing else.
+# Manual only: each variant is a full Kane run and uses TestMu AI credits.
+name: Known-answer test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  variant:
+    name: ${{ matrix.id }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        id: [clean, m1-infura-key, m2-holesky-rpc, m3-swapped-digits, m4-polygon-chain, m5-jsdelivr-script, m6-seed-in-session, m7-wrong-confirm-amount]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      - name: Install Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v2
+
+      - name: Install Kane CLI and DappSentinel
+        run: |
+          npm install -g @testmuai/kane-cli
+          npm install
+
+      - name: Build the variant
+        run: node scripts/mutants.js build ${{ matrix.id }}
+
+      - name: Run the gate on it
+        env:
+          LT_USERNAME: ${{ secrets.LT_USERNAME }}
+          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+          KANE_CLI_CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+        run: node bin/dappsentinel.js check --site .mutants/${{ matrix.id }} || true
+
+      - name: Judge the result
+        run: node scripts/mutants.js judge ${{ matrix.id }}
+
+      - name: Post the report to the run summary
+        if: always()
+        run: cat .sentinel/report.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Keep the judged result
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: result-${{ matrix.id }}
+          path: |
+            .mutants/result-${{ matrix.id }}.json
+            .sentinel/report.md
+          include-hidden-files: true
+          if-no-files-found: ignore
+
+  summary:
+    needs: variant
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: result-*
+          path: results
+          merge-multiple: false
+      - name: Build the results table
+        run: |
+          mkdir -p all
+          find results -name 'result-*.json' -exec cp {} all/ \;
+          node scripts/mutants.js summary all
+          cat all/mutation-results.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: mutation-results
+          path: all/mutation-results.md

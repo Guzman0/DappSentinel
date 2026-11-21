@@ -1,0 +1,67 @@
+{
+  "about": "Known-answer test for DappSentinel. 'clean' is the fixed SentinelSwap and must pass every check. Each mutant is the clean site with exactly one new mistake planted, and must fail exactly the check listed in 'expect' and nothing else. None of these mistakes is the same as the ones in demo-dapp/, so the checks are not just tuned to the demo. All keys and seed phrases below are fake.",
+  "variants": [
+    {
+      "id": "clean",
+      "mistake": "None: the fixed site",
+      "expect": [],
+      "edits": []
+    },
+    {
+      "id": "m1-infura-key",
+      "mistake": "An Infura RPC URL with an API key in it (the demo uses Alchemy)",
+      "expect": ["rpc-key-leak"],
+      "edits": [
+        { "file": "app.js", "find": "blockRpc: \"https://ethereum-rpc.publicnode.com\"", "replace": "blockRpc: \"https://mainnet.infura.io/v3/3f9c2e7a51d84b06a2c1e8f4d7b90a65\"" }
+      ]
+    },
+    {
+      "id": "m2-holesky-rpc",
+      "mistake": "A Holesky testnet RPC in the mainnet build (the demo uses Sepolia)",
+      "expect": ["testnet-rpc"],
+      "edits": [
+        { "file": "app.js", "find": "gasRpc: \"https://ethereum-rpc.publicnode.com\"", "replace": "gasRpc: \"https://ethereum-holesky-rpc.publicnode.com\"" }
+      ]
+    },
+    {
+      "id": "m3-swapped-digits",
+      "mistake": "Two characters swapped in the middle of the USDC address (the demo changes the last one)",
+      "expect": ["contract-address"],
+      "edits": [
+        { "file": "app.js", "find": "usdcAddress: \"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\"", "replace": "usdcAddress: \"0xA0b86991c6218b63c1d19D4a2e9Eb0cE3606eB48\"" }
+      ]
+    },
+    {
+      "id": "m4-polygon-chain",
+      "mistake": "Chain ID 137 (Polygon) under an Ethereum label (the demo uses Sepolia's 11155111)",
+      "expect": ["chain-id"],
+      "edits": [
+        { "file": "app.js", "find": "chainId: 1,", "replace": "chainId: 137," }
+      ]
+    },
+    {
+      "id": "m5-jsdelivr-script",
+      "mistake": "A script loaded from the jsDelivr CDN (the demo uses unpkg)",
+      "expect": ["unknown-scripts"],
+      "edits": [
+        { "file": "index.html", "find": "<!-- date formatting helper -->", "replace": "<!-- date formatting helper -->\n  <script src=\"https://cdn.jsdelivr.net/npm/dayjs@1.11.13/dayjs.min.js\"></script>" }
+      ]
+    },
+    {
+      "id": "m6-seed-in-session",
+      "mistake": "A seed phrase saved in sessionStorage under a harmless-looking name (the demo puts a private key in localStorage)",
+      "expect": ["storage-secrets"],
+      "edits": [
+        { "file": "app.js", "find": "  localStorage.removeItem(\"wallet_pk\");", "replace": "  localStorage.removeItem(\"wallet_pk\");\n  sessionStorage.setItem(\"backup\", \"test test test test test test test test test test test junk\");" }
+      ]
+    },
+    {
+      "id": "m7-wrong-confirm-amount",
+      "mistake": "The confirmation screen shows a tenth of the amount the user typed (a decimals bug)",
+      "expect": ["swap-flow"],
+      "edits": [
+        { "file": "app.js", "find": "$(\"confirm-pay\").textContent = String(quote.pay);", "replace": "$(\"confirm-pay\").textContent = String(quote.pay / 10);" }
+      ]
+    }
+  ]
+}
