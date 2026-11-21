@@ -51,21 +51,26 @@ jobs:
         if: always()
         run: cat .sentinel/report.md >> "$GITHUB_STEP_SUMMARY" || true
 
-      - name: Keep the judged result
+      - name: Collect the report, Kane's steps, screenshots and masked network log
+        if: always()
+        run: node scripts/collect-evidence.js ${{ matrix.id }} mutation-out/${{ matrix.id }}
+
+      - name: Keep it
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: result-${{ matrix.id }}
-          path: |
-            .mutants/result-${{ matrix.id }}.json
-            .sentinel/report.md
-          include-hidden-files: true
+          path: mutation-out/
           if-no-files-found: ignore
 
+  # Builds the results table and commits everything the run collected to a branch of its own,
+  # mutation-evidence-<run id>, so the record stays in the repository after artifacts expire.
   summary:
     needs: variant
     if: always()
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -74,15 +79,23 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           pattern: result-*
-          path: results
-          merge-multiple: false
+          path: collected
+          merge-multiple: true
       - name: Build the results table
         run: |
-          mkdir -p all
-          find results -name 'result-*.json' -exec cp {} all/ \;
-          node scripts/mutants.js summary all
-          cat all/mutation-results.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v7
-        with:
-          name: mutation-results
-          path: all/mutation-results.md
+          dir="evidence/mutation-test/run-${{ github.run_id }}"
+          mkdir -p "$dir"
+          cp -r collected/. "$dir/"
+          mkdir -p verdicts
+          find collected -name 'result-*.json' -exec cp {} verdicts/ \;
+          node scripts/mutants.js summary verdicts
+          cp verdicts/mutation-results.md "$dir/"
+          cat "$dir/mutation-results.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Commit the record to its own branch
+        run: |
+          git config user.name "DappSentinel mutation test"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "mutation-evidence-${{ github.run_id }}"
+          git add evidence/mutation-test
+          git commit -m "Mutation test (known-answer) record, run ${{ github.run_id }}"
+          git push origin "mutation-evidence-${{ github.run_id }}"
