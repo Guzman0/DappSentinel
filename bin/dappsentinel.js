@@ -509,7 +509,7 @@ async function cmdCheck(args) {
       const e = r.runEnd || {};
       for (const id of todo) {
         const st = r.steps.find((x) => /^\s*assert/i.test(String(x.remark)) && match[id].test(String(x.remark)));
-        if (st) devtools[id] = { status: st.status === "passed" ? "passed" : st.status === "failed" ? "failed" : "error", remark: String(st.remark || "").trim(), testUrl: e.test_url || "" };
+        if (st) devtools[id] = { status: st.status === "failed" ? "failed" : /^(passed|success|succeeded|done|completed|ok)$/i.test(String(st.status)) ? "passed" : "error", rawStatus: st.status, remark: String(st.remark || "").trim(), testUrl: e.test_url || "" };
       }
       const left = todo.filter((id) => !devtools[id]);
       if (!r.runEnd || left.length === todo.length) {
