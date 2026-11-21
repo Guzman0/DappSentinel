@@ -55,11 +55,14 @@ function parseArgs(argv) {
 }
 
 function loadConfig(args = {}) {
+  // Run from any folder (for example with npx) and pass --url: with no config of your own here,
+  // use the bundled checks that work on any live dApp.
+  if (!args.config && args.url && !fs.existsSync(CONFIG_PATH)) args.config = path.join(__dirname, "..", "profiles", "live");
   if (args.config) {
     CONFIG_PATH = path.resolve(String(args.config));
     if (fs.existsSync(CONFIG_PATH) && fs.statSync(CONFIG_PATH).isDirectory()) CONFIG_PATH = path.join(CONFIG_PATH, "sentinel.config.json");
   }
-  if (!fs.existsSync(CONFIG_PATH)) die(`${path.relative(ROOT, CONFIG_PATH)} not found. Run this from the project folder.`);
+  if (!fs.existsSync(CONFIG_PATH)) die(`${path.relative(ROOT, CONFIG_PATH)} not found. Run this from your project folder, or check a live site with: dappsentinel check --url https://your-dapp.xyz`);
   let config;
   try {
     config = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
@@ -544,7 +547,25 @@ const args = parseArgs(process.argv.slice(2));
 const cmd = args._[0] || "check";
 module.exports = { hashDir, loadChecks, templateValues, fill, toObjective };
 
+const HELP = `DappSentinel: a pre-launch safety gate for dApp frontends, run by Kane CLI in a real browser.
+
+Usage
+  dappsentinel check --url https://your-dapp.xyz   Check any live dApp (no setup in your repo)
+  dappsentinel check                               Check the site configured in ./sentinel.config.json
+  dappsentinel check --config <dir|file>           Use another config (for example profiles/lido)
+  dappsentinel list                                List the checks that would run
+  dappsentinel serve                               Serve the configured site locally
+
+Options
+  --headed        Watch Kane in a visible browser
+  --only <ids>    Run only some checks, comma-separated
+  --site <dir>    Check a local folder instead of the configured site
+
+Needs Node.js 20+, Chrome, and Kane CLI signed in: npm i -g @testmuai/kane-cli && kane-cli login
+Report: .sentinel/report.md   More: https://github.com/Guzman0/DappSentinel`;
+
 if (require.main === module) {
+  if (args.help || cmd === "help") { console.log(HELP); process.exit(0); }
   if (cmd === "check") cmdCheck(args);
   else if (cmd === "serve") cmdServe(args);
   else if (cmd === "list") cmdList(args);
