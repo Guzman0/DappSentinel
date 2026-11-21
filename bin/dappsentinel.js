@@ -512,7 +512,8 @@ async function cmdCheck(args) {
       sessionDir: ev ? ev.file : "",
       fix: fill(c.fix, values),
     };
-    for (const f of a.findings) console.log(`      ✖ ${f.slice(0, 120)}`);
+    a.findings.forEach((f, i) => console.log(`      ✖ ${f.slice(0, 120)}${a.trace && a.trace[i] ? `\n        ${a.trace[i]}` : ""}`));
+    if (a.status === "failed" && rec && rec.testUrl) console.log(`        Watch Kane's run: ${rec.testUrl}`);
     console.log(`      → ${a.status === "passed" ? "✅ passed" : a.status === "error" ? "⚠️  error" : "❌ failed"}: ${a.summary}\n`);
   }
 
