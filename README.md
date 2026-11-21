@@ -14,6 +14,22 @@
 
 ▶ **[Watch the demo video (3:59)](https://youtu.be/FiErWhY495U)**
 
+## For judges
+
+Every judging rule, and where to see the proof. Everything below is public; nothing needs a login or credits to read.
+
+| Judging rule | Where to see it |
+|---|---|
+| **Bar: it works end to end** | [Reproduce it yourself](#reproduce-it-yourself) in 7 steps, each with a public run. The published action, used exactly as another repo would, on Lido: [run](https://github.com/Guzman0/DappSentinel/actions/runs/44909812956), 5 of 5, "Clear to ship" |
+| **Bar: Kane caught or proved something** | 6 planted mistakes caught on the demo ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669), [video at 1:26](https://youtu.be/FiErWhY495U?t=86)). 7 new mistakes it was never tuned for, [8 of 8 twice](#mutation-test-known-answer-mistakes-it-was-never-tuned-for). A keyed Alchemy RPC URL found on CoW Swap's live site ([real-world runs](#real-world-runs)) |
+| **Bar: the agent and Kane talk** | Kane's findings go straight to Claude Code, and a Stop hook won't let Claude finish while a check fails ([how the loop works](#how-the-loop-works), [video at 1:52](https://youtu.be/FiErWhY495U?t=112)). On GitHub, the fix job hands Claude Kane's report, and the pull request gets a comment with what Claude changed ([PR #7](https://github.com/Guzman0/DappSentinel/pull/7#issuecomment-7052572418)) |
+| **Ships** (25%) | Runs in Claude Code (`/sentinel`), from the command line, and as a GitHub Action ([`@v1.1.0`](https://github.com/Guzman0/DappSentinel/releases/tag/v1.1.0)). A required check blocks merging a broken pull request ([PR #2](https://github.com/Guzman0/DappSentinel/pull/2)) |
+| **Verified** (25%) | [Mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) with the full record, including Kane's screenshots, in [`evidence/mutation-test/`](evidence/mutation-test/). Live mainnet dApps: Lido 6 of 6, Aave 5 of 6, CoW Swap 3 of 5 ([results](#real-world-runs)). Kane's own words are quoted in every report |
+| **Closed loop** (25%) | Locally: Kane fails, Claude fixes, the Stop hook re-runs Kane, round 2 passes 7 of 7. On GitHub, with no human: Kane fails PR #5 6 of 7, Claude fixes and pushes, the PR's own check passes 7 of 7 ([forensic trail](#forensic-trail-the-loop-on-github-step-by-step)). Max 3 rounds. The agent [can't cheat](#the-agent-cant-cheat): editing a check is blocked, and the gate refuses to run ([PR #6](https://github.com/Guzman0/DappSentinel/pull/6)) |
+| **Craft** (25%) | One line in a workflow: `uses: Guzman0/DappSentinel@v1.1.0` ([use it in your own repo](#use-it-in-your-own-repo)). One config file for your own dApp. Reports mask keys, and raw evidence is never uploaded by default ([SECURITY.md](SECURITY.md)). Honest limits in [what DappSentinel doesn't do](#what-dappsentinel-doesnt-do) |
+| **Check it without credits** | `npm test` runs the analyzers on recorded fixtures. The [forensic trail](#forensic-trail-the-loop-on-github-step-by-step), the [track record](#track-record) and [`evidence/mutation-test/`](evidence/mutation-test/) are readable as they are |
+| **Dates** | First commit `ed622c0`, 18 Nov 2026, after the 12 Nov start. The history is as written |
+
 DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
 
 It blocks the release wherever it runs: Claude Code can't finish its turn while a check fails, a pull request gets a red check ([GitHub Action](#use-it-in-your-own-repo)), and `npm run deploy` only deploys when every check passes.
