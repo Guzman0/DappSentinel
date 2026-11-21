@@ -1,0 +1,12 @@
+{
+  "id": "m1-infura-key",
+  "mistake": "An Infura RPC URL with an API key in it (the demo uses Alchemy)",
+  "expect": [
+    "rpc-key-leak"
+  ],
+  "failed": [
+    "rpc-key-leak"
+  ],
+  "unsure": [],
+  "verdict": "correct"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "m2-holesky-rpc",
+  "mistake": "A Holesky testnet RPC in the mainnet build (the demo uses Sepolia)",
+  "expect": [
+    "testnet-rpc"
+  ],
+  "failed": [
+    "testnet-rpc"
+  ],
+  "unsure": [],
+  "verdict": "correct"
+}

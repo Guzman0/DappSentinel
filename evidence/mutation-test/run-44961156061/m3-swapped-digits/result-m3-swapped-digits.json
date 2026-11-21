@@ -1,0 +1,12 @@
+{
+  "id": "m3-swapped-digits",
+  "mistake": "Two characters swapped in the middle of the USDC address (the demo changes the last one)",
+  "expect": [
+    "contract-address"
+  ],
+  "failed": [
+    "contract-address"
+  ],
+  "unsure": [],
+  "verdict": "correct"
+}
