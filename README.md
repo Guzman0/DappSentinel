@@ -10,9 +10,9 @@
 > - **The loop:** Kane catches it → Claude Code fixes it → Kane checks again, until every check passes. The agent can't edit the checks to cheat.
 > - **Where it runs:** in Claude Code on your machine (`/sentinel`), and on GitHub, where it blocks the merge and fixes the pull request itself.
 > - **Proof, all public:** broken PR blocked ([#2](https://github.com/Guzman0/DappSentinel/pull/2)) · Claude fixes a PR on GitHub with no human ([#5](https://github.com/Guzman0/DappSentinel/pull/5)) · cheating refused ([#6](https://github.com/Guzman0/DappSentinel/pull/6)) · 8 of 8 on a [mutation test (known-answer)](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) with mistakes it was never tuned for · [forensic trail](#forensic-trail-the-loop-on-github-step-by-step) · live runs on Lido, Aave and CoW Swap ([results](#real-world-runs)).
-> - **Install:** `uses: Guzman0/DappSentinel@v1.1.0` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:39](https://youtu.be/Z5SIdWPsH4g)
+> - **Install:** `uses: Guzman0/DappSentinel@v1.1.0` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U)
 
-▶ **[Watch the demo video (3:39)](https://youtu.be/Z5SIdWPsH4g)**
+▶ **[Watch the demo video (3:59)](https://youtu.be/FiErWhY495U)**
 
 DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
 
@@ -217,8 +217,8 @@ Each step says what you should see, and links a public run where it already happ
 | Step | Command | Expected result | Public run |
 |---|---|---|---|
 | 1. Check the broken demo | `npm install` → `kane-cli login` → `npm run sentinel` | ❌ 6 of 7 checks fail (only the swap flow passes), exit code 1 | [main, 6 of 7 failed](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669) |
-| 2. Let Claude Code fix it | Open the folder in Claude Code and run `/sentinel` | Claude fixes `demo-dapp/`, the Stop hook re-runs Kane, round 2 passes 7 of 7 | Shown in the [demo video](https://youtu.be/Z5SIdWPsH4g); the same fixes are in [PR #1](https://github.com/Guzman0/DappSentinel/pull/1) |
-| 3. Try to cheat | Ask Claude to edit `checks/04-chain-id.md`, or edit it yourself and run `npm run sentinel` | The edit is blocked; or the gate refuses to run (exit code 3) | Shown in the [demo video](https://youtu.be/Z5SIdWPsH4g) |
+| 2. Let Claude Code fix it | Open the folder in Claude Code and run `/sentinel` | Claude fixes `demo-dapp/`, the Stop hook re-runs Kane, round 2 passes 7 of 7 | Shown in the [demo video](https://youtu.be/FiErWhY495U); the same fixes are in [PR #1](https://github.com/Guzman0/DappSentinel/pull/1) |
+| 3. Try to cheat | Ask Claude to edit `checks/04-chain-id.md`, or edit it yourself and run `npm run sentinel` | The edit is blocked; or the gate refuses to run (exit code 3) | Shown in the [demo video](https://youtu.be/FiErWhY495U) |
 | 4. Fix in a pull request | Open a PR that fixes `demo-dapp/` | The `gate` check passes 7 of 7 | [PR #1, 7 of 7 passed](https://github.com/Guzman0/DappSentinel/actions/runs/44756869916) |
 | 5. Break in a pull request | Open a PR that leaves the mistakes in | The `gate` check fails and the required check blocks the merge | [PR #2, 6 of 7 failed](https://github.com/Guzman0/DappSentinel/actions/runs/44794168901), merge blocked |
 | 6. Let Claude fix it on GitHub | Open a PR that leaves the mistakes in, with `CLAUDE_CODE_OAUTH_TOKEN` set | The gate fails, Claude Code commits a fix to the PR, the gate re-runs and passes 7 of 7 | [PR #5](https://github.com/Guzman0/DappSentinel/pull/5): [red](https://github.com/Guzman0/DappSentinel/actions/runs/44819169522), then [green](https://github.com/Guzman0/DappSentinel/actions/runs/44819910638) |
