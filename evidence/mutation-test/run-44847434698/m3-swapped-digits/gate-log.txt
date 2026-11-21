@@ -1,0 +1,71 @@
+[Build the variant] ﻿2026-11-21T01:00:26.9954178Z ##[group]Run node scripts/mutants.js build m3-swapped-digits
+[Build the variant] [36;1mnode scripts/mutants.js build m3-swapped-digits[0m
+[Build the variant] shell: /usr/bin/bash -e {0}
+[Build the variant] ##[endgroup]
+[Build the variant] Built m3-swapped-digits in .mutants/m3-swapped-digits: Two characters swapped in the middle of the USDC address (the demo changes the last one)
+[Run the gate on it] ﻿2026-11-21T01:00:27.1792682Z ##[group]Run node bin/dappsentinel.js check --site .mutants/m3-swapped-digits || true
+[Run the gate on it] [36;1mnode bin/dappsentinel.js check --site .mutants/m3-swapped-digits || true[0m
+[Run the gate on it] shell: /usr/bin/bash -e {0}
+[Run the gate on it] env:
+[Run the gate on it]   LT_USERNAME: ***
+[Run the gate on it]   LT_ACCESS_KEY: ***
+[Run the gate on it]   KANE_CLI_CHROME_PATH: /opt/hostedtoolcache/setup-chrome/chrome/stable/x64/chrome
+[Run the gate on it] ##[endgroup]
+[Run the gate on it] 
+[Run the gate on it] 🛡  DappSentinel: 7 checks against http://localhost:4173 (4 Kane runs)
+[Run the gate on it] 
+[Run the gate on it]    Serving .mutants/m3-swapped-digits at http://localhost:4173
+[Run the gate on it] 
+[Run the gate on it] [1/7] Displayed contract addresses match the expected ones
+[Run the gate on it]       · navigate: Navigate to http://localhost:4173
+[Run the gate on it]       · wait: PRIMARY: wait for the page to fully load
+[Run the gate on it]       · analyze: ANALYZE(textual_visual, 'the USDC contract address shown on the page is exactly 
+[Run the gate on it]       ✖ assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4
+[Run the gate on it]       → ❌ failed: The page showed the requested USDC address, but the test did not save that value before it performed its comparison.
+[Run the gate on it] 
+[Run the gate on it] [2/7] The app targets the right chain
+[Run the gate on it]       · navigate: Navigate to http://localhost:4173
+[Run the gate on it]       · wait: PRIMARY: wait until the network badge at the top of the page is visible
+[Run the gate on it]       · analyze: ANALYZE(textual_visual, 'the network badge at the top of the page shows the netw
+[Run the gate on it]       · assert: the network badge at the top of the page shows chain ID exactly 1 and the networ
+[Run the gate on it]       → ✅ passed: Confirmed that the network badge at the top of the page showed Ethereum with chain ID 1.
+[Run the gate on it] 
+[Run the gate on it] [3/7] No private keys or seed phrases in browser storage
+[Run the gate on it]       · navigate: Navigate to http://localhost:4173
+[Run the gate on it]       · wait: PRIMARY: wait for the Swap page to fully load
+[Run the gate on it]       · type: Typing 1 into the You pay amount field
+[Run the gate on it]       · analyze: the You receive field shows a number greater than 0
+[Run the gate on it]       · assert: the You receive field shows a number greater than 0
+[Run the gate on it]       → ✅ passed: While Kane used the page, the site saved 1 item in browser storage and none is a private key or seed phrase.
+[Run the gate on it] 
+[Run the gate on it] [4/7] The swap flow works end to end
+[Run the gate on it]       · navigate: Navigate to http://localhost:4173
+[Run the gate on it]       · wait: PRIMARY: wait until the page has fully loaded
+[Run the gate on it]       · type: Typing 0.5 in You pay amount field
+[Run the gate on it]       · analyze: a fee is shown
+[Run the gate on it]       · assert: the You receive field shows a number greater than 0 and a fee is shown
+[Run the gate on it]       · click: Clicking Review swap button
+[Run the gate on it]       · analyze: the confirmation shows You pay 0.5 ETH
+[Run the gate on it]       · assert: the confirmation shows You pay 0.5 ETH
+[Run the gate on it]       · click: Clicking Confirm swap button
+[Run the gate on it]       · analyze: the text Swap submitted is visible
+[Run the gate on it]       · assert: the text Swap submitted is visible
+[Run the gate on it]       → ✅ passed: Confirmed the swap successfully; a “Swap submitted” message was displayed.
+[Run the gate on it] 
+[Run the gate on it] [5/7] No RPC API keys in network requests
+[Run the gate on it]       → ✅ passed: None of the 5 recorded requests carries an RPC API key.
+[Run the gate on it] 
+[Run the gate on it] [6/7] No testnet, staging or local endpoints in a mainnet build
+[Run the gate on it]       → ✅ passed: None of the 5 recorded requests goes to a testnet, staging or local endpoint.
+[Run the gate on it] 
+[Run the gate on it] [7/7] Scripts only load from trusted hosts
+[Run the gate on it]       → ✅ passed: All 1 scripts came from trusted hosts.
+[Run the gate on it] 
+[Run the gate on it] ❌ 1 of 7 checks failed. Not safe to ship.
+[Run the gate on it]    Report: .sentinel/report.md
+[Run the gate on it] 
+[Judge the result] ﻿2026-11-21T01:03:42.3057235Z ##[group]Run node scripts/mutants.js judge m3-swapped-digits
+[Judge the result] [36;1mnode scripts/mutants.js judge m3-swapped-digits[0m
+[Judge the result] shell: /usr/bin/bash -e {0}
+[Judge the result] ##[endgroup]
+[Judge the result] m3-swapped-digits: correct

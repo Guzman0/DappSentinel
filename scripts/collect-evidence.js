@@ -52,16 +52,18 @@ for (const r of results) {
   const file = dir.endsWith(".evidence") ? dir : newestEvidenceFile(dir);
   if (!file || !fs.existsSync(file) || seen.has(file)) continue;
   seen.add(file);
+  // Network checks read the recording run's evidence, so name its files after that run.
+  const label = r.kind === "network" ? `${r.recording || "swap-flow"}-run` : r.id;
 
   const zip = new AdmZip(file);
   const entries = zip.getEntries().map((e) => e.entryName.replace(/\\/g, "/"));
-  fs.writeFileSync(path.join(out, `evidence-contents-${r.id}.txt`), entries.join("\n") + "\n");
+  fs.writeFileSync(path.join(out, `evidence-contents-${label}.txt`), entries.join("\n") + "\n");
 
   // Screenshots: Kane takes one per step; keep them all, in step order, named after the check.
   const images = zip.getEntries().filter((e) => IMG.test(e.entryName)).sort((a, b) => a.entryName.localeCompare(b.entryName, "en", { numeric: true }));
   images.forEach((e, i) => {
     const ext = path.extname(e.entryName).toLowerCase();
-    fs.writeFileSync(path.join(out, "screenshots", `${r.id}-${String(i + 1).padStart(2, "0")}${ext}`), e.getData());
+    fs.writeFileSync(path.join(out, "screenshots", `${label}-${String(i + 1).padStart(2, "0")}${ext}`), e.getData());
   });
 
   // Network requests Kane recorded, masked.
@@ -76,7 +78,7 @@ for (const r of results) {
       /* skip unreadable log */
     }
   }
-  if (lines.length) fs.writeFileSync(path.join(out, `network-${r.id}.txt`), redact(lines.join("\n"), config) + "\n");
+  if (lines.length) fs.writeFileSync(path.join(out, `network-${label}.txt`), redact(lines.join("\n"), config) + "\n");
 }
 
 fs.writeFileSync(path.join(out, "kane-steps.md"), redact(`# ${id}: what Kane did and saw\n\n${steps.join("\n")}\n`, config));

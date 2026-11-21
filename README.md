@@ -235,7 +235,7 @@ Every CI run so far, unfiltered. Same input, same verdict.
 | Demo with the six mistakes (`main`, PR #2) | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44777482670), [3](https://github.com/Guzman0/DappSentinel/actions/runs/44794168901) | ❌ 6 of 7 failed, every time |
 | Demo with the fixes (PR #1) | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44756869916), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44777479949) | ✅ 7 of 7 passed, every time |
 | Demo fixed by Claude Code on GitHub (PR #3, PR #5) | [#3 red](https://github.com/Guzman0/DappSentinel/actions/runs/44812319363) → [#3 green](https://github.com/Guzman0/DappSentinel/actions/runs/44813042427), [#5 red](https://github.com/Guzman0/DappSentinel/actions/runs/44819169522) → [#5 green](https://github.com/Guzman0/DappSentinel/actions/runs/44819910638) | ❌ 6 of 7, then ✅ 7 of 7 after Claude's fix, both times |
-| Mutation test (known-answer): fixed site + 7 new mistakes | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698) | ✅ 8 of 8 judged correctly |
+| Mutation test (known-answer): fixed site + 7 new mistakes | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44884542975) | ✅ 8 of 8 judged correctly, both times |
 | An edited check (PR #6) | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44831572149) | ⛔ refused to run, auto-fix not started |
 | Lido | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44762327264), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44771371726), [3](https://github.com/Guzman0/DappSentinel/actions/runs/44776723947) | ✅ 5 of 5, every time since the "self" fix |
 | CoW Swap | [1](https://github.com/Guzman0/DappSentinel/actions/runs/44760471120), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44762331502) | ❌ keyed RPC URL and outside script hosts, both times |
@@ -245,20 +245,26 @@ Not counted above, and why: one Lido run ([run](https://github.com/Guzman0/DappS
 
 ## Mutation test (known-answer): mistakes it was never tuned for
 
-A gate is only useful if it's right. So we took the fixed site and made 7 copies, each with **one new mistake** that is different from the demo's (Infura instead of Alchemy, Holesky instead of Sepolia, a swapped digit in the middle of the address instead of the last one, and so on). The clean site must pass everything; each copy must fail exactly its own check and nothing else. [One run, 8 of 8 correct](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698).
+A gate is only useful if it's right. So we took the fixed site and made 7 copies, each with **one new mistake** that is different from the demo's (Infura instead of Alchemy, Holesky instead of Sepolia, a swapped digit in the middle of the address instead of the last one, and so on). The clean site must pass everything; each copy must fail exactly its own check and nothing else.
 
-| Variant | Planted mistake | Should fail | Kane failed |
-|---|---|---|---|
-| `clean` | None: the fixed site | nothing | ✅ nothing |
-| `m1-infura-key` | An Infura RPC URL with an API key in it | `rpc-key-leak` | ✅ `rpc-key-leak` |
-| `m2-holesky-rpc` | A Holesky testnet RPC in the mainnet build | `testnet-rpc` | ✅ `testnet-rpc` |
-| `m3-swapped-digits` | Two characters swapped in the middle of the USDC address | `contract-address` | ✅ `contract-address` |
-| `m4-polygon-chain` | Chain ID 137 (Polygon) under an Ethereum label | `chain-id` | ✅ `chain-id` |
-| `m5-jsdelivr-script` | A script from the jsDelivr CDN | `unknown-scripts` | ✅ `unknown-scripts` |
-| `m6-seed-in-session` | A seed phrase in sessionStorage under the harmless name `backup` | `storage-secrets` | ✅ `storage-secrets` |
-| `m7-wrong-confirm-amount` | The confirmation shows a tenth of what the user typed | `swap-flow` | ✅ `swap-flow` |
+**Two runs, same verdict both times: 8 of 8.** [Run 1](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698) · [Run 2](https://github.com/Guzman0/DappSentinel/actions/runs/44884542975)
 
-On `m7`, Kane didn't just see a wrong number: it noted that the received amount and fee still matched 0.5 ETH, so only the displayed payment was off. The variants are in [`mutants/mutants.json`](mutants/mutants.json); run them yourself from the **Mutation test (known-answer)** workflow, or one at a time with `node scripts/mutants.js build <id>` and `node bin/dappsentinel.js check --site .mutants/<id>`.
+![Mutation test results: the clean site passes 7 of 7, and each of the 7 copies fails exactly its own check](assets/mutation-test.jpg)
+
+| Variant | Planted mistake | Expected | Run 1 | Run 2 | What Kane found |
+|---|---|---|---|---|---|
+| `clean` | None: the fixed site | 7 of 7 pass | ✅ | ✅ | Completed the swap; address and chain ID confirmed |
+| `m1-infura-key` | Infura RPC URL with an API key | fail `rpc-key-leak` only | ✅ | ✅ | `POST mainnet.infura.io/v3/3f9c…a65` in its network recording |
+| `m2-holesky-rpc` | Holesky testnet RPC in a mainnet build | fail `testnet-rpc` only | ✅ | ✅ | A request to `ethereum-holesky-rpc.publicnode.com` |
+| `m3-swapped-digits` | Two characters swapped mid USDC address | fail `contract-address` only | ✅ | ✅ | Failed it both times, but its written reason was about its own step (see below) |
+| `m4-polygon-chain` | Chain ID 137 under an Ethereum label | fail `chain-id` only | ✅ | ✅ | "showing the chain ID for a different network while keeping the Ethereum name" |
+| `m5-jsdelivr-script` | Script from the jsDelivr CDN | fail `unknown-scripts` only | ✅ | ✅ | 1 script from 1 untrusted host, `cdn.jsdelivr.net` |
+| `m6-seed-in-session` | Seed phrase in sessionStorage as `backup` | fail `storage-secrets` only | ✅ | ✅ | `sessionStorage["backup"]` holds a seed phrase |
+| `m7-wrong-confirm-amount` | Confirm screen shows a tenth of the amount | fail `swap-flow` only | ✅ | ✅ | The decimal point is in the wrong place; received amount and fee still match 0.5 ETH |
+
+**Honest note on m3:** the verdict is right and repeatable (fail on the swapped address, pass on the clean one, twice each), but Kane never wrote "these two characters differ". Both times it said its own comparison step hadn't stored the value it read. We count the verdict, not the explanation.
+
+**The full record**, kept in the repo after GitHub's artifacts expire: [`evidence/mutation-test/`](evidence/mutation-test/) has, for every variant, the report, every step Kane took, Kane's screenshots and the masked network log. Run 2's record was committed by the workflow itself. Run it yourself from the **Mutation test (known-answer)** workflow, or one variant at a time with `node scripts/mutants.js build <id>` and `node bin/dappsentinel.js check --site .mutants/<id>`.
 
 ## Real-world runs
 
