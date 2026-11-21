@@ -77,7 +77,7 @@ function summary(dir) {
   }
   const ok = rows.filter((r) => r.verdict === "correct").length;
   const lines = [
-    `# DappSentinel mutation test`,
+    `# DappSentinel mutation test (known-answer)`,
     ``,
     `**${ok} of ${rows.length} variants judged correctly.** The clean site must pass every check; each mutant has one new mistake and must fail exactly that check.`,
     ``,
