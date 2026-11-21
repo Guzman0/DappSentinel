@@ -538,6 +538,8 @@ async function cmdCheck(args) {
 // which request it was and how many seconds into the run, so it can be found in Kane's replay.
 function traceFindings(findings, raw) {
   const t0 = raw.length ? Date.parse(raw[0].startedDateTime) : NaN;
+  // Some recordings stamp every request with the same time; then the time says nothing.
+  const span = raw.length ? (Date.parse(raw[raw.length - 1].startedDateTime) - t0) / 1000 : 0;
   return (findings || []).map((f) => {
     const i = raw.findIndex((e) => {
       const host = analyzers.hostOf((e.request && e.request.url) || "");
@@ -545,7 +547,7 @@ function traceFindings(findings, raw) {
     });
     if (i < 0) return "";
     const dt = (Date.parse(raw[i].startedDateTime) - t0) / 1000;
-    const when = Number.isFinite(dt) ? `, ${dt.toFixed(1)} s into Kane's run` : "";
+    const when = Number.isFinite(dt) && span >= 0.5 ? `, ${dt.toFixed(1)} s into Kane's run` : "";
     return `first seen in Kane's recording as request ${i + 1} of ${raw.length}${when}`;
   });
 }

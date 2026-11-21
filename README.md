@@ -46,7 +46,7 @@ Kane checks what a user can see. Its recording captures what a user can't. DappS
 
 Why the last four are read by code: a page can send 200 requests, and none of them appear on screen. Plain code checks every one, the same way every time, and masks a real key before anything is saved. An AI skimming that much could miss one, and a missed key is the worst result a security gate can give. Kane's job is what only a real browser can do: use the dApp like a person, so the traffic it records is the traffic real users would cause.
 
-Every report says where each network finding happened in Kane's run, for example *"first seen in Kane's recording as request 3 of 54, 6.2 s into Kane's run"*, and links Kane's own step-by-step replay of that run.
+Every report says where each network finding happened in Kane's run, for example *"first seen in Kane's recording as request 5 of 6"*, and links Kane's own step-by-step replay of that run ([a run showing it](https://github.com/Guzman0/DappSentinel/actions/runs/44950691350)).
 
 DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
 
