@@ -4,6 +4,8 @@
 
 **The gate between your dApp and mainnet. Your dApp doesn't ship until Kane says it's safe.**
 
+**For judges, in 60 seconds:** open the [demo site](https://sentinelswap-demo.netlify.app): it looks fine, but has 6 hidden mistakes. Open [PR #5](https://github.com/Guzman0/DappSentinel/pull/5): Kane fails it 6 of 7, Claude Code fixes it, and Kane passes it 7 of 7, with no human. Open [PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817): when the fix needs a person's decision, Claude stops and hands over. Then [Polaris #118](#real-world-loop-2-a-bug-the-maintainers-reported): a real bug its maintainers reported, caught by Kane and fixed. No login needed for any of it.
+
 > [!TIP]
 > **TL;DR**
 > - **What:** a pre-launch gate for dApp websites. Kane CLI checks the site in a real browser for mistakes you can't see on screen: leaked RPC keys, testnet endpoints, wrong contracts, wrong chain, untrusted scripts, keys in storage.
