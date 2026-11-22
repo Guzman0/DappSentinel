@@ -14,5 +14,5 @@ Workflow: [`.github/workflows/realworld-polaris.yml`](../../.github/workflows/re
 
 **Honest notes:**
 - In proof 2 the page still shows an error, and Kane says why: Polaris's live oracle only accepts requests from Polaris's own website, so it refuses our test copy at `localhost`. That's the oracle's access policy working, not the bug. What the fix changes is where the page sends requests, and Kane's DevTools verdict confirms it: before, a request to a local service; after, none.
-- The fix has not been offered to Polaris yet. Its `ci.yml` hunk was written against 10 Nov code; the rest applies to today's `main` unchanged.
+- **Offered upstream:** on 22 Nov we commented on [issue #118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118) with the tested fix and asked to be assigned, as Polaris's contributor programme expects; we'll open the pull request once a maintainer agrees. Its `ci.yml` hunk was written against 10 Nov code and will be redone against `main`; the rest applies unchanged.
 - Polaris's `main` was briefly unbuildable on 22 Nov (merged pull requests imported functions that no longer existed), which is why this run is pinned to the commit the issue was filed against.

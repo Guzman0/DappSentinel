@@ -310,7 +310,7 @@ The same key is still in Spark's production traffic: DappSentinel's [live scan o
 2. **Claude Code fixed it the way the issue asks.** A production build with a missing setting now stops with an error naming it; the defaults stay for development; CI sets explicit values ([the patch](evidence/realworld-polaris/run-45015619019/fix.patch)).
 3. **Proven twice.** The misconfigured build is now refused, naming all three settings, which is the issue's first acceptance criterion. A correctly configured build passes Kane's DevTools assertion: no request to localhost or a testnet.
 
-Full record and honest notes, including why the configured build still can't load Polaris's live data from a test copy: [`evidence/realworld-polaris/`](evidence/realworld-polaris/).
+**Offered upstream:** the tested fix is offered on [issue #118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118), and the pull request follows once a maintainer assigns it. Full record and honest notes, including why the configured build still can't load Polaris's live data from a test copy: [`evidence/realworld-polaris/`](evidence/realworld-polaris/).
 
 ## Mutation test (known-answer): mistakes it was never tuned for
 
