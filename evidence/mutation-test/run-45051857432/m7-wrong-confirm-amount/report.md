@@ -1,0 +1,41 @@
+# DappSentinel report
+
+- Site: http://localhost:4173
+- Run at: 2026-11-22T17:57:27.521Z
+- Result: **FAILED**, 6 of 7 checks passed
+
+| Check | Severity | Result |
+|---|---|---|
+| No RPC API keys in network requests | critical | ✅ passed |
+| No testnet, staging or local endpoints in a mainnet build | critical | ✅ passed |
+| Displayed contract addresses match the expected ones | critical | ✅ passed |
+| The app targets the right chain | high | ✅ passed |
+| Scripts only load from trusted hosts | critical | ✅ passed |
+| No private keys or seed phrases in browser storage | critical | ✅ passed |
+| The swap flow works end to end | high | ❌ failed |
+
+## What Kane caught
+
+### ❌ The swap flow works end to end (`swap-flow`)
+
+**Kane says:** The confirmation screen uses the wrong amount. It changes the entered 0.5 ETH into 0.05 ETH instead of carrying the user's value through unchanged.
+Fix the review/confirmation amount mapping so it preserves the entered ETH amount exactly, then add a test that compares the entered value with the confirmation value before a swap can be submitted.
+evidence: objective_contradiction: check FAILED: the confirmation shows You pay 0.5 ETH — expected: true | observed: {{confirmation_you_pay_0_5_eth}}
+
+_Source: Kane CLI assertion in a real browser._
+
+**Reason:** Checkpoint assertion failed: "the confirmation shows You pay 0.5 ETH"
+
+Failed steps:
+- assert: the confirmation shows You pay 0.5 ETH
+
+Values Kane read from the page: `{"you_receive_amount_greater_than_0":"1,570.28","fee_shown":"true","confirmation_you_pay_0_5_eth":"false"}`
+
+**How to fix:** Make sure entering an amount shows a quote, Review swap opens the confirmation, and Confirm swap shows the success message.
+
+Watch Kane's run, step by step: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M826AMC9BPTXRAVMESSN7FBJ/dashboard/share/US_1Y13G34QWHCN1AJGBX2Z2X6INPB79TGQT4SZLH4U716CUBLAWUHWM0G3GZ3IMGBG?type=summary&agentView=true&fqdn=summary-page
+
+Local evidence: `/home/runner/.testmuai/kaneai/sessions/e54c3c30-6447-4900-8d22-7d7fddd963cb`
+
+---
+For AI agents: fix the app in `.mutants/m7-wrong-confirm-amount/` so these checks pass, then run `npm run sentinel` again. Do not edit `checks/` or `sentinel.config.json` to make a check pass.
