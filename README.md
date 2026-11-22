@@ -185,7 +185,10 @@ So a red check can only turn green by changing the site.
 
 The fix loop on GitHub never tries forever. After 3 rounds of Claude Code fixes, if Kane still finds problems, the fix job stops and posts a comment on the pull request: a person needs to look, here are the checks still failing, here is the latest gate report and Kane's run. It does the same if Kane fails a check but Claude finds nothing in the site to fix, since then the problem may be in the check run itself.
 
-**Test:** results coming.
+**Tested on two pull requests, both closed, not merged:**
+
+- [PR #9](https://github.com/Guzman0/DappSentinel/pull/9): the handover. The three fix-round commits on this pull request are **simulated** (empty commits that stand in for three used rounds), and the demo site still has its six mistakes. Kane failed the gate, the fix job counted 3 rounds, made no more fixes, and [commented](https://github.com/Guzman0/DappSentinel/pull/9#issuecomment-7081219978) that a person needs to look, with the six checks still failing and a link to Kane's run ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45037005761)).
+- [PR #8](https://github.com/Guzman0/DappSentinel/pull/8): a real attempt to make the loop fail. For this test only, Claude Code was given just 4 steps per round instead of the usual 40 (the `handover-test` label does this). It still fixed all six mistakes in round 1, running out of steps right after its last edit, and Kane passed round 2, 7 of 7 ([round 1](https://github.com/Guzman0/DappSentinel/actions/runs/45035701861), [round 2](https://github.com/Guzman0/DappSentinel/actions/runs/45036443915)). So the handover never triggered there, which is why PR #9 simulates the rounds.
 
 ## Quick start
 
