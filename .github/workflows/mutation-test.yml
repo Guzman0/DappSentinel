@@ -7,6 +7,11 @@ name: Mutation test (known-answer)
 
 on:
   workflow_dispatch:
+    inputs:
+      variants:
+        description: Which variants to run, as a JSON list (default all)
+        required: false
+        default: '["clean","m1-infura-key","m2-holesky-rpc","m3-swapped-digits","m4-polygon-chain","m5-jsdelivr-script","m6-seed-in-session","m7-wrong-confirm-amount"]'
 
 jobs:
   variant:
@@ -17,7 +22,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        id: [clean, m1-infura-key, m2-holesky-rpc, m3-swapped-digits, m4-polygon-chain, m5-jsdelivr-script, m6-seed-in-session, m7-wrong-confirm-amount]
+        id: ${{ fromJSON(inputs.variants) }}
     steps:
       - uses: actions/checkout@v7
 

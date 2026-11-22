@@ -494,17 +494,24 @@ async function cmdCheck(args) {
     const own = analyzers.ownDomain(v.siteHost);
     const hosts = (config.allowedScriptHosts || ["self"]).map((h) => (h === "self" ? own : h)).join(", ");
     const want = (id) => checks.some((c) => c.id === id);
+    // Kane's network capture resets at every step, so the requests are stored in the step that
+    // reloads the page, and the assertions then check the stored list.
     const asserts = {
-      "rpc-key-leak": "Assert: no network request URL contains an RPC provider API key, such as a long key after /v2/ on an alchemy.com host or after /v3/ on an infura.io host.",
-      "testnet-rpc": `Assert: no network request was made to a testnet, staging or local endpoint, meaning a host containing ${v.testnetHints}, other than ${v.siteHost} itself.`,
-      "unknown-scripts": `Assert: every request with resource type script was loaded from one of these domains or their subdomains: ${hosts}.`,
+      "rpc-key-leak": "Assert: no URL in page_requests contains an RPC provider API key, such as a long key after /v2/ on an alchemy.com host or after /v3/ on an infura.io host.",
+      "testnet-rpc": `Assert: no URL in page_requests goes to a testnet, staging or local endpoint, meaning a host containing ${v.testnetHints}, other than ${v.siteHost} itself.`,
+      "unknown-scripts": `Assert: every entry in page_requests with resource type script was loaded from one of these domains or their subdomains: ${hosts}.`,
       "storage-secrets": "Assert: no localStorage value is a private key (64 hexadecimal characters, with or without 0x) or a seed phrase of 12 or 24 lowercase words.",
     };
     const match = { "rpc-key-leak": /api key/i, "testnet-rpc": /testnet/i, "unknown-scripts": /resource type script/i, "storage-secrets": /localstorage/i };
     // Kane stops at the first failed assertion, so the ones it never reached get a run of their own.
     let todo = hiddenIds.filter(want);
     for (let round = 0; todo.length && round < 4; round++) {
-      const lines = [`Go to ${url} and wait until the page has fully loaded.`, ...todo.map((id) => asserts[id])];
+      const net = todo.some((id) => id !== "storage-secrets");
+      const lines = [
+        `Go to ${url} and wait until the page has fully loaded.`,
+        ...(net ? ["Reload the page and, in that same step, store the full URL and resource type of every network request the page makes while it loads, as page_requests."] : []),
+        ...todo.map((id) => asserts[id]),
+      ];
       const r = await runKane(lines.join("\n"), { url, timeout: config.timeoutSeconds || 300, maxSteps: 12, headed: Boolean(args.headed) });
       const e = r.runEnd || {};
       for (const id of todo) {
