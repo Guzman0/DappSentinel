@@ -520,6 +520,22 @@ For what DappSentinel collects, masks and uploads, see [SECURITY.md](SECURITY.md
 - **Some sites block automated browsers.** When Kane can't reach the real page, DappSentinel reports the network checks as inconclusive, never as clean.
 - **Testing on `localhost` can trip the testnet check.** It matches words like `localhost` anywhere in a request's address, including where a third-party widget sends the page's own address, as in [PR #10](https://github.com/Guzman0/DappSentinel/pull/10). Check a deployed preview to avoid it.
 
+## Built with
+
+The code was written by **Claude** (Anthropic) working as a coding agent (Claude Opus 5.5 in the final sessions), with Kane CLI as the browser that checks its work.
+
+| Tool | What it does in DappSentinel |
+|---|---|
+| **Kane CLI** (`@testmuai/kane-cli`, 0.10.7 in the latest runs) | Runs every check in a real Chrome, gives its own verdicts (page assertions and DevTools assertions), and records the network log (HAR), screenshots and replay links that are the evidence |
+| **Claude Code** | Fixes the site: through the Stop hook and `/sentinel` locally, and on GitHub through [`anthropics/claude-code-action@v1`](https://github.com/anthropics/claude-code-action) with its default model |
+| **Node.js** (20 in CI) | The gate (`bin/dappsentinel.js`) and the analyzers (`lib/`), with three small dependencies: `adm-zip` (reads Kane's evidence packs), `ws` (talks to Chrome), `cross-spawn` (starts Kane) |
+| **Google Chrome**, over the Chrome DevTools Protocol | The browser Kane drives; DappSentinel reads its localStorage and sessionStorage live |
+| **GitHub Actions** | The pull request gate, the fix job, the mutation test and the real-world runs |
+| **Docker** | Builds and serves outside code (Polaris) in isolation, with no secrets |
+| **Netlify** | Hosts the [site](https://dappsentinel.netlify.app) |
+
+The demo site is plain HTML, CSS and JavaScript with no build step.
+
 ## Notes
 
 - A full round is 4 Kane CLI runs and uses TestMu AI credits. New accounts get free credits.
