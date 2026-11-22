@@ -59,7 +59,7 @@ const s = state[session] || { rounds: 0, lastCheckedHash: "" };
 
 // Nothing changed since the last failed check: don't burn credits re-running it.
 if (s.lastCheckedHash === siteHash) {
-  allowStop("DappSentinel: site unchanged since the last failed check. See .sentinel/report.md.");
+  allowStop("DappSentinel: a person needs to look at this. Claude Code made no change to the site since Kane's last failed check, so the checks still fail. Kane isn't re-run on an unchanged site. Kane's full report: .sentinel/report.md");
 }
 if (s.rounds >= MAX_ROUNDS) {
   const last = readJson(path.join(OUT_DIR, "report.json"), { results: [] });

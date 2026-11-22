@@ -185,21 +185,22 @@ Both secrets on that page are fake: the Alchemy key was made up and the private 
 
 ## How the loop works
 
-```
- Claude Code edits the site
-          │
-          ▼
- Stop hook runs DappSentinel ──► Kane CLI checks the site in a real browser
-          ▲                                   │
-          │                         all pass? ├── yes ──► ✅ clear to ship
-          │                                   │
-          └──── Kane's findings + fix hints ◄─┘ no
+```mermaid
+flowchart TD
+    A["Claude Code edits the site"] --> B["Stop hook runs DappSentinel"]
+    B --> C["Kane CLI checks the site in a real browser"]
+    C --> D{"Every check passes?"}
+    D -- yes --> E["Clear to ship: Claude may finish"]
+    D -- no --> F{"Fewer than 3 rounds,<br/>and the fix is Claude's to make?"}
+    F -- yes --> G["Claude is blocked and gets<br/>Kane's findings and fix hints"]
+    G --> A
+    F -- no --> H["A person needs to look:<br/>the checks still failing and Kane's report"]
 ```
 
 1. You (or Claude) change the site.
 2. When Claude finishes its turn, a Claude Code **Stop hook** (`hooks/sentinel-stop.js`) runs every check with Kane CLI.
 3. If anything fails, the hook **blocks Claude from finishing** and hands it Kane's report (`.sentinel/report.md`): what failed, the offending URLs or values, and how to fix it.
-4. Claude fixes the code and finishes again, which re-runs the checks. This repeats until everything passes (or 5 rounds).
+4. Claude fixes the code and finishes again, which re-runs the checks. This repeats until everything passes. After 3 rounds, or when the fix needs a person's decision, it hands over to a person ([what happens when](#what-happens-when)).
 5. `npm run deploy` only deploys if every check passes.
 
 ### What Claude sees when Kane blocks it
@@ -244,7 +245,7 @@ On GitHub, Claude gets the same report with [this prompt](.github/workflows/dapp
 | Every check passes | Claude may finish: "all checks passed, clear to ship" | Green check, merge allowed |
 | A check fails (rounds 1 to 3) | Claude is blocked with the message above and fixes `demo-dapp/` | The fix job hands Claude Kane's report, commits its fix to the PR and comments what changed; Kane checks again |
 | Kane can't decide (the page didn't load, or bot protection) | Counted as a failure, never as a pass | Same: red check, never a fake green |
-| Claude makes no change (the fix needs a person's decision) | The site is unchanged, so Kane isn't re-run and Claude may stop; the report stays in `.sentinel/report.md` | [Comment](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817): a person needs to look, with Claude's reasoning |
+| Claude makes no change (the fix needs a person's decision) | Kane isn't re-run on an unchanged site. Claude may stop, with "a person needs to look at this" and Kane's report | [Comment](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817): a person needs to look, with Claude's reasoning |
 | 3 rounds used and Kane still fails | Claude may stop, with "a person needs to look at this" and the checks still failing | [Comment](https://github.com/Guzman0/DappSentinel/pull/9#issuecomment-7081219978): a person needs to look; no more automatic fixes |
 | A check, the config or the gate was edited | Blocked: "revert those files and fix the site instead" (gate exit code `3`) | Red check, and no fix job runs ([PR #6](https://github.com/Guzman0/DappSentinel/pull/6)) |
 | Claude edits anything outside the site | Edits to the checks and the gate are blocked as Claude makes them (`hooks/guard-checks.js`) | The fix job refuses to commit and fails |
