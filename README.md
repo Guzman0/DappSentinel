@@ -14,7 +14,9 @@
 > - **Proof, all public:** broken PR blocked ([#2](https://github.com/Guzman0/DappSentinel/pull/2)) · cheating refused ([#6](https://github.com/Guzman0/DappSentinel/pull/6)) · [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) 8 of 8 on four runs · [8 live dApps](#real-world-runs) scanned
 > - **Install:** `uses: Guzman0/DappSentinel@v1.1.0` or `npm i -g github:Guzman0/DappSentinel` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U)
 
-▶ **[Watch the demo video (3:59)](https://youtu.be/FiErWhY495U)**
+[![Watch the DappSentinel demo video (3:59)](assets/video-thumb.jpg)](https://youtu.be/FiErWhY495U)
+
+*Click to watch on YouTube (3:59).*
 
 ## Table of contents
 
@@ -433,6 +435,32 @@ A gate is only useful if it's right. So we took the fixed site and made 7 copies
 | `m7-wrong-confirm-amount` | Confirm screen shows a tenth of the amount | fail `swap-flow` only | ✅ | ✅ | ✅ | ✅ | The decimal point is in the wrong place; received amount and fee still match 0.5 ETH |
 
 ### What Kane saw (its own screenshots)
+
+Two of the swap-flow runs from mutation test run 4, played back from Kane's own step screenshots. The red boxes are Kane's, marking what it is about to type into or click. The captions follow Kane's step log, and the last card gives the verdict (for the catch, in Kane's own words).
+
+<table>
+<tr>
+<td width="50%">
+
+**A clean pass** (`clean`): Kane completes the swap and every assertion holds.
+
+![Kane CLI completing the swap on the clean site, step by step, ending in a pass](assets/kane-pass.gif)
+
+*Source: [`clean/screenshots/`](evidence/mutation-test/run-45023763082/clean/screenshots/)*
+
+</td>
+<td width="50%">
+
+**A mistake caught** (`m7-wrong-confirm-amount`): the confirmation shows 0.05 ETH for a 0.5 ETH swap, and Kane fails the run.
+
+![Kane CLI catching the wrong amount on the confirmation screen](assets/kane-catch.gif)
+
+*Source: [`m7-wrong-confirm-amount/screenshots/`](evidence/mutation-test/run-45023763082/m7-wrong-confirm-amount/screenshots/)*
+
+</td>
+</tr>
+</table>
+
 
 Cropped from Kane's step screenshots in run 2. The full, uncropped sets are in [`evidence/mutation-test/run-44884542975/`](evidence/mutation-test/run-44884542975/).
 
