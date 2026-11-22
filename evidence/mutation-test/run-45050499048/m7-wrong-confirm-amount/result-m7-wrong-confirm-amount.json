@@ -1,0 +1,10 @@
+{
+  "id": "m7-wrong-confirm-amount",
+  "mistake": "The confirmation screen shows a tenth of the amount the user typed (a decimals bug)",
+  "expect": [
+    "swap-flow"
+  ],
+  "failed": [],
+  "unsure": [],
+  "verdict": "missed swap-flow"
+}
