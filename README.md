@@ -192,15 +192,14 @@ Both secrets on that page are fake: the Alchemy key was made up and the private 
 ## How the loop works
 
 ```mermaid
-flowchart TD
-    A["Claude Code edits the site"] --> B["Stop hook runs DappSentinel"]
-    B --> C["Kane CLI checks the site in a real browser"]
-    C --> D{"Every check passes?"}
-    D -- yes --> E["Clear to ship: Claude may finish"]
-    D -- no --> F{"Fewer than 3 rounds,<br/>and the fix is Claude's to make?"}
-    F -- yes --> G["Claude is blocked and gets<br/>Kane's findings and fix hints"]
+flowchart LR
+    A["Claude Code<br/>edits the site"] --> C["Stop hook:<br/>Kane CLI checks<br/>in a real browser"]
+    C --> D{"All checks<br/>pass?"}
+    D -- yes --> E["Clear to ship"]
+    D -- no --> F{"Under 3 rounds and<br/>Claude's fix to make?"}
+    F -- yes --> G["Claude is blocked,<br/>gets Kane's findings"]
     G --> A
-    F -- no --> H["A person needs to look:<br/>the checks still failing and Kane's report"]
+    F -- no --> H["A person<br/>needs to look"]
 ```
 
 1. You (or Claude) change the site.
@@ -211,13 +210,16 @@ flowchart TD
 
 ### What Claude sees when Kane blocks it
 
-This is the hook's real output, word for word. To capture it, we ran `hooks/sentinel-stop.js` on Kane's real report from mutation test run 4, where the demo site was given an Infura key ([report](evidence/mutation-test/run-45023763082/m1-infura-key/report.md)):
+This is the hook's real output, word for word (it is JSON; the line breaks are shown here as lines). To capture it, we ran `hooks/sentinel-stop.js` on Kane's real report from mutation test run 4, where the demo site was given an Infura key ([report](evidence/mutation-test/run-45023763082/m1-infura-key/report.md)):
 
-```json
-{
-  "decision": "block",
-  "reason": "DappSentinel (Kane CLI) round 1/3: 1 of 7 checks failed.\n- No RPC API keys in network requests: Kane's network recording shows 1 request carrying an RPC API key in the URL.\n\nRead .sentinel/report.md for Kane's full findings and fix hints, fix the app in demo-dapp/, then finish your turn so the checks re-run.\nDo not edit checks/ or sentinel.config.json to make a check pass."
-}
+```text
+decision: block
+reason:
+DappSentinel (Kane CLI) round 1/3: 1 of 7 checks failed.
+- No RPC API keys in network requests: Kane's network recording shows 1 request carrying an RPC API key in the URL.
+
+Read .sentinel/report.md for Kane's full findings and fix hints, fix the app in demo-dapp/, then finish your turn so the checks re-run.
+Do not edit checks/ or sentinel.config.json to make a check pass.
 ```
 
 Claude then reads Kane's report, which gives the evidence, Kane's own verdict and the fix (excerpt; the key is masked in every report):
