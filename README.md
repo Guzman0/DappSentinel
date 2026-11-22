@@ -202,6 +202,41 @@ Both secrets on that page are fake: the Alchemy key was made up and the private 
 4. Claude fixes the code and finishes again, which re-runs the checks. This repeats until everything passes (or 5 rounds).
 5. `npm run deploy` only deploys if every check passes.
 
+### What Claude sees when Kane blocks it
+
+This is the hook's real output, word for word. To capture it, we ran `hooks/sentinel-stop.js` on Kane's real report from mutation test run 4, where the demo site was given an Infura key ([report](evidence/mutation-test/run-45023763082/m1-infura-key/report.md)):
+
+```json
+{
+  "decision": "block",
+  "reason": "DappSentinel (Kane CLI) round 1/3: 1 of 7 checks failed.\n- No RPC API keys in network requests: Kane's network recording shows 1 request carrying an RPC API key in the URL.\n\nRead .sentinel/report.md for Kane's full findings and fix hints, fix the app in demo-dapp/, then finish your turn so the checks re-run.\nDo not edit checks/ or sentinel.config.json to make a check pass."
+}
+```
+
+Claude then reads Kane's report, which gives the evidence, Kane's own verdict and the fix (excerpt; the key is masked in every report):
+
+```text
+### ❌ No RPC API keys in network requests (`rpc-key-leak`)
+Finding: Kane's network recording shows 1 request carrying an RPC API key in the URL.
+Kane's own DevTools verdict: ❌ failed: assert: No URL in page_requests contains an RPC provider API key …
+Kane and DappSentinel both found it.
+- POST https://mainnet.infura.io/v3/3f9c…a65  (first seen in Kane's recording as request 4 of 5)
+How to fix: Remove provider API keys from frontend code. Use a keyless public RPC for read calls,
+or route keyed calls through a server-side proxy. …
+Watch Kane's run, step by step: https://test-manager.lambdatest.com/…
+```
+
+After 3 rounds that Kane still fails, the hook lets Claude stop and says so instead:
+
+```text
+DappSentinel: a person needs to look at this. Claude Code made 3 rounds of fixes and Kane still finds problems, so the loop stops here instead of trying forever.
+Checks still failing:
+- No RPC API keys in network requests
+Kane's full report: .sentinel/report.md
+```
+
+On GitHub, Claude gets the same report with [this prompt](.github/workflows/dappsentinel.yml), and both sides of the conversation end up on the pull request: Claude's summary of its fix ([PR #7](https://github.com/Guzman0/DappSentinel/pull/7#issuecomment-7052572418)) or its reason for handing over ([PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817)).
+
 ## The agent can't cheat
 
 The coding agent is allowed to fix the site. It is not allowed to touch the referee.
