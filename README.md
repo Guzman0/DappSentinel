@@ -16,6 +16,14 @@
 
 ▶ **[Watch the demo video (3:59)](https://youtu.be/FiErWhY495U)**
 
+**Contents**
+
+- **Start here:** [For judges](#for-judges) · [Kane's five jobs](#kanes-five-jobs) · [Who catches what](#who-catches-what-kane-and-dappsentinel)
+- **Proof:** [Spark loop](#real-world-loop-a-bug-in-code-we-didnt-write) · [Polaris loop](#real-world-loop-2-a-bug-the-maintainers-reported) · [Mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) · [8 live dApps](#real-world-runs) · [Forensic trail](#forensic-trail-the-loop-on-github-step-by-step) · [Track record](#track-record) · [Reproduce it yourself](#reproduce-it-yourself)
+- **The loop:** [How it works](#how-the-loop-works) · [Can't cheat](#the-agent-cant-cheat) · [Handover to a person](#when-the-loop-gives-up-a-person-takes-over)
+- **Use it:** [Any dApp, any folder](#try-it-on-any-dapp-from-any-folder) · [Try it in a minute](#try-it-yourself-in-a-minute) · [Quick start](#quick-start) · [Your own dApp](#use-it-on-your-own-dapp) · [Any live dApp](#check-any-live-dapp) · [Your own repo](#use-it-in-your-own-repo) · [CI](#run-it-in-ci) · [Commands](#commands)
+- **Why and limits:** [Why it matters](#why-it-matters) · [Why Kane CLI](#why-kane-cli-and-not-playwright-plus-a-parser) · [What it doesn't do](#what-dappsentinel-doesnt-do) · [Notes](#notes)
+
 ## For judges
 
 Every judging rule, and where to see the proof. Everything below is public; nothing needs a login or credits to read.
