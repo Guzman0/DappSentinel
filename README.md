@@ -237,6 +237,21 @@ Kane's full report: .sentinel/report.md
 
 On GitHub, Claude gets the same report with [this prompt](.github/workflows/dappsentinel.yml), and both sides of the conversation end up on the pull request: Claude's summary of its fix ([PR #7](https://github.com/Guzman0/DappSentinel/pull/7#issuecomment-7052572418)) or its reason for handing over ([PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817)).
 
+### What happens when
+
+| Situation | In Claude Code (Stop hook) | On GitHub (pull request) |
+|---|---|---|
+| Every check passes | Claude may finish: "all checks passed, clear to ship" | Green check, merge allowed |
+| A check fails (rounds 1 to 3) | Claude is blocked with the message above and fixes `demo-dapp/` | The fix job hands Claude Kane's report, commits its fix to the PR and comments what changed; Kane checks again |
+| Kane can't decide (the page didn't load, or bot protection) | Counted as a failure, never as a pass | Same: red check, never a fake green |
+| Claude makes no change (the fix needs a person's decision) | The site is unchanged, so Kane isn't re-run and Claude may stop; the report stays in `.sentinel/report.md` | [Comment](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817): a person needs to look, with Claude's reasoning |
+| 3 rounds used and Kane still fails | Claude may stop, with "a person needs to look at this" and the checks still failing | [Comment](https://github.com/Guzman0/DappSentinel/pull/9#issuecomment-7081219978): a person needs to look; no more automatic fixes |
+| A check, the config or the gate was edited | Blocked: "revert those files and fix the site instead" (gate exit code `3`) | Red check, and no fix job runs ([PR #6](https://github.com/Guzman0/DappSentinel/pull/6)) |
+| Claude edits anything outside the site | Edits to the checks and the gate are blocked as Claude makes them (`hooks/guard-checks.js`) | The fix job refuses to commit and fails |
+| Kane CLI isn't installed or signed in | Claude may stop, with "could not run Kane (setup problem)"; nothing is reported as safe | Red check (exit code `2`), no fix job |
+| Site unchanged since the last pass | Kane isn't re-run, no credits used | Not applicable: every push is checked |
+| A pull request from a fork | Not applicable | GitHub doesn't give forks the repository's secrets, so Kane can't run there and there is no automatic fix |
+
 ## The agent can't cheat
 
 The coding agent is allowed to fix the site. It is not allowed to touch the referee.
