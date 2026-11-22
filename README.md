@@ -88,7 +88,7 @@ Every check gets a verdict from Kane itself. Kane checks what a user can see by 
 |---|---|---|
 | Wrong contract address | **Kane**, reading the page | |
 | Wrong chain ID | **Kane**, reading the network badge | |
-| Main flow broken | **Kane**, using the swap like a person | |
+| Main flow broken | **Kane**, using the swap like a person | The amount Kane itself read on the confirmation must be exactly 0.5 ETH |
 | RPC key leaked | **Kane**, DevTools network assertion | Every request in Kane's recording |
 | Testnet endpoint | **Kane**, DevTools network assertion | Every request in Kane's recording |
 | Untrusted script | **Kane**, DevTools network assertion | Every script in Kane's recording |
@@ -475,6 +475,8 @@ Cropped from Kane's step screenshots in run 2. The full, uncropped sets are in [
 | <img src="assets/kane-saw/m3-address.jpg" alt="Kane's screenshot: USDC contract 0xA0b86991c6218b63c1d19D4a2e9Eb0cE3606eB48, two characters swapped" width="420"><br><sub>**m3:** the USDC address on the page reads `…c6218b63c1…`. The real one is `…c6218b36c1…`. Kane failed the address check.</sub> | <img src="assets/kane-saw/m4-chain.jpg" alt="Kane's screenshot: network badge reading Ethereum, Chain ID 137" width="420"><br><sub>**m4:** the badge says Ethereum but Chain ID 137. Kane: "showing the chain ID for a different network while keeping the Ethereum name."</sub> |
 | <img src="assets/kane-saw/m7-confirm.jpg" alt="Kane's screenshot: Confirm swap, You pay 0.05 ETH, You receive 1,570.28 USDC" width="420"><br><sub>**m7:** the user typed 0.5 ETH, the confirmation says 0.05, while the 1,570.28 USDC received still matches 0.5. Kane failed the swap flow.</sub> | <img src="assets/kane-saw/clean-submitted.jpg" alt="Kane's screenshot: Swap submitted, swapped 0.5 ETH for 1,570.28 USDC" width="420"><br><sub>**clean:** the fixed site. Kane completed the swap: "Swapped 0.5 ETH for 1,570.28 USDC."</sub> |
 
+**Honest note on Kane CLI 0.10.8:** on the day it came out, we ran the test against it. In one run Kane read "You pay 0.05 ETH" on the confirmation, stored it, and even wrote that it differs from 0.5 ETH, but still passed the check. It failed it correctly on the next two runs. So the swap check now has an exact check behind Kane's verdict: Kane stores the amount it reads, and a pass only stands if that reading is 0.5 ([the full story](evidence/mutation-test/#kane-cli-0108-released-22-nov-2026-and-one-miss)).
+
 **Honest note on m3:** the verdict is right and repeatable (fail on the swapped address, pass on the clean one, twice each), but Kane never wrote "these two characters differ". Both times it said its own comparison step hadn't stored the value it read. We count the verdict, not the explanation.
 
 **The full record**, kept in the repo after GitHub's artifacts expire: [`evidence/mutation-test/`](evidence/mutation-test/) has, for every variant, the report, every step Kane took, Kane's screenshots and the masked network log. Run 2's record was committed by the workflow itself. Run it yourself from the **Mutation test (known-answer)** workflow, or one variant at a time with `node scripts/mutants.js build <id>` and `node bin/dappsentinel.js check --site .mutants/<id>`.
@@ -581,7 +583,7 @@ The code was written by **Claude** (Anthropic) working as a coding agent (Claude
 
 | Tool | What it does in DappSentinel |
 |---|---|
-| **Kane CLI** (`@testmuai/kane-cli`, 0.10.7 in the latest runs) | Runs every check in a real Chrome, gives its own verdicts (page assertions and DevTools assertions), and records the network log (HAR), screenshots and replay links that are the evidence |
+| **Kane CLI** (`@testmuai/kane-cli`; tested on 0.10.7 and on 0.10.8, released 22 Nov) | Runs every check in a real Chrome, gives its own verdicts (page assertions and DevTools assertions), and records the network log (HAR), screenshots and replay links that are the evidence |
 | **Claude Code** | Fixes the site: through the Stop hook and `/sentinel` locally, and on GitHub through [`anthropics/claude-code-action@v1`](https://github.com/anthropics/claude-code-action) with its default model |
 | **Node.js** (20 in CI) | The gate (`bin/dappsentinel.js`) and the analyzers (`lib/`), with three small dependencies: `adm-zip` (reads Kane's evidence packs), `ws` (talks to Chrome), `cross-spawn` (starts Kane) |
 | **Google Chrome**, over the Chrome DevTools Protocol | The browser Kane drives; DappSentinel reads its localStorage and sessionStorage live |

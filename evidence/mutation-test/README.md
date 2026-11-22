@@ -15,6 +15,22 @@ None of the mistakes is the same as the ones in the demo, so the checks were not
 | [44962415067](https://github.com/Guzman0/DappSentinel/actions/runs/44962415067) | 22 Nov 2026 | 8 of 8 correct | [`run-44962415067/`](run-44962415067/): as run 2, plus Kane's own DevTools verdicts on the 4 hidden checks. Kane's assertions caught m1 (Infura key) and m2 (Holesky RPC) themselves and missed m5 (jsDelivr script) and m6 (seed in sessionStorage, which Kane's storage assertion doesn't read); DappSentinel's exact check caught all four. No false alarms from Kane on any other check |
 | [45023763082](https://github.com/Guzman0/DappSentinel/actions/runs/45023763082) | 22 Nov 2026 | 8 of 8 correct | [`run-45023763082/`](run-45023763082/): Kane now stores the page's requests in the step that reloads it, because its network capture resets every step. Kane's assertions caught m1, m2 and m5 themselves; only m6 (sessionStorage, which Kane's DevTools don't read) was left to DappSentinel's exact check. No false alarms from Kane |
 
+### Kane CLI 0.10.8 (released 22 Nov 2026), and one miss
+
+Kane CLI 0.10.8 came out on 22 Nov, and these runs check DappSentinel against it. All runs below installed it, except the control.
+
+| Run | Kane CLI | Variants | Result |
+|---|---|---|---|
+| [45050499048](https://github.com/Guzman0/DappSentinel/actions/runs/45050499048) | 0.10.8 | clean, m1, m7 | clean ✅, m1 ✅, **m7 missed**: see below. Record: [`run-45050499048/`](run-45050499048/) |
+| [45051845872](https://github.com/Guzman0/DappSentinel/actions/runs/45051845872) | 0.10.8 | m7 | ✅ Kane failed the wrong amount |
+| [45051857432](https://github.com/Guzman0/DappSentinel/actions/runs/45051857432) | 0.10.8 | m7 | ✅ Kane failed the wrong amount |
+| [45051867244](https://github.com/Guzman0/DappSentinel/actions/runs/45051867244) | 0.10.7 (control) | m7 | ✅ Kane failed the wrong amount |
+| [45052587659](https://github.com/Guzman0/DappSentinel/actions/runs/45052587659) | 0.10.8 | clean, m7 | clean ✅ and m7 ✅, with the new exact check below in place |
+
+**The miss.** In run 45050499048, Kane's own screenshot of the confirmation shows "You pay 0.05 ETH" ([screenshot](run-45050499048/m7-wrong-confirm-amount/screenshots/swap-flow-run-10.jpg)). Kane read it correctly: it stored `"You pay 0.05 ETH"`, and its summary says the review screen "differs from the requested 0.5 ETH amount" ([report](run-45050499048/m7-wrong-confirm-amount/report.md)). It still marked "the confirmation shows You pay 0.5 ETH" as passed, and the run ended as a pass. On the next two runs with the same version, Kane failed it correctly. In total Kane has caught this mistake on 8 of 9 runs.
+
+**What we changed.** The swap check now asks Kane to store the amount it reads on the confirmation (`confirm_pay_amount`), and DappSentinel checks it exactly (`expect: confirm_pay_amount=0.5` in [`checks/07-swap-flow.md`](../../checks/07-swap-flow.md)). Kane still makes the call, but a pass only stands if Kane's own reading matches. In run 45052587659 Kane stored `"0.5 ETH"` on the clean site, and the check passed. A unit test replays the real miss: the value `"You pay 0.05 ETH"` must fail (`npm test`).
+
 ## The matrix
 
 | Variant | Planted mistake | Expected | Run 1 | Run 2 | Run 3 | Run 4 | What Kane found (run 2) |
