@@ -1,0 +1,5 @@
+GET 200 http://localhost:4173/
+GET 200 http://localhost:4173/style.css
+GET 200 http://localhost:4173/app.js
+POST 200 https://ethereum-rpc.publicnode.com/
+POST 200 https://ethereum-rpc.publicnode.com/
