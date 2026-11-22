@@ -1,0 +1,1 @@
+Refused, as issue 118 asks (exit 1).

@@ -1,0 +1,82 @@
+diff --git a/.env.local.example b/.env.local.example
+index 27c5465..8a1270b 100644
+--- a/.env.local.example
++++ b/.env.local.example
+@@ -1,2 +1,4 @@
+ NEXT_PUBLIC_ORACLE_URL=http://localhost:3001
++NEXT_PUBLIC_STELLAR_RPC_URL=https://soroban-testnet.stellar.org
++NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
+ NEXT_PUBLIC_WEBAUTHN_RP_ID=localhost
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 9b71e7a..ae211c0 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -19,3 +19,7 @@ jobs:
+       - run: npx tsc --noEmit
+       - run: npm test
+       - run: npm run build
++        env:
++          NEXT_PUBLIC_ORACLE_URL: http://localhost:3001
++          NEXT_PUBLIC_STELLAR_RPC_URL: https://soroban-testnet.stellar.org
++          NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE: Test SDF Network ; September 2015
+diff --git a/README.md b/README.md
+index 082f6b3..38045ef 100644
+--- a/README.md
++++ b/README.md
+@@ -164,9 +164,13 @@ Two environment variables matter in production:
+ 
+ | Variable | Purpose |
+ |---|---|
+-| `NEXT_PUBLIC_ORACLE_URL` | The `polaris-oracle` API this app talks to |
++| `NEXT_PUBLIC_ORACLE_URL` | The `polaris-oracle` API this app talks to. Required in production builds |
++| `NEXT_PUBLIC_STELLAR_RPC_URL` | Soroban RPC endpoint used for wallet-signed transactions. Required in production builds |
++| `NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE` | Stellar network passphrase matching the RPC endpoint. Required in production builds |
+ | `NEXT_PUBLIC_WEBAUTHN_RP_ID` | Must exactly match the deployed domain — WebAuthn's relying-party id is tied to it, and a mismatch silently breaks every passkey prompt |
+ 
++In development the first three fall back to localhost/testnet defaults; `next build` fails with an error naming any that are missing.
++
+ ## Design notes
+ 
+ ### Embedding a market
+diff --git a/src/lib/config.ts b/src/lib/config.ts
+index 0b2efb8..53600fc 100644
+--- a/src/lib/config.ts
++++ b/src/lib/config.ts
+@@ -3,10 +3,32 @@
+ // submission do not: a connected wallet (Freighter) builds, simulates,
+ // signs, and sends its own transactions directly against Soroban RPC — see
+ // lib/freighter-wallet.ts. Both RPC values below are public network
+-// parameters, not secrets — safe to bake in as defaults the same way
+-// oracleUrl already is.
++// parameters, not secrets.
++//
++// Next.js inlines NEXT_PUBLIC_* at build time, so each one must be read as a
++// literal process.env.NEXT_PUBLIC_... expression. The localhost/testnet
++// defaults are for development only; a production build must set every
++// variable explicitly rather than silently ship localhost or testnet.
++const values = {
++  NEXT_PUBLIC_ORACLE_URL: process.env.NEXT_PUBLIC_ORACLE_URL,
++  NEXT_PUBLIC_STELLAR_RPC_URL: process.env.NEXT_PUBLIC_STELLAR_RPC_URL,
++  NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE: process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE,
++};
++
++if (process.env.NODE_ENV === 'production') {
++  const missing = Object.entries(values)
++    .filter(([, value]) => !value)
++    .map(([name]) => name);
++  if (missing.length > 0) {
++    throw new Error(
++      `Missing required environment variable(s) for a production build: ${missing.join(', ')}. ` +
++        'Set them explicitly; the localhost/testnet defaults are for development only.',
++    );
++  }
++}
++
+ export const config = {
+-  oracleUrl: process.env.NEXT_PUBLIC_ORACLE_URL ?? 'http://localhost:3001',
+-  stellarRpcUrl: process.env.NEXT_PUBLIC_STELLAR_RPC_URL ?? 'https://soroban-testnet.stellar.org',
+-  stellarNetworkPassphrase: process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE ?? 'Test SDF Network ; September 2015',
++  oracleUrl: values.NEXT_PUBLIC_ORACLE_URL || 'http://localhost:3001',
++  stellarRpcUrl: values.NEXT_PUBLIC_STELLAR_RPC_URL || 'https://soroban-testnet.stellar.org',
++  stellarNetworkPassphrase: values.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE || 'Test SDF Network ; September 2015',
+ };
