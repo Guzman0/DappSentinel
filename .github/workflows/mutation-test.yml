@@ -12,6 +12,10 @@ on:
         description: Which variants to run, as a JSON list (default all)
         required: false
         default: '["clean","m1-infura-key","m2-holesky-rpc","m3-swapped-digits","m4-polygon-chain","m5-jsdelivr-script","m6-seed-in-session","m7-wrong-confirm-amount"]'
+      kane_version:
+        description: Kane CLI version to test with (default the latest release)
+        required: false
+        default: latest
 
 jobs:
   variant:
@@ -35,8 +39,10 @@ jobs:
         uses: browser-actions/setup-chrome@v2
 
       - name: Install Kane CLI and DappSentinel
+        env:
+          KANE_VERSION: ${{ inputs.kane_version }}
         run: |
-          npm install -g @testmuai/kane-cli
+          npm install -g "@testmuai/kane-cli@${KANE_VERSION:-latest}"
           npm install
 
       - name: Build the variant
