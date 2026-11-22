@@ -16,13 +16,37 @@
 
 ▶ **[Watch the demo video (3:59)](https://youtu.be/FiErWhY495U)**
 
-**Contents**
+## Table of contents
 
-- **Start here:** [For judges](#for-judges) · [Kane's five jobs](#kanes-five-jobs) · [Who catches what](#who-catches-what-kane-and-dappsentinel)
-- **Proof:** [Spark loop](#real-world-loop-a-bug-in-code-we-didnt-write) · [Polaris loop](#real-world-loop-2-a-bug-the-maintainers-reported) · [Mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) · [8 live dApps](#real-world-runs) · [Forensic trail](#forensic-trail-the-loop-on-github-step-by-step) · [Track record](#track-record) · [Reproduce it yourself](#reproduce-it-yourself)
-- **The loop:** [How it works](#how-the-loop-works) · [Can't cheat](#the-agent-cant-cheat) · [Handover to a person](#when-the-loop-gives-up-a-person-takes-over)
-- **Use it:** [Any dApp, any folder](#try-it-on-any-dapp-from-any-folder) · [Try it in a minute](#try-it-yourself-in-a-minute) · [Quick start](#quick-start) · [Your own dApp](#use-it-on-your-own-dapp) · [Any live dApp](#check-any-live-dapp) · [Your own repo](#use-it-in-your-own-repo) · [CI](#run-it-in-ci) · [Commands](#commands)
-- **Why and limits:** [Why it matters](#why-it-matters) · [Why Kane CLI](#why-kane-cli-and-not-playwright-plus-a-parser) · [What it doesn't do](#what-dappsentinel-doesnt-do) · [Notes](#notes)
+- [For judges](#for-judges)
+- [Kane's five jobs](#kanes-five-jobs)
+- [Who catches what: Kane and DappSentinel](#who-catches-what-kane-and-dappsentinel)
+- [Real-world loop: a bug in code we didn't write](#real-world-loop-a-bug-in-code-we-didnt-write)
+- [Real-world loop 2: a bug the maintainers reported](#real-world-loop-2-a-bug-the-maintainers-reported)
+- [What DappSentinel checks](#what-dappsentinel-checks)
+  - [Why two kinds of check?](#why-two-kinds-of-check)
+- [Why it matters](#why-it-matters)
+- [Try it on any dApp, from any folder](#try-it-on-any-dapp-from-any-folder)
+- [Try it yourself in a minute](#try-it-yourself-in-a-minute)
+- [How the loop works](#how-the-loop-works)
+- [The agent can't cheat](#the-agent-cant-cheat)
+- [When the loop gives up, a person takes over](#when-the-loop-gives-up-a-person-takes-over)
+- [Quick start](#quick-start)
+  - [Close the loop with Claude Code](#close-the-loop-with-claude-code)
+- [Use it on your own dApp](#use-it-on-your-own-dapp)
+- [Check any live dApp](#check-any-live-dapp)
+- [Use it in your own repo](#use-it-in-your-own-repo)
+- [Why Kane CLI, and not Playwright plus a parser](#why-kane-cli-and-not-playwright-plus-a-parser)
+- [Forensic trail: the loop on GitHub, step by step](#forensic-trail-the-loop-on-github-step-by-step)
+- [Reproduce it yourself](#reproduce-it-yourself)
+- [Track record](#track-record)
+- [Mutation test (known-answer): mistakes it was never tuned for](#mutation-test-known-answer-mistakes-it-was-never-tuned-for)
+  - [What Kane saw (its own screenshots)](#what-kane-saw-its-own-screenshots)
+- [Real-world runs](#real-world-runs)
+- [Run it in CI](#run-it-in-ci)
+- [Commands](#commands)
+- [What DappSentinel doesn't do](#what-dappsentinel-doesnt-do)
+- [Notes](#notes)
 
 ## For judges
 
@@ -91,6 +115,8 @@ The same key is still in Spark's production traffic: DappSentinel's [live scan o
 3. **Proven twice.** The misconfigured build is now refused, naming all three settings, which is the issue's first acceptance criterion. A correctly configured build passes Kane's DevTools assertion: no request to localhost or a testnet.
 
 **Offered upstream:** the tested fix is offered [in a comment on issue #118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118#issuecomment-7079526239) (22 Nov), and the pull request follows once a maintainer assigns it. Full record and honest notes, including why the configured build still can't load Polaris's live data from a test copy: [`evidence/realworld-polaris/`](evidence/realworld-polaris/).
+
+## What DappSentinel checks
 
 DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
 
