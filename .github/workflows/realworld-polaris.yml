@@ -1,6 +1,7 @@
 # Real-world loop on an open, reported bug in code we didn't write: Polaris (MIT), a prediction-market
 # dApp on Stellar. Issue PolarisQ-xyz/polaris-frontend#118: a production build with a missing
 # NEXT_PUBLIC_* variable still builds, and silently points the site at localhost and testnet.
+# Pinned to 0119e87 (10 Nov), the code the issue was filed against on 18 Nov; config.ts is unchanged since.
 #
 # Kane checks the misconfigured build, DappSentinel reads Kane's recording, Claude Code fixes the
 # source as the issue asks, and the fixed code is checked twice: the misconfigured build must now
@@ -15,7 +16,7 @@ on:
 
 env:
   POLARIS_REPO: https://github.com/PolarisQ-xyz/polaris-frontend.git
-  POLARIS_SHA: 17bfbf22264b3c44a8e8b6800e96885e44ec0915
+  POLARIS_SHA: 0119e87d76d108c1593cb37993d01c0bd88f18be
   ORACLE_URL: https://polaris-oracle-api.fly.dev
 
 permissions:
