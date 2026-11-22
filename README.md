@@ -6,11 +6,13 @@
 
 > [!TIP]
 > **TL;DR**
-> - **What:** a pre-launch gate for dApp websites. Kane CLI checks the site in a real browser for 6 mistakes you can't see on screen: leaked RPC keys, testnet endpoints, wrong contracts, wrong chain, untrusted scripts, keys in storage.
+> - **What:** a pre-launch gate for dApp websites. Kane CLI checks the site in a real browser for mistakes you can't see on screen: leaked RPC keys, testnet endpoints, wrong contracts, wrong chain, untrusted scripts, keys in storage.
 > - **The loop:** Kane catches it → Claude Code fixes it → Kane checks again, until every check passes. The agent can't edit the checks to cheat.
-> - **Where it runs:** in Claude Code on your machine (`/sentinel`), and on GitHub, where it blocks the merge and fixes the pull request itself.
-> - **Proof, all public:** broken PR blocked ([#2](https://github.com/Guzman0/DappSentinel/pull/2)) · Claude fixes a PR on GitHub with no human ([#5](https://github.com/Guzman0/DappSentinel/pull/5)) · cheating refused ([#6](https://github.com/Guzman0/DappSentinel/pull/6)) · 8 of 8 on a [mutation test (known-answer)](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) with mistakes it was never tuned for · [forensic trail](#forensic-trail-the-loop-on-github-step-by-step) · live runs on Lido, Aave and CoW Swap ([results](#real-world-runs)).
-> - **Install:** `uses: Guzman0/DappSentinel@v1.1.0` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U)
+> - **Real bugs in code we didn't write:** Polaris issue [#118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118), reported by its maintainers: Kane caught it, Claude fixed it, proven twice, fix offered upstream ([loop](#real-world-loop-2-a-bug-the-maintainers-reported)). Spark's frontend: a hardcoded RPC key that breaks every build outside Spark's domain ([loop](#real-world-loop-a-bug-in-code-we-didnt-write)).
+> - **Kane makes the call:** Kane gives its own verdict on every check, using its DevTools for the hidden ones; DappSentinel's exact check runs behind it ([who catches what](#who-catches-what-kane-and-dappsentinel)).
+> - **Where it runs:** in Claude Code on your machine (`/sentinel`), and on GitHub, where it blocks the merge and fixes the pull request itself ([#5](https://github.com/Guzman0/DappSentinel/pull/5), no human involved).
+> - **Proof, all public:** broken PR blocked ([#2](https://github.com/Guzman0/DappSentinel/pull/2)) · cheating refused ([#6](https://github.com/Guzman0/DappSentinel/pull/6)) · [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) 8 of 8 on four runs · [8 live dApps](#real-world-runs) scanned
+> - **Install:** `uses: Guzman0/DappSentinel@v1.1.0` or `npm i -g github:Guzman0/DappSentinel` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U)
 
 ▶ **[Watch the demo video (3:59)](https://youtu.be/FiErWhY495U)**
 
@@ -51,6 +53,26 @@ Every check gets a verdict from Kane itself. Kane checks what a user can see by 
 - **No false alarms from Kane:** on the clean site, and on Lido's live site, every Kane DevTools verdict matched DappSentinel's ([Lido run](https://github.com/Guzman0/DappSentinel/actions/runs/45023768462)).
 
 That's why both run: Kane's verdicts come from Kane, and the exact check makes sure nothing slips past either. Every report shows both side by side, with a link to Kane's own replay. Each network finding also says where it sits in Kane's run, for example *"first seen in Kane's recording as request 5 of 6"*.
+
+## Real-world loop: a bug in code we didn't write
+
+Spark is a large DeFi lending app. Its web app's code (MIT licence) was public on GitHub in 2024, and [a copy](https://github.com/syt4sh1/spark-app) still is. One workflow, [one run](https://github.com/Guzman0/DappSentinel/actions/runs/44953030392), every job green:
+
+1. **Kane caught it.** We built Spark's code unchanged and Kane used it in a real browser. Kane failed the page itself: *"The page tries to use an external Ethereum data service from the browser, but that service does not allow requests from this page's address. The app cannot load its required data and shows an error screen."* The cause, in the browser's own error: an Alchemy API key written into the source, locked to Spark's domain.
+2. **Claude Code fixed it.** It removed the key from the source, made the RPC URL a setting (`VITE_MAINNET_RPC_URL`) with a keyless public fallback, and documented it. 3 lines in 2 files: [the patch](evidence/realworld-spark/run-44953030392/fix.patch).
+3. **Kane proved it.** Rebuilt and checked again: the page loads, and none of the 46 requests carries a key or goes to a testnet.
+
+The same key is still in Spark's production traffic: DappSentinel's [live scan of app.spark.fi](https://github.com/Guzman0/DappSentinel/actions/runs/44952359583) found it. Spark's repository is private now, so there's no pull request to offer; the key is masked throughout. Full record and honest notes: [`evidence/realworld-spark/`](evidence/realworld-spark/).
+
+## Real-world loop 2: a bug the maintainers reported
+
+[Polaris](https://github.com/PolarisQ-xyz/polaris-frontend) is an open-source prediction-market dApp. Its maintainers' issue [#118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118) says a production build with a missing setting still builds, and silently points the site at localhost and testnet. One workflow, [one run](https://github.com/Guzman0/DappSentinel/actions/runs/45015619019), every job green:
+
+1. **Kane caught it.** We built Polaris exactly as the issue describes. Kane failed the page: *"The page tried to get market and account data from a local service, but that service was not accepting connections."* Kane's own DevTools assertion against local and testnet requests failed too.
+2. **Claude Code fixed it the way the issue asks.** A production build with a missing setting now stops with an error naming it; the defaults stay for development; CI sets explicit values ([the patch](evidence/realworld-polaris/run-45015619019/fix.patch)).
+3. **Proven twice.** The misconfigured build is now refused, naming all three settings, which is the issue's first acceptance criterion. A correctly configured build passes Kane's DevTools assertion: no request to localhost or a testnet.
+
+**Offered upstream:** the tested fix is offered on [issue #118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118), and the pull request follows once a maintainer assigns it. Full record and honest notes, including why the configured build still can't load Polaris's live data from a test copy: [`evidence/realworld-polaris/`](evidence/realworld-polaris/).
 
 DappSentinel is a pre-launch safety gate for dApp frontends. It uses [Kane CLI](https://github.com/LambdaTest/kane-cli) to open your site in a real browser and check what happens *behind* the page: every network request, every script, everything left in browser storage. When Kane catches a problem, your coding agent (Claude Code) gets the findings, fixes the code, and Kane checks again, until every check passes.
 
@@ -292,33 +314,13 @@ Every CI run so far, unfiltered. Same input, same verdict.
 
 Not counted above, and why: one Lido run ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44770797794)) hit Cloudflare bot protection, which led to the "inconclusive" rule; one action test ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44770752102)) ran before the `v1` tag existed; the first runs on Lido, CoW Swap and Aave ([1](https://github.com/Guzman0/DappSentinel/actions/runs/44759647200), [2](https://github.com/Guzman0/DappSentinel/actions/runs/44759652548)) were before two false-alarm fixes, described in [Real-world runs](#real-world-runs).
 
-## Real-world loop: a bug in code we didn't write
-
-Spark is a large DeFi lending app. Its web app's code (MIT licence) was public on GitHub in 2024, and [a copy](https://github.com/syt4sh1/spark-app) still is. One workflow, [one run](https://github.com/Guzman0/DappSentinel/actions/runs/44953030392), every job green:
-
-1. **Kane caught it.** We built Spark's code unchanged and Kane used it in a real browser. Kane failed the page itself: *"The page tries to use an external Ethereum data service from the browser, but that service does not allow requests from this page's address. The app cannot load its required data and shows an error screen."* The cause, in the browser's own error: an Alchemy API key written into the source, locked to Spark's domain.
-2. **Claude Code fixed it.** It removed the key from the source, made the RPC URL a setting (`VITE_MAINNET_RPC_URL`) with a keyless public fallback, and documented it. 3 lines in 2 files: [the patch](evidence/realworld-spark/run-44953030392/fix.patch).
-3. **Kane proved it.** Rebuilt and checked again: the page loads, and none of the 46 requests carries a key or goes to a testnet.
-
-The same key is still in Spark's production traffic: DappSentinel's [live scan of app.spark.fi](https://github.com/Guzman0/DappSentinel/actions/runs/44952359583) found it. Spark's repository is private now, so there's no pull request to offer; the key is masked throughout. Full record and honest notes: [`evidence/realworld-spark/`](evidence/realworld-spark/).
-
-## Real-world loop 2: a bug the maintainers reported
-
-[Polaris](https://github.com/PolarisQ-xyz/polaris-frontend) is an open-source prediction-market dApp. Its maintainers' issue [#118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118) says a production build with a missing setting still builds, and silently points the site at localhost and testnet. One workflow, [one run](https://github.com/Guzman0/DappSentinel/actions/runs/45015619019), every job green:
-
-1. **Kane caught it.** We built Polaris exactly as the issue describes. Kane failed the page: *"The page tried to get market and account data from a local service, but that service was not accepting connections."* Kane's own DevTools assertion against local and testnet requests failed too.
-2. **Claude Code fixed it the way the issue asks.** A production build with a missing setting now stops with an error naming it; the defaults stay for development; CI sets explicit values ([the patch](evidence/realworld-polaris/run-45015619019/fix.patch)).
-3. **Proven twice.** The misconfigured build is now refused, naming all three settings, which is the issue's first acceptance criterion. A correctly configured build passes Kane's DevTools assertion: no request to localhost or a testnet.
-
-**Offered upstream:** the tested fix is offered on [issue #118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118), and the pull request follows once a maintainer assigns it. Full record and honest notes, including why the configured build still can't load Polaris's live data from a test copy: [`evidence/realworld-polaris/`](evidence/realworld-polaris/).
-
 ## Mutation test (known-answer): mistakes it was never tuned for
 
 A gate is only useful if it's right. So we took the fixed site and made 7 copies, each with **one new mistake** that is different from the demo's (Infura instead of Alchemy, Holesky instead of Sepolia, a swapped digit in the middle of the address instead of the last one, and so on). The clean site must pass everything; each copy must fail exactly its own check and nothing else.
 
 **Four runs, same verdict every time: 8 of 8.** Run 4 also shows Kane's own DevTools verdicts catching 3 of the 4 hidden mistakes by themselves ([run 4](https://github.com/Guzman0/DappSentinel/actions/runs/45023763082)). Run 3: [link](https://github.com/Guzman0/DappSentinel/actions/runs/44962415067)). [Run 1](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698) · [Run 2](https://github.com/Guzman0/DappSentinel/actions/runs/44884542975)
 
-![Mutation test results: the clean site passes 7 of 7, and each of the 7 copies fails exactly its own check](assets/mutation-test.jpg)
+![Mutation test results: the clean site passes 7 of 7, and each of the 7 copies fails exactly its own check, on all four runs](assets/mutation-test.jpg)
 
 | Variant | Planted mistake | Expected | Run 1 | Run 2 | What Kane found |
 |---|---|---|---|---|---|

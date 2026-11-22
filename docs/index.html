@@ -149,7 +149,7 @@
   <header class="top">
     <a class="brand" href="#top"><img src="img/logo-eye.svg" alt="">DappSentinel</a>
     <nav aria-label="Sections">
-      <a href="#problem">Problem</a><a href="#checks">Checks</a><a href="#loop">Loop</a><a href="#proof">Proof</a><a href="#install">Install</a>
+      <a href="#problem">Problem</a><a href="#checks">Checks</a><a href="#loop">Loop</a><a href="#real-bugs">Real bugs</a><a href="#proof">Proof</a><a href="#install">Install</a>
     </nav>
   </header>
 
@@ -224,16 +224,16 @@
 
     <section id="checks">
       <h2>What Kane checks</h2>
-      <p class="lede">Kane drives a real Chrome and uses the site like a person. DappSentinel reads the evidence Kane records: every request, every script, everything left in storage.</p>
+      <p class="lede">Kane drives a real Chrome and uses the site like a person, and gives its own verdict on every check: by reading the page, or with its DevTools on the traffic and storage it captured. DappSentinel then reads Kane's recording line by line as a second, exact check. A check fails if either finds the problem.</p>
       <div class="grid6">
-        <div class="card"><h3>Leaked RPC keys</h3><p>Provider API keys (Alchemy, Infura, QuickNode…) in the requests the page sends.</p><div class="how">Kane's network recording</div></div>
-        <div class="card"><h3>Testnet in a mainnet build</h3><p>Sepolia, staging or local endpoints left in a production site.</p><div class="how">Kane's network recording</div></div>
+        <div class="card"><h3>Leaked RPC keys</h3><p>Provider API keys (Alchemy, Infura, QuickNode…) in the requests the page sends.</p><div class="how">Kane's DevTools + its network recording</div></div>
+        <div class="card"><h3>Testnet in a mainnet build</h3><p>Sepolia, staging or local endpoints left in a production site.</p><div class="how">Kane's DevTools + its network recording</div></div>
         <div class="card"><h3>Wrong contract address</h3><p>A token address on the page that's off by even one character.</p><div class="how">Kane reads the page</div></div>
         <div class="card"><h3>Wrong chain</h3><p>A network badge that says Sepolia when you meant mainnet.</p><div class="how">Kane reads the page</div></div>
-        <div class="card"><h3>Untrusted scripts</h3><p>Code loaded from any host you haven't allowed. The BadgerDAO problem.</p><div class="how">Kane's network recording</div></div>
-        <div class="card"><h3>Keys in browser storage</h3><p>Private keys or seed phrases saved where any script on the page can read them.</p><div class="how">The browser Kane drives</div></div>
+        <div class="card"><h3>Untrusted scripts</h3><p>Code loaded from any host you haven't allowed. The BadgerDAO problem.</p><div class="how">Kane's DevTools + its network recording</div></div>
+        <div class="card"><h3>Keys in browser storage</h3><p>Private keys or seed phrases saved where any script on the page can read them.</p><div class="how">Kane's DevTools + the browser Kane drives</div></div>
       </div>
-      <p class="note">Plus a seventh check that the main flow still works: Kane runs the swap from start to finish, so a fix can't pass by breaking the page. That run is also the one whose traffic the network checks read. On a live dApp DappSentinel doesn't know, it runs the five checks that need no inside knowledge: the four above that read traffic and storage, and a check that the page loads.</p>
+      <p class="note">Plus a seventh check that the main flow still works: Kane runs the swap from start to finish, so a fix can't pass by breaking the page. That run is also the one whose traffic the network checks read. Measured: on the demo, Kane's DevTools failed all 4 hidden checks by themselves; in the mutation test they caught 3 of 4 hidden mistakes by themselves, with no false alarms. The 4th was in sessionStorage, which Kane's DevTools don't read, and DappSentinel's exact check caught it. On a live dApp DappSentinel doesn't know, it runs the five checks that need no inside knowledge: the four above that read traffic and storage, and a check that the page loads.</p>
     </section>
 
     <section id="loop">
@@ -245,6 +245,16 @@
       </div>
       <p class="back">↺ After every fix, the hook re-runs Kane. The loop ends only when every check passes, and the gate opens.</p>
       <p class="lede" style="font-size:18px">The loop closes on GitHub too. In <a href="https://github.com/Guzman0/DappSentinel/pull/5">PR #5</a>, nobody touched anything: Kane failed the pull request 6 of 7, Claude Code fixed the site on GitHub and pushed the fix, and the pull request's own gate passed 7 of 7. Only <code>demo-dapp/</code> may change, and it stops after 3 rounds.</p>
+    </section>
+
+    <section id="real-bugs">
+      <h2>Real bugs, in code we didn't write</h2>
+      <p class="lede">The same loop on open-source dApps: Kane catches it, Claude Code fixes it, Kane proves the fix. One workflow run each, every job green.</p>
+      <div class="grid6">
+        <div class="card"><h3>Polaris, issue #118</h3><p>Reported by Polaris's own maintainers: a production build with a missing setting silently talks to localhost and testnet. Kane failed the page: "The page tried to get market and account data from a local service." Claude fixed it as the issue asks. The bad build is now refused, and Kane's DevTools find no localhost or testnet requests. Fix offered on the issue.</p><div class="how"><a href="https://github.com/Guzman0/DappSentinel/actions/runs/45015619019">Run</a> · <a href="https://github.com/PolarisQ-xyz/polaris-frontend/issues/118">Issue</a> · <a href="https://github.com/Guzman0/DappSentinel/tree/main/evidence/realworld-polaris">Record</a></div></div>
+        <div class="card"><h3>Spark's frontend</h3><p>Spark's 2024 open-source code had an Alchemy key written into it, locked to Spark's domain. Built anywhere else, Kane failed the page: "The app cannot load its required data and shows an error screen." Claude removed the key and made the RPC a setting; Kane confirmed the page loads, with 0 keys in 46 requests.</p><div class="how"><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44953030392">Run</a> · <a href="https://github.com/Guzman0/DappSentinel/tree/main/evidence/realworld-spark">Record</a></div></div>
+        <div class="card"><h3>8 live dApps scanned</h3><p>Yearn and Curve clean. Spark's live site still sends that key. Uniswap, ENS and Revoke.cash load bot-protection, analytics or chat scripts. Balancer and Sushi honestly marked inconclusive. Real sites also made the tool better: it now follows a site that forwards to another address.</p><div class="how"><a href="https://github.com/Guzman0/DappSentinel#real-world-runs">All runs</a></div></div>
+      </div>
     </section>
 
     <section id="why-kane">
@@ -278,7 +288,9 @@
           <tr><td>The fix, in <a href="https://github.com/Guzman0/DappSentinel/pull/1">PR #1</a></td><td><span class="g">7 of 7 passed</span>, every time</td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44756869916">1</a>, <a href="https://github.com/Guzman0/DappSentinel/actions/runs/44777479949">2</a></td></tr>
           <tr><td>Broken, then fixed by Claude Code on GitHub, in <a href="https://github.com/Guzman0/DappSentinel/pull/3">PR #3</a> and <a href="https://github.com/Guzman0/DappSentinel/pull/5">PR #5</a></td><td><span class="r">6 of 7</span>, then <span class="g">7 of 7</span> after Claude's fix, both times</td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44812319363">#3 red</a>, <a href="https://github.com/Guzman0/DappSentinel/actions/runs/44813042427">#3 green</a>, <a href="https://github.com/Guzman0/DappSentinel/actions/runs/44819169522">#5 red</a>, <a href="https://github.com/Guzman0/DappSentinel/actions/runs/44819910638">#5 green</a></td></tr>
           <tr><td>A broken change, in <a href="https://github.com/Guzman0/DappSentinel/pull/2">PR #2</a></td><td><span class="r">6 of 7 failed</span>, merge blocked</td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44794168901">1</a></td></tr>
-          <tr><td>Mutation test (known-answer): the fixed site plus 7 copies, each with one new mistake the checks were never tuned for (<a href="https://github.com/Guzman0/DappSentinel/tree/main/evidence/mutation-test">full record</a>)</td><td><span class="g">8 of 8 judged correctly</span>, both times</td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44847434698">1</a>, <a href="https://github.com/Guzman0/DappSentinel/actions/runs/44884542975">2</a></td></tr>
+          <tr><td>Mutation test (known-answer): the fixed site plus 7 copies, each with one new mistake the checks were never tuned for (<a href="https://github.com/Guzman0/DappSentinel/tree/main/evidence/mutation-test">full record</a>)</td><td><span class="g">8 of 8 judged correctly</span>, all four runs</td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44847434698">1</a>, <a href="https://github.com/Guzman0/DappSentinel/actions/runs/44884542975">2</a>, <a href="https://github.com/Guzman0/DappSentinel/actions/runs/44962415067">3</a>, <a href="https://github.com/Guzman0/DappSentinel/actions/runs/45023763082">4</a></td></tr>
+          <tr><td>Polaris issue #118, reported by its maintainers: the misconfigured build, then Claude's fix</td><td><span class="r">Kane failed it</span>, then <span class="g">bad build refused, no localhost or testnet requests</span></td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/45015619019">1</a></td></tr>
+          <tr><td>Spark's open-source frontend: built as shipped, then Claude's fix</td><td><span class="r">Kane failed it</span>, then <span class="g">page loads, 0 keys</span></td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44953030392">1</a></td></tr>
           <tr><td>An edited check, in <a href="https://github.com/Guzman0/DappSentinel/pull/6">PR #6</a></td><td><span class="r">Refused to run</span>, auto-fix not started</td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44831572149">1</a></td></tr>
           <tr><td>Lido, with Kane using the stake screen</td><td><span class="g">6 of 6 passed</span></td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44835470086">1</a></td></tr>
           <tr><td>Aave, with Kane using the USDC market</td><td><span class="a">5 of 6</span>: Kane's screen check passed; same script hosts as before</td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44834742720">1</a></td></tr>
@@ -287,7 +299,7 @@
           <tr><td>CoW Swap (live, mainnet)</td><td><span class="r">3 of 5</span>: an Alchemy RPC URL carrying a key, and scripts from 11 ad and analytics hosts</td><td><a href="https://github.com/Guzman0/DappSentinel/actions/runs/44762331502">1</a></td></tr>
         </tbody>
       </table>
-      <p><a href="https://github.com/Guzman0/DappSentinel/tree/main/evidence/mutation-test"><img src="img/mutation-test.jpg" alt="Mutation test results: the clean site passes 7 of 7, and each of 7 copies with one new mistake fails exactly its own check, on both runs" style="width:100%;height:auto;border-radius:12px;margin-top:24px" loading="lazy"></a></p>
+      <p><a href="https://github.com/Guzman0/DappSentinel/tree/main/evidence/mutation-test"><img src="img/mutation-test.jpg" alt="Mutation test results: the clean site passes 7 of 7, and each of 7 copies with one new mistake fails exactly its own check, on every run" style="width:100%;height:auto;border-radius:12px;margin-top:24px" loading="lazy"></a></p>
       <p class="note">A flagged key or script host is a prompt to look, not proof of an attack: many dApps ship keys that only work from their own domain. Keys are masked in every report. The demo has 7 checks; live dApps get the 5 that need no inside knowledge of the site. PR #2's run is also the third run of the broken demo. The full list, including the runs that don't count and why, is in the <a href="https://github.com/Guzman0/DappSentinel#track-record">README</a>.</p>
     </section>
 
