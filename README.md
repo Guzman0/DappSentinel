@@ -31,6 +31,8 @@
 - [Try it on any dApp, from any folder](#try-it-on-any-dapp-from-any-folder)
 - [Try it yourself in a minute](#try-it-yourself-in-a-minute)
 - [How the loop works](#how-the-loop-works)
+  - [What Claude sees when Kane blocks it](#what-claude-sees-when-kane-blocks-it)
+  - [What happens when](#what-happens-when)
 - [The agent can't cheat](#the-agent-cant-cheat)
 - [When the loop gives up, a person takes over](#when-the-loop-gives-up-a-person-takes-over)
 - [Quick start](#quick-start)
@@ -48,6 +50,8 @@
 - [Run it in CI](#run-it-in-ci)
 - [Commands](#commands)
 - [What DappSentinel doesn't do](#what-dappsentinel-doesnt-do)
+- [Repository layout](#repository-layout)
+- [Built with](#built-with)
 - [Notes](#notes)
 
 ## For judges
@@ -547,6 +551,27 @@ For what DappSentinel collects, masks and uploads, see [SECURITY.md](SECURITY.md
 - **It can't catch every frontend compromise.** It sees what the browser does while Kane uses the page. Malicious code that only wakes up for certain wallets or transactions, like the code in the Bybit attack, may stay quiet during a check.
 - **Some sites block automated browsers.** When Kane can't reach the real page, DappSentinel reports the network checks as inconclusive, never as clean.
 - **Testing on `localhost` can trip the testnet check.** It matches words like `localhost` anywhere in a request's address, including where a third-party widget sends the page's own address, as in [PR #10](https://github.com/Guzman0/DappSentinel/pull/10). Check a deployed preview to avoid it.
+
+## Repository layout
+
+```text
+demo-dapp/            The site being guarded: SentinelSwap, a simulated ETH to USDC swap page (plain HTML, CSS, JS)
+checks/               One check per file, in plain English for Kane (assert, storage and network checks)
+sentinel.config.json  What "correct" means: chain ID, contract addresses, trusted script hosts
+bin/dappsentinel.js   The gate: runs every check with Kane CLI and writes .sentinel/report.md
+lib/                  Reads Kane's network log (HAR) and the storage of the Chrome Kane drives;
+                      integrity.js is the tamper check that refuses to run if the rules changed
+hooks/                Claude Code hooks: sentinel-stop.js closes the loop, guard-checks.js blocks edits to the rules
+.claude/              Hook settings and the /sentinel command
+profiles/             Ready-made checks for live dApps: live (any site), lido, aave
+action.yml            The GitHub Action: uses: Guzman0/DappSentinel@v1.1.0
+.github/workflows/    The PR gate and fix job, the mutation test, the install tests, the Spark and Polaris loops
+mutants/, scripts/    The mutation test: the clean site, the 7 planted mistakes, and the scripts that build and judge them
+evidence/             Committed records of the mutation test and the real-world loops
+test/                 npm test: the analyzers on recorded fixtures, no Kane credits needed
+docs/                 The website (dappsentinel.netlify.app) and the list of the demo's planted mistakes
+assets/               Logos, screenshots and GIFs used in this README
+```
 
 ## Built with
 
