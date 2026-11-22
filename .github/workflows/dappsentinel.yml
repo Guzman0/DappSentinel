@@ -141,13 +141,17 @@ jobs:
         run: |
           n=$(git log "origin/$BASE..HEAD" --grep '\[dappsentinel-fix\]' --oneline | wc -l)
           echo "n=$((n + 1))" >> "$GITHUB_OUTPUT"
+          # 40 steps per round normally. A pull request labelled `handover-test` gives Claude only 4, so it
+          # can't finish and the 3-round limit and the handover to a person can be tested for real.
+          labels=$(gh pr list --head "$BRANCH" --json labels --jq '.[0].labels[].name' 2>/dev/null || true)
+          if echo "$labels" | grep -qx 'handover-test'; then echo "turns=4" >> "$GITHUB_OUTPUT"; else echo "turns=40" >> "$GITHUB_OUTPUT"; fi
           if [ "$n" -ge 3 ]; then
             echo "Stopping: Claude Code already made 3 fix rounds on this pull request." >> "$GITHUB_STEP_SUMMARY"
             echo "stop=1" >> "$GITHUB_OUTPUT"
           fi
 
+      # The report is downloaded even when the rounds are used up: the handover note below reads it.
       - uses: actions/download-artifact@v8
-        if: steps.round.outputs.stop != '1'
         with:
           name: gate-report
           path: gate-report
@@ -155,13 +159,15 @@ jobs:
       - name: Claude Code fixes the site
         id: claude
         if: steps.round.outputs.stop != '1'
+        # If Claude runs out of steps, whatever it managed to fix is still committed and re-checked.
+        continue-on-error: true
         uses: anthropics/claude-code-action@v1
         env:
           DAPPSENTINEL_HOOK: "off"     # the gate runs in CI, not inside this session
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          claude_args: "--max-turns 40 --allowedTools Read,Edit,Write,Glob,Grep"
+          claude_args: "--max-turns ${{ steps.round.outputs.turns }} --allowedTools Read,Edit,Write,Glob,Grep"
           display_report: "true"       # Claude's steps go to this run's summary, as evidence
           prompt: |
             Kane CLI checked this dApp in a real browser and DappSentinel's gate failed.
@@ -179,6 +185,7 @@ jobs:
         id: guard
         if: steps.round.outputs.stop != '1'
         run: |
+          cp gate-report/report.md "$RUNNER_TEMP/gate-report.md" 2>/dev/null || true
           rm -rf gate-report
           changed=$(git status --porcelain | awk '{print $NF}')
           if [ -z "$changed" ]; then
@@ -234,3 +241,36 @@ jobs:
             } > comment.md
             gh pr comment "$pr" --body-file comment.md
           fi
+
+      # After 3 rounds, or when Claude found nothing in the site to fix, the loop stops and hands over
+      # to a person: a comment on the pull request with the checks still failing and Kane's report.
+      - name: Hand over to a person
+        if: steps.round.outputs.stop == '1' || steps.guard.outputs.skip == '1'
+        env:
+          STOPPED: ${{ steps.round.outputs.stop }}
+        run: |
+          report=gate-report/report.md
+          [ -f "$report" ] || report="$RUNNER_TEMP/gate-report.md"
+          pr=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
+          [ -n "$pr" ] || { echo "No pull request for $BRANCH"; exit 0; }
+          failing=$(grep -E '^\| .* \| ❌' "$report" 2>/dev/null | awk -F'|' '{gsub(/^ +| +$/,"",$2); gsub(/^ +| +$/,"",$3); print "- " $2 " (" $3 ")"}')
+          kane=$(grep -oE 'https://test-manager\.lambdatest\.com/[^ )]+' "$report" 2>/dev/null | head -1)
+          run="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          {
+            if [ "$STOPPED" = "1" ]; then
+              echo "🛑 **DappSentinel: a person needs to look at this.** Claude Code made 3 rounds of fixes and Kane still finds problems, so the loop stops here instead of trying forever."
+            else
+              echo "🛑 **DappSentinel: a person needs to look at this.** Kane's checks failed, but Claude Code found nothing in the site to fix, so the failure may come from the check run itself."
+            fi
+            echo
+            echo "**Checks still failing:**"
+            echo
+            if [ -n "$failing" ]; then echo "$failing"; else echo "- See the report below."; fi
+            echo
+            echo "[Latest gate run and report]($run)"
+            if [ -n "$kane" ]; then echo " · [Watch Kane's run, step by step]($kane)"; fi
+            echo
+            echo "No more automatic fixes will be made on this pull request. Fix the site by hand and push; Kane checks every push."
+          } > handover.md
+          cat handover.md >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment "$pr" --body-file handover.md
