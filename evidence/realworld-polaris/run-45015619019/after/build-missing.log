@@ -1,0 +1,64 @@
+Unable to find image 'node:22' locally
+22: Pulling from library/node
+69245854ad58: Pulling fs layer
+9bab93d346cd: Pulling fs layer
+450e9cb70a64: Pulling fs layer
+338554e9113f: Pulling fs layer
+2abb2fbacec9: Pulling fs layer
+7cd13466dc1b: Pulling fs layer
+172a422ce4a3: Pulling fs layer
+d6c30932f8d3: Pulling fs layer
+450e9cb70a64: Download complete
+2abb2fbacec9: Download complete
+172a422ce4a3: Download complete
+338554e9113f: Download complete
+ca58bfb5cfd7: Download complete
+69245854ad58: Download complete
+f679bfbbca07: Download complete
+7cd13466dc1b: Download complete
+d6c30932f8d3: Download complete
+9bab93d346cd: Download complete
+69245854ad58: Pull complete
+338554e9113f: Pull complete
+d6c30932f8d3: Pull complete
+2abb2fbacec9: Pull complete
+9bab93d346cd: Pull complete
+450e9cb70a64: Pull complete
+172a422ce4a3: Pull complete
+7cd13466dc1b: Pull complete
+Digest: sha256:e13726ca604184d7a91fcacab1fc09eefd642dc28e79ac34e85540dd93b78cfb
+Status: Downloaded newer image for node:22
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
+▲ Next.js 16.4.5 (Turbopack)
+✓ Running next.config.ts took 29ms
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 5.7s
+  Running TypeScript ...
+  Finished TypeScript in 4.2s ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/17) ...
+Error occurred prerendering page "/_not-found". Read more: https://nextjs.org/docs/messages/prerender-error
+Error: Missing required environment variable(s) for a production build: NEXT_PUBLIC_ORACLE_URL, NEXT_PUBLIC_STELLAR_RPC_URL, NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE. Set them explicitly; the localhost/testnet defaults are for development only.
+    at module evaluation (src/lib/config.ts:23:11)
+    at module evaluation (src/lib/freighter-wallet.ts:3:1)
+  21 |     .map(([name]) => name);
+  22 |   if (missing.length > 0) {
+> 23 |     throw new Error(
+     |           ^
+  24 |       `Missing required environment variable(s) for a production build: ${missing.join(', ')}. ` +
+  25 |         'Set them explicitly; the localhost/testnet defaults are for development only.',
+  26 |     ); {
+  digest: '1273724044'
+}
+Export encountered an error on /_not-found/page: /_not-found, exiting the build.
+⨯ Next.js build worker exited with code: 1 and signal: null
