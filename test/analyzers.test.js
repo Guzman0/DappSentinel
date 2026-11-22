@@ -99,3 +99,16 @@ assert.ok(!scrubbed.includes("ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae
 assert.ok(!scrubbed.includes("ABCDEFGHIJKLMNOPQRST"), scrubbed);
 assert.ok(scrubbed.includes("aX7k…GuE"), scrubbed);
 console.log("✅ redaction tests passed");
+
+// The exact check behind Kane's verdict. The first case is the real one: on Kane CLI 0.10.8,
+// Kane stored "You pay 0.05 ETH" and still passed "the confirmation shows You pay 0.5 ETH"
+// (mutation test run 45050499048, m7-wrong-confirm-amount).
+assert.strictEqual(a.valueMatches("You pay 0.05 ETH", "0.5"), false);
+assert.strictEqual(a.valueMatches("You pay 0.5 ETH", "0.5"), true);
+assert.strictEqual(a.valueMatches("0.50", "0.5"), true);
+assert.strictEqual(a.valueMatches("5 ETH", "0.5"), false);
+assert.strictEqual(a.valueMatches("1,570.28 USDC", "1570.28"), true);
+assert.strictEqual(a.valueMatches(undefined, "0.5"), null);
+assert.strictEqual(a.valueMatches("", "0.5"), null);
+assert.strictEqual(a.valueMatches("Ethereum mainnet", "ethereum"), true);
+console.log("✅ exact value tests passed");

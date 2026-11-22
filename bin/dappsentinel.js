@@ -103,6 +103,13 @@ function loadChecks() {
         // may not be the real page (a bot challenge, an error page), so clean scans don't count.
         gatesRecording: meta.gates === "recording",
         fix: meta.fix || "",
+        // expect: name=value; name2=value2. Values Kane must have read and stored during the run.
+        // A second, exact check behind Kane's own verdict: if Kane passes the run but the value it
+        // stored doesn't match, the check fails anyway.
+        expect: (meta.expect || "").split(";").map((x) => x.trim()).filter(Boolean).map((x) => {
+          const i = x.indexOf("=");
+          return { name: x.slice(0, i).trim(), value: x.slice(i + 1).trim() };
+        }).filter((x) => x.name && x.value),
         body: m[2].trim(),
       };
     });
@@ -459,9 +466,33 @@ async function cmdCheck(args) {
       source = seen ? "browser storage, watched live over the Chrome DevTools Protocol in the Chrome that Kane CLI drove" : "localStorage as read by Kane CLI";
     }
 
+    // Kane's verdict, checked against what Kane itself read: a pass only stands if every value
+    // the check expects was stored by Kane and matches.
+    const stored = ctx.memory ? Object.fromEntries(Object.entries(ctx.memory).map(([k, v]) => [k.toLowerCase(), v && v.extracted_value !== undefined ? v.extracted_value : v])) : {};
+    let exact = null;
+    if (c.kind === "assert" && c.expect.length && status === "passed") {
+      for (const x of c.expect) {
+        const got = stored[x.name.toLowerCase()];
+        const ok = analyzers.valueMatches(got, x.value);
+        if (ok === null) {
+          status = "error";
+          exact = `Kane passed this check but did not store ${x.name}, so its verdict could not be confirmed.`;
+        } else if (!ok) {
+          status = "failed";
+          exact = `Kane passed this check, but the value Kane itself read does not match: ${x.name} is "${String(got)}", expected ${x.value}.`;
+        }
+        if (exact) break;
+      }
+      if (exact) {
+        summary = `${exact}\nKane's own summary: ${summary}`;
+        console.log(`      ✖ ${exact}`);
+      }
+    }
+
     byId[c.id] = {
       id: c.id,
       name: c.name,
+      exactCheck: exact,
       severity: c.severity,
       kind: c.kind,
       status,
