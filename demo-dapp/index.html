@@ -17,6 +17,14 @@
     </div>
   </header>
 
+  <!-- Live price ticker (TradingView widget) -->
+  <div class="tradingview-widget-container">
+    <div class="tradingview-widget-container__widget"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+    {"symbols":[{"proName":"COINBASE:ETHUSD","title":"ETH/USD"},{"proName":"COINBASE:USDCUSD","title":"USDC/USD"}],"showSymbolLogo":true,"colorTheme":"dark","isTransparent":true,"displayMode":"adaptive","locale":"en"}
+    </script>
+  </div>
+
   <main>
     <section class="card" id="swap-card">
       <h1>Swap</h1>
