@@ -4,7 +4,8 @@
 // When Claude finishes a turn, this hook checks whether the site folder changed since
 // the last passing run. If it did, it runs the DappSentinel gate. If any check fails,
 // it blocks Claude from stopping and hands it Kane's report, so Claude fixes the code
-// and stops again, which re-runs the gate. It gives up after MAX_ROUNDS to avoid loops.
+// and stops again, which re-runs the gate. After MAX_ROUNDS (3) it stops
+// and hands over to a person, with the checks still failing, instead of looping forever.
 //
 // Turn it off for a session with: DAPPSENTINEL_HOOK=off
 
@@ -14,7 +15,7 @@ const fs = require("fs");
 const path = require("path");
 const spawn = require("cross-spawn");
 
-const MAX_ROUNDS = 5;
+const MAX_ROUNDS = 3;
 const ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const OUT_DIR = path.join(ROOT, ".sentinel");
 const STATE = path.join(OUT_DIR, "hook-state.json");
@@ -61,7 +62,13 @@ if (s.lastCheckedHash === siteHash) {
   allowStop("DappSentinel: site unchanged since the last failed check. See .sentinel/report.md.");
 }
 if (s.rounds >= MAX_ROUNDS) {
-  allowStop(`DappSentinel: stopped after ${MAX_ROUNDS} fix rounds. Checks still failing, see .sentinel/report.md.`);
+  const last = readJson(path.join(OUT_DIR, "report.json"), { results: [] });
+  const still = (last.results || []).filter((r) => r.status !== "passed").map((r) => `- ${r.name}`);
+  allowStop([
+    `DappSentinel: a person needs to look at this. Claude Code made ${MAX_ROUNDS} rounds of fixes and Kane still finds problems, so the loop stops here instead of trying forever.`,
+    ...(still.length ? ["Checks still failing:", ...still] : []),
+    "Kane's full report: .sentinel/report.md",
+  ].join("\n"));
 }
 
 const log = fs.openSync(path.join(OUT_DIR, "last-run.log"), "w");

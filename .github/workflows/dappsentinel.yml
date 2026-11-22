@@ -156,6 +156,12 @@ jobs:
           name: gate-report
           path: gate-report
 
+      # What the pull request is for, so Claude keeps it instead of undoing it to turn a check green.
+      - name: The pull request's purpose
+        if: steps.round.outputs.stop != '1'
+        run: |
+          gh pr list --head "$BRANCH" --json title,body --jq '.[0] | "# " + .title + "\n\n" + (.body // "")' > gate-report/pull-request.md || true
+
       - name: Claude Code fixes the site
         id: claude
         if: steps.round.outputs.stop != '1'
@@ -179,6 +185,10 @@ jobs:
               Changing the rules doesn't count as a fix, and the gate refuses to run if they change.
             - Keep the swap flow working (checks/07-swap-flow.md).
             - Don't run Kane or the gate yourself. CI re-checks the site after you finish.
+            - gate-report/pull-request.md says what this pull request is for. Keep that. If the only way to pass
+              a check is to undo what the pull request sets out to do, or a decision only a person may make
+              (for example trusting a new script host or a new contract address), don't do it: leave that check
+              failing and say in your summary that a person needs to decide, and why.
             Finish with a short list of what you changed and why.
 
       - name: Only the site may change
@@ -191,7 +201,7 @@ jobs:
           if [ -z "$changed" ]; then
             # Nothing in the site needed fixing, so the failure came from somewhere else (for
             # example a Kane run that went wrong). Leave it for a human, don't commit or loop.
-            echo "::notice::Claude Code found nothing to fix in the site. The failure needs a human look."
+            echo "::notice::Claude Code made no change to the site. The failure needs a human look."
             echo "Claude Code found nothing to fix in \`demo-dapp/\`, so nothing was committed. Read the gate report above: the failure may come from the check run itself." >> "$GITHUB_STEP_SUMMARY"
             echo "skip=1" >> "$GITHUB_OUTPUT"
             exit 0
@@ -248,7 +258,13 @@ jobs:
         if: steps.round.outputs.stop == '1' || steps.guard.outputs.skip == '1'
         env:
           STOPPED: ${{ steps.round.outputs.stop }}
+          EXEC_FILE: ${{ steps.claude.outputs.execution_file }}
         run: |
+          SUMMARY=""
+          if [ "$STOPPED" != "1" ] && [ -n "$EXEC_FILE" ]; then
+            SUMMARY=$(jq -r '[.[] | select(.type == "result")] | last | .result // empty' "$EXEC_FILE" 2>/dev/null \
+              | node -e 'const a=require("./lib/analyzers");const c=require("./sentinel.config.json");let t="";process.stdin.on("data",d=>t+=d).on("end",()=>process.stdout.write(a.redact(t,c)))')
+          fi
           report=gate-report/report.md
           [ -f "$report" ] || report="$RUNNER_TEMP/gate-report.md"
           pr=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
@@ -260,8 +276,9 @@ jobs:
             if [ "$STOPPED" = "1" ]; then
               echo "🛑 **DappSentinel: a person needs to look at this.** Claude Code made 3 rounds of fixes and Kane still finds problems, so the loop stops here instead of trying forever."
             else
-              echo "🛑 **DappSentinel: a person needs to look at this.** Kane's checks failed, but Claude Code found nothing in the site to fix, so the failure may come from the check run itself."
+              echo "🛑 **DappSentinel: a person needs to look at this.** Kane's checks failed, but Claude Code made no change to the site. Either fixing it needs a decision only a person may make, or the failure comes from the check run itself."
             fi
+            if [ -n "$SUMMARY" ]; then echo; echo "**Claude Code's reasoning:**"; echo; echo "$SUMMARY"; fi
             echo
             echo "**Checks still failing:**"
             echo
