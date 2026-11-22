@@ -17,16 +17,16 @@ None of the mistakes is the same as the ones in the demo, so the checks were not
 
 ## The matrix
 
-| Variant | Planted mistake | Expected | Run 1 | Run 2 | What Kane found (run 2) |
-|---|---|---|---|---|---|
-| `clean` | None: the fixed site | 7 of 7 pass | ✅ 7/7 | ✅ 7/7 | Completed the swap ("Swap submitted"); address and chain ID confirmed |
-| `m1-infura-key` | Infura RPC URL with an API key | fail `rpc-key-leak` only | ✅ | ✅ | `POST https://mainnet.infura.io/v3/3f9c…a65` in Kane's network recording |
-| `m2-holesky-rpc` | Holesky testnet RPC in a mainnet build | fail `testnet-rpc` only | ✅ | ✅ | `POST https://ethereum-holesky-rpc.publicnode.com/` (matches "holesky") |
-| `m3-swapped-digits` | Two characters swapped mid USDC address | fail `contract-address` only | ✅ | ✅ | Failed, but see the note below |
-| `m4-polygon-chain` | Chain ID 137 under an Ethereum label | fail `chain-id` only | ✅ | ✅ | "The network badge is showing the chain ID for a different network while keeping the Ethereum name." |
-| `m5-jsdelivr-script` | Script from the jsDelivr CDN | fail `unknown-scripts` only | ✅ | ✅ | `cdn.jsdelivr.net/npm/dayjs@1.11.13/dayjs.min.js`, 1 script from 1 untrusted host |
-| `m6-seed-in-session` | Seed phrase in sessionStorage as `backup` | fail `storage-secrets` only | ✅ | ✅ | `sessionStorage["backup"]` holds a value that looks like a seed phrase |
-| `m7-wrong-confirm-amount` | Confirm screen shows a tenth of the amount | fail `swap-flow` only | ✅ | ✅ | The payment amount has "the decimal point in the wrong place"; the received amount and fee still match 0.5 ETH |
+| Variant | Planted mistake | Expected | Run 1 | Run 2 | Run 3 | Run 4 | What Kane found (run 2) |
+|---|---|---|---|---|---|---|---|
+| `clean` | None: the fixed site | 7 of 7 pass | ✅ 7/7 | ✅ 7/7 | ✅ 7/7 | ✅ 7/7 | Completed the swap ("Swap submitted"); address and chain ID confirmed |
+| `m1-infura-key` | Infura RPC URL with an API key | fail `rpc-key-leak` only | ✅ | ✅ | ✅ | ✅ | `POST https://mainnet.infura.io/v3/3f9c…a65` in Kane's network recording |
+| `m2-holesky-rpc` | Holesky testnet RPC in a mainnet build | fail `testnet-rpc` only | ✅ | ✅ | ✅ | ✅ | `POST https://ethereum-holesky-rpc.publicnode.com/` (matches "holesky") |
+| `m3-swapped-digits` | Two characters swapped mid USDC address | fail `contract-address` only | ✅ | ✅ | ✅ | ✅ | Failed, but see the note below |
+| `m4-polygon-chain` | Chain ID 137 under an Ethereum label | fail `chain-id` only | ✅ | ✅ | ✅ | ✅ | "The network badge is showing the chain ID for a different network while keeping the Ethereum name." |
+| `m5-jsdelivr-script` | Script from the jsDelivr CDN | fail `unknown-scripts` only | ✅ | ✅ | ✅ | ✅ | `cdn.jsdelivr.net/npm/dayjs@1.11.13/dayjs.min.js`, 1 script from 1 untrusted host |
+| `m6-seed-in-session` | Seed phrase in sessionStorage as `backup` | fail `storage-secrets` only | ✅ | ✅ | ✅ | ✅ | `sessionStorage["backup"]` holds a value that looks like a seed phrase |
+| `m7-wrong-confirm-amount` | Confirm screen shows a tenth of the amount | fail `swap-flow` only | ✅ | ✅ | ✅ | ✅ | The payment amount has "the decimal point in the wrong place"; the received amount and fee still match 0.5 ETH |
 
 ## Honest note on m3
 

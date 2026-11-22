@@ -9,7 +9,7 @@
 > - **What:** a pre-launch gate for dApp websites. Kane CLI checks the site in a real browser for mistakes you can't see on screen: leaked RPC keys, testnet endpoints, wrong contracts, wrong chain, untrusted scripts, keys in storage.
 > - **The loop:** Kane catches it → Claude Code fixes it → Kane checks again, until every check passes. The agent can't edit the checks to cheat.
 > - **Real bugs in code we didn't write:** Polaris issue [#118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118), reported by its maintainers: Kane caught it, Claude fixed it, proven twice, fix [offered upstream](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118#issuecomment-7079526239) ([loop](#real-world-loop-2-a-bug-the-maintainers-reported)). Spark's frontend: a hardcoded RPC key that breaks every build outside Spark's domain ([loop](#real-world-loop-a-bug-in-code-we-didnt-write)).
-> - **Kane makes the call:** Kane gives its own verdict on every check, using its DevTools for the hidden ones; DappSentinel's exact check runs behind it ([who catches what](#who-catches-what-kane-and-dappsentinel)).
+> - **Kane makes the call:** Kane gives its own verdict on every check, using its DevTools for the hidden ones (they can't read sessionStorage); DappSentinel's exact check runs behind it and catches what Kane misses ([who catches what](#who-catches-what-kane-and-dappsentinel)).
 > - **Where it runs:** in Claude Code on your machine (`/sentinel`), and on GitHub, where it blocks the merge and fixes the pull request itself ([#5](https://github.com/Guzman0/DappSentinel/pull/5), no human involved).
 > - **Proof, all public:** broken PR blocked ([#2](https://github.com/Guzman0/DappSentinel/pull/2)) · cheating refused ([#6](https://github.com/Guzman0/DappSentinel/pull/6)) · [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) 8 of 8 on four runs · [8 live dApps](#real-world-runs) scanned
 > - **Install:** `uses: Guzman0/DappSentinel@v1.1.0` or `npm i -g github:Guzman0/DappSentinel` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U)
@@ -72,7 +72,7 @@ Spark is a large DeFi lending app. Its web app's code (MIT licence) was public o
 2. **Claude Code fixed it.** It removed the key from the source, made the RPC URL a setting (`VITE_MAINNET_RPC_URL`) with a keyless public fallback, and documented it. 3 lines in 2 files: [the patch](evidence/realworld-spark/run-44953030392/fix.patch).
 3. **Kane proved it.** Rebuilt and checked again: the page loads, and none of the 46 requests carries a key or goes to a testnet.
 
-The same key is still in Spark's production traffic: DappSentinel's [live scan of app.spark.fi](https://github.com/Guzman0/DappSentinel/actions/runs/44952359583) found it. Spark's repository is private now, so there's no pull request to offer; the key is masked throughout. Full record and honest notes: [`evidence/realworld-spark/`](evidence/realworld-spark/).
+The same key is still in Spark's production traffic: DappSentinel's [live scan of app.spark.fi](https://github.com/Guzman0/DappSentinel/actions/runs/44952359583) found it. Spark's repository is private now, so there's no pull request to offer; the key is masked throughout. To be precise about what kind of bug this is: the key only works from Spark's own domain, so it isn't proof of a leak (see [what DappSentinel doesn't do](#what-dappsentinel-doesnt-do)). The bug is that the published code can't run anywhere else: every fork or self-hosted build shows an error screen until the key is replaced. Full record and honest notes: [`evidence/realworld-spark/`](evidence/realworld-spark/).
 
 ## Real-world loop 2: a bug the maintainers reported
 
@@ -103,18 +103,14 @@ These are the mistakes that look fine on screen and cost users money:
 ### Why two kinds of check?
 
 Kane is great at plain-English assertions about what's on the page, so the visible checks
-(`contract-address`, `chain-id`, `swap-flow`) are Kane assertions. The hidden problems live in
-traffic and storage. Asking an agent to reason over a whole network log in one assertion tends to
-time out, but Kane already records every request it sees in its evidence pack as a standard HAR
-file. So while Kane runs the swap flow, DappSentinel reads that recording and checks every request
-deterministically. Kane is still the one in the browser catching it; DappSentinel just reads the
-tape.
-
-Storage works the same way. DappSentinel starts Chrome, Kane drives it (`kane-cli --cdp-endpoint`),
-and DappSentinel watches that browser's localStorage and sessionStorage live over the Chrome
-DevTools Protocol while Kane uses the page. Secrets are masked in the report.
-
-That's 4 Kane runs per round instead of 7, so each fix-and-verify loop is faster and cheaper.
+(`contract-address`, `chain-id`, `swap-flow`) are Kane's verdicts alone. For the hidden problems,
+Kane gives its own verdict with its DevTools assertions on the network requests and localStorage it
+captured. DappSentinel's code then checks the same evidence exactly: it reads every request in the
+network recording (HAR file) Kane saves, and watches localStorage and sessionStorage live in the
+Chrome that Kane drives (`kane-cli --cdp-endpoint`). A check fails if either one finds the problem.
+The second check matters because Kane's DevTools can't read sessionStorage and can miss a request,
+as the [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) shows. Secrets are
+masked in the report.
 
 ## Why it matters
 
@@ -191,7 +187,7 @@ The fix loop never tries forever, and it never quietly undoes what a developer m
 
 ## Quick start
 
-You need [Node.js 18+](https://nodejs.org), Google Chrome and a free [TestMu AI](https://www.testmuai.com/kane-cli/) account.
+You need [Node.js 20+](https://nodejs.org), Google Chrome and a free [TestMu AI](https://www.testmuai.com/kane-cli/) account.
 
 ```bash
 # 1. Install Kane CLI and sign in
@@ -336,20 +332,20 @@ Not counted above, and why: one Lido run ([run](https://github.com/Guzman0/DappS
 
 A gate is only useful if it's right. So we took the fixed site and made 7 copies, each with **one new mistake** that is different from the demo's (Infura instead of Alchemy, Holesky instead of Sepolia, a swapped digit in the middle of the address instead of the last one, and so on). The clean site must pass everything; each copy must fail exactly its own check and nothing else.
 
-**Four runs, same verdict every time: 8 of 8.** Run 4 also shows Kane's own DevTools verdicts catching 3 of the 4 hidden mistakes by themselves ([run 4](https://github.com/Guzman0/DappSentinel/actions/runs/45023763082)). Run 3: [link](https://github.com/Guzman0/DappSentinel/actions/runs/44962415067)). [Run 1](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698) · [Run 2](https://github.com/Guzman0/DappSentinel/actions/runs/44884542975)
+**Four runs, same verdict every time: 8 of 8** ([run 1](https://github.com/Guzman0/DappSentinel/actions/runs/44847434698) · [run 2](https://github.com/Guzman0/DappSentinel/actions/runs/44884542975) · [run 3](https://github.com/Guzman0/DappSentinel/actions/runs/44962415067) · [run 4](https://github.com/Guzman0/DappSentinel/actions/runs/45023763082)). Runs 3 and 4 also record Kane's own DevTools verdicts on the 4 hidden mistakes. In run 3 Kane caught 2 of them by itself and missed the jsDelivr script and the seed in sessionStorage. We fixed how Kane captures the page's requests, and in run 4 it caught 3 of 4. Kane's DevTools can't read sessionStorage, so that one is always caught by DappSentinel's exact check.
 
 ![Mutation test results: the clean site passes 7 of 7, and each of the 7 copies fails exactly its own check, on all four runs](assets/mutation-test.jpg)
 
-| Variant | Planted mistake | Expected | Run 1 | Run 2 | What Kane found |
-|---|---|---|---|---|---|
-| `clean` | None: the fixed site | 7 of 7 pass | ✅ | ✅ | Completed the swap; address and chain ID confirmed |
-| `m1-infura-key` | Infura RPC URL with an API key | fail `rpc-key-leak` only | ✅ | ✅ | `POST mainnet.infura.io/v3/3f9c…a65` in its network recording |
-| `m2-holesky-rpc` | Holesky testnet RPC in a mainnet build | fail `testnet-rpc` only | ✅ | ✅ | A request to `ethereum-holesky-rpc.publicnode.com` |
-| `m3-swapped-digits` | Two characters swapped mid USDC address | fail `contract-address` only | ✅ | ✅ | Failed it both times, but its written reason was about its own step (see below) |
-| `m4-polygon-chain` | Chain ID 137 under an Ethereum label | fail `chain-id` only | ✅ | ✅ | "showing the chain ID for a different network while keeping the Ethereum name" |
-| `m5-jsdelivr-script` | Script from the jsDelivr CDN | fail `unknown-scripts` only | ✅ | ✅ | 1 script from 1 untrusted host, `cdn.jsdelivr.net` |
-| `m6-seed-in-session` | Seed phrase in sessionStorage as `backup` | fail `storage-secrets` only | ✅ | ✅ | `sessionStorage["backup"]` holds a seed phrase |
-| `m7-wrong-confirm-amount` | Confirm screen shows a tenth of the amount | fail `swap-flow` only | ✅ | ✅ | The decimal point is in the wrong place; received amount and fee still match 0.5 ETH |
+| Variant | Planted mistake | Expected | Run 1 | Run 2 | Run 3 | Run 4 | What Kane found |
+|---|---|---|---|---|---|---|---|
+| `clean` | None: the fixed site | 7 of 7 pass | ✅ | ✅ | ✅ | ✅ | Completed the swap; address and chain ID confirmed |
+| `m1-infura-key` | Infura RPC URL with an API key | fail `rpc-key-leak` only | ✅ | ✅ | ✅ | ✅ | `POST mainnet.infura.io/v3/3f9c…a65` in its network recording |
+| `m2-holesky-rpc` | Holesky testnet RPC in a mainnet build | fail `testnet-rpc` only | ✅ | ✅ | ✅ | ✅ | A request to `ethereum-holesky-rpc.publicnode.com` |
+| `m3-swapped-digits` | Two characters swapped mid USDC address | fail `contract-address` only | ✅ | ✅ | ✅ | ✅ | Failed it both times, but its written reason was about its own step (see below) |
+| `m4-polygon-chain` | Chain ID 137 under an Ethereum label | fail `chain-id` only | ✅ | ✅ | ✅ | ✅ | "showing the chain ID for a different network while keeping the Ethereum name" |
+| `m5-jsdelivr-script` | Script from the jsDelivr CDN | fail `unknown-scripts` only | ✅ | ✅ | ✅ | ✅ | 1 script from 1 untrusted host, `cdn.jsdelivr.net` |
+| `m6-seed-in-session` | Seed phrase in sessionStorage as `backup` | fail `storage-secrets` only | ✅ | ✅ | ✅ | ✅ | `sessionStorage["backup"]` holds a seed phrase |
+| `m7-wrong-confirm-amount` | Confirm screen shows a tenth of the amount | fail `swap-flow` only | ✅ | ✅ | ✅ | ✅ | The decimal point is in the wrong place; received amount and fee still match 0.5 ETH |
 
 ### What Kane saw (its own screenshots)
 
@@ -444,7 +440,7 @@ For what DappSentinel collects, masks and uploads, see [SECURITY.md](SECURITY.md
 - A full round is 4 Kane CLI runs and uses TestMu AI credits. New accounts get free credits.
 - `npm test` runs the analyzers against a network log recorded by Kane, with no credits needed.
 - Both secrets in the demo are fake on purpose: the Alchemy key was made up, and the private key is the public Hardhat test key (account #0). Never use it for real funds.
-- Kane CLI's own localStorage reading timed out in our tests (even on the cookbook's example), so DappSentinel reads storage from the Chrome that Kane drives instead. Kane still does the browsing; the storage is read from its browser.
+- Kane CLI's DevTools assertions read localStorage but not sessionStorage. DappSentinel reads both from the Chrome that Kane drives, so a key hidden in sessionStorage is still caught.
 - DappSentinel checks what a browser can see. It doesn't replace a smart contract audit.
 
 Built for the [Kane CLI Online Hackathon](https://www.kaneclihack.sh/) with Claude Code; Kane CLI verifies it, and Kane's result drives the fix. MIT licence.
