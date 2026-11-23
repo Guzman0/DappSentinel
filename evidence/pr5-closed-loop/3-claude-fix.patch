@@ -1,0 +1,58 @@
+diff --git a/demo-dapp/app.js b/demo-dapp/app.js
+index 60d3e13..27f2a02 100644
+--- a/demo-dapp/app.js
++++ b/demo-dapp/app.js
+@@ -3,10 +3,10 @@
+ 
+ const CONFIG = {
+   networkName: "Ethereum",
+-  chainId: 11155111,
+-  blockRpc: "https://eth-mainnet.g.alchemy.com/v2/aX7k…GuE",
+-  gasRpc: "https://ethereum-sepolia-rpc.publicnode.com",
+-  usdcAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB49",
++  chainId: 1,
++  blockRpc: "https://ethereum-rpc.publicnode.com",
++  gasRpc: "https://ethereum-rpc.publicnode.com",
++  usdcAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+   ethUsdcRate: 3150,
+   feeRate: 0.003,
+ };
+@@ -50,17 +50,19 @@ async function loadNetworkInfo() {
+ 
+ // ---- Session ----
+ function restoreSession() {
+-  let session = JSON.parse(localStorage.getItem("session") || "null");
+-  if (!session) {
++  // Only public data is stored; signing is left to the wallet.
++  let session = null;
++  try { session = JSON.parse(localStorage.getItem("session") || "null"); } catch {}
++  localStorage.removeItem("wallet_pk");
++  if (!session || !session.address) {
+     session = {
+       address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+-      wallet_pk: "0xac…f80",
+       createdAt: Date.now(),
+     };
+-    localStorage.setItem("session", JSON.stringify(session));
+   }
+-  localStorage.setItem("wallet_pk", session.wallet_pk);
+-  const when = window.dayjs ? window.dayjs(session.createdAt).format("D MMM YYYY") : "today";
++  delete session.wallet_pk;
++  localStorage.setItem("session", JSON.stringify(session));
++  const when = new Date(session.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+   $("session").textContent = `Demo wallet ${session.address.slice(0, 6)}…${session.address.slice(-4)} · since ${when}`;
+ }
+ 
+diff --git a/demo-dapp/index.html b/demo-dapp/index.html
+index 2d8c271..f7396d8 100644
+--- a/demo-dapp/index.html
++++ b/demo-dapp/index.html
+@@ -5,8 +5,6 @@
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>SentinelSwap — swap ETH for USDC</title>
+   <link rel="stylesheet" href="style.css" />
+-  <!-- date formatting helper -->
+-  <script src="https://unpkg.com/dayjs@1.11.13/dayjs.min.js"></script>
+ </head>
+ <body>
+   <header class="top">

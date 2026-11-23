@@ -18,8 +18,22 @@
 
 *Click to watch on YouTube (3:59).*
 
+## See it work
+
+On your machine, with [Node.js 20+](https://nodejs.org), Chrome and a free [TestMu AI](https://www.testmuai.com/kane-cli/) account:
+
+```bash
+npm install -g @testmuai/kane-cli && kane-cli login
+git clone https://github.com/Guzman0/DappSentinel.git && cd DappSentinel && npm install
+npm run sentinel     # ❌ 6 of 7 checks fail: Kane finds the demo's hidden mistakes
+claude               # then type /sentinel: Claude fixes demo-dapp/, the Stop hook re-runs Kane, ✅ 7 of 7
+```
+
+Or watch it happen on GitHub with no human: Kane fails [PR #5](https://github.com/Guzman0/DappSentinel/pull/5) 6 of 7, Claude Code fixes it, and Kane passes it 7 of 7. Kane's own output from both runs and Claude's fix are kept in [`evidence/pr5-closed-loop/`](evidence/pr5-closed-loop/). Reset the demo with `npm run demo:reset`.
+
 ## Table of contents
 
+- [See it work](#see-it-work)
 - [For judges](#for-judges)
 - [Kane's five jobs](#kanes-five-jobs)
 - [Who catches what: Kane and DappSentinel](#who-catches-what-kane-and-dappsentinel)
@@ -67,9 +81,9 @@ Every judging rule, and where to see the proof. All of it is public; nothing nee
 | **Bar: the agent and Kane talk** | Kane's findings go straight to Claude Code, and a Stop hook won't let Claude finish while a check fails ([how the loop works](#how-the-loop-works), [video at 1:52](https://youtu.be/FiErWhY495U?t=112)). On GitHub, Claude gets Kane's report and comments what it changed ([PR #7](https://github.com/Guzman0/DappSentinel/pull/7#issuecomment-7052572418)) |
 | **Ships** (25%) | Claude Code (`/sentinel`), the command line, and a GitHub Action ([`@v1.1.0`](https://github.com/Guzman0/DappSentinel/releases/tag/v1.1.0)). A required check blocks merging a broken pull request ([PR #2](https://github.com/Guzman0/DappSentinel/pull/2)) |
 | **Verified** (25%) | Polaris #118: caught, fixed as the issue asks, proven twice ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45015619019)). Spark: caught, fixed, re-checked ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44953030392)). The [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for), with Kane's own screenshots, and [11 live dApps](#real-world-runs) |
-| **Closed loop** (25%) | With no human: Kane fails PR #5 6 of 7, Claude fixes and pushes, the PR passes 7 of 7 ([forensic trail](#forensic-trail-the-loop-on-github-step-by-step)). Max 3 rounds; when only a person can decide, Claude [hands over](#when-the-loop-gives-up-a-person-takes-over) ([PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817)). The agent [can't cheat](#the-agent-cant-cheat) ([PR #6](https://github.com/Guzman0/DappSentinel/pull/6)) |
+| **Closed loop** (25%) | With no human: Kane fails PR #5 6 of 7, Claude fixes and pushes, the PR passes 7 of 7 ([Kane's output and the fix](evidence/pr5-closed-loop/), [forensic trail](#forensic-trail-the-loop-on-github-step-by-step)). Max 3 rounds; when only a person can decide, Claude [hands over](#when-the-loop-gives-up-a-person-takes-over) ([PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817)). The agent [can't cheat](#the-agent-cant-cheat) ([PR #6](https://github.com/Guzman0/DappSentinel/pull/6)) |
 | **Craft** (25%) | Two commands from any folder ([try it on any dApp](#try-it-on-any-dapp-from-any-folder)), or one line in a workflow ([use it in your own repo](#use-it-in-your-own-repo)). Keys masked in every report ([SECURITY.md](SECURITY.md)). Honest limits in [what DappSentinel doesn't do](#what-dappsentinel-doesnt-do) |
-| **Check it without credits** | `npm test`, the [session viewer](https://dappsentinel.netlify.app/dashboard/), and [`evidence/`](evidence/) |
+| **Check it without credits** | `npm test`, the [session viewer](https://dappsentinel.netlify.app/dashboard/), and [`evidence/`](evidence/): Kane's own output for PR #5, Spark, Polaris and every mutation-test variant, kept in the repo |
 | **Dates** | First commit `ed622c0`, 18 Nov 2026, after the 12 Nov start |
 
 ## Kane's five jobs
@@ -248,34 +262,11 @@ The fix loop never tries forever, and never quietly undoes what a developer mean
 
 ## Quick start
 
-You need [Node.js 20+](https://nodejs.org), Google Chrome and a free [TestMu AI](https://www.testmuai.com/kane-cli/) account.
-
-```bash
-# 1. Install Kane CLI and sign in
-npm install -g @testmuai/kane-cli
-kane-cli login
-
-# 2. Get DappSentinel
-git clone https://github.com/Guzman0/DappSentinel.git
-cd DappSentinel
-npm install
-
-# 3. Run the gate against the included demo dApp
-npm run sentinel
-```
-
-The demo dApp (`demo-dapp/`, a simulated ETH → USDC swap page) ships with real-world mistakes in it, so the first run fails and shows you what Kane catches. Open `.sentinel/report.md` to see the findings.
+The four commands are in [See it work](#see-it-work). The demo dApp (`demo-dapp/`, a simulated ETH → USDC swap page) ships with six real-world mistakes, so the first run fails and `.sentinel/report.md` shows what Kane caught.
 
 ### Close the loop with Claude Code
 
-```bash
-npx @testmuai/kane-cli-skill   # optional: teaches Claude Code how to use Kane
-claude                          # open Claude Code in this folder
-```
-
-Then ask: *"Run /sentinel and fix everything Kane catches."* Or change anything in `demo-dapp/` and let the Stop hook take over.
-
-Want to watch Kane work? `npm run sentinel:headed` runs the checks in a visible browser.
+Open Claude Code in the folder (`claude`) and ask: *"Run /sentinel and fix everything Kane catches."* Or change anything in `demo-dapp/` and let the Stop hook take over. `npx @testmuai/kane-cli-skill` optionally teaches Claude Code how to use Kane, and `npm run sentinel:headed` lets you watch Kane work.
 
 ## Use it on your own dApp
 
@@ -329,7 +320,7 @@ A scripted browser can record the traffic of a site you wrote the script for. It
 
 ## Forensic trail: the loop on GitHub, step by step
 
-Every step of the closed loop on [PR #7](https://github.com/Guzman0/DappSentinel/pull/7), each with the artifact that proves it: Kane fails it 6 of 7 ([gate job](https://github.com/Guzman0/DappSentinel/actions/runs/44831840406/job/136618434622)), Claude Code gets Kane's report ([fix job](https://github.com/Guzman0/DappSentinel/actions/runs/44831840406/job/136620210863)), changes only `demo-dapp/` ([commit](https://github.com/Guzman0/DappSentinel/commit/f89938ad734d4633e7c2760f21d897dff42998c7)), explains it on the PR ([comment](https://github.com/Guzman0/DappSentinel/pull/7#issuecomment-7052572418)), and Kane passes it 7 of 7 ([re-check](https://github.com/Guzman0/DappSentinel/actions/runs/44833318875)). [The full table, with an honest note](DETAILS.md#forensic-trail-the-loop-on-github-step-by-step).
+Every step of the closed loop on [PR #7](https://github.com/Guzman0/DappSentinel/pull/7), each with the artifact that proves it: Kane fails it 6 of 7 ([gate job](https://github.com/Guzman0/DappSentinel/actions/runs/44831840406/job/136618434622)), Claude Code gets Kane's report ([fix job](https://github.com/Guzman0/DappSentinel/actions/runs/44831840406/job/136620210863)), changes only `demo-dapp/` ([commit](https://github.com/Guzman0/DappSentinel/commit/f89938ad734d4633e7c2760f21d897dff42998c7)), explains it on the PR ([comment](https://github.com/Guzman0/DappSentinel/pull/7#issuecomment-7052572418)), and Kane passes it 7 of 7 ([re-check](https://github.com/Guzman0/DappSentinel/actions/runs/44833318875)). The same loop on [PR #5](https://github.com/Guzman0/DappSentinel/pull/5), with Kane's output kept in the repo: [`evidence/pr5-closed-loop/`](evidence/pr5-closed-loop/). [The full table, with an honest note](DETAILS.md#forensic-trail-the-loop-on-github-step-by-step).
 
 ## Reproduce it yourself
 

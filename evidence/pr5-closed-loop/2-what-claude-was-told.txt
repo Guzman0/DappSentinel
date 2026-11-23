@@ -1,0 +1,9 @@
+Context prompt: Kane CLI checked this dApp in a real browser and DappSentinel's gate failed.
+Read gate-report/report.md for every failing check, the evidence Kane recorded, and how to fix it.
+
+Fix the site so every failing check passes:
+- Edit only files in demo-dapp/. It is plain HTML, CSS and JavaScript with no build step; keep it that way.
+- Never edit checks/, sentinel.config.json, bin/, lib/, hooks/, profiles/, .github/ or .claude/.
+  Changing the rules doesn't count as a fix, and the gate refuses to run if they change.
+- Keep the swap flow working (checks/07-swap-flow.md).
+- Don't run Kane or the gate yourself. CI re-checks the site after you finish.
