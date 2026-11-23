@@ -464,6 +464,12 @@ async function cmdCheck(args) {
     }
 
     const e = r.runEnd || {};
+    // Out of credits is a setup problem, not a verdict about the site: stop instead of reporting
+    // every check as failed.
+    if (/insufficient credits|credits exhausted/i.test(`${e.summary || ""} ${e.reason || ""} ${(r.steps || []).map((x) => x.remark).join(" ")} ${r.stderr || ""}`)) {
+      if (server) server.close();
+      die("Kane CLI has run out of TestMu AI credits, so the checks could not run. Nothing about the site was judged.\nCheck with: kane-cli balance");
+    }
     const ctx = typeof e.context === "object" && e.context ? e.context : {};
     let status = r.code === 0 ? "passed" : r.code === 1 ? "failed" : "error";
     let summary = e.summary || e.one_liner || (status === "error" ? "Timed out or cancelled." : "");
