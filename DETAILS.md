@@ -260,7 +260,7 @@ lib/                  Reads Kane's network log (HAR) and the storage of the Chro
 hooks/                Claude Code hooks: sentinel-stop.js closes the loop, guard-checks.js blocks edits to the rules
 .claude/              Hook settings and the /sentinel command
 profiles/             Ready-made checks for live dApps: live (any site), lido, aave
-action.yml            The GitHub Action: uses: Guzman0/DappSentinel@v1.1.0
+action.yml            The GitHub Action: uses: Guzman0/DappSentinel@v1.2.0
 .github/workflows/    The PR gate and fix job, the mutation test, the install tests, the Spark and Polaris loops
 mutants/, scripts/    The mutation test: the clean site, the 7 planted mistakes, and the scripts that build and judge them
 evidence/             Committed records of the mutation test and the real-world loops

@@ -12,7 +12,7 @@
 > - **The loop:** Kane catches it → Claude Code fixes it → Kane checks again, until every check passes. The agent can't edit the checks to cheat, and after 3 rounds, or when only a person can decide, it hands over.
 > - **Kane makes the call on all 7 checks**, with DevTools assertions for the hidden ones. An exact check runs behind it for what Kane's DevTools can't see ([who catches what](#who-catches-what-kane-and-dappsentinel)).
 > - **Real bugs in code we didn't write:** [Polaris #118](#real-world-loop-2-a-bug-reported-on-polariss-issue-tracker) and [Spark](#real-world-loop-a-bug-in-code-we-didnt-write). Plus a [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for), 8 of 8 on four runs, and [11 live dApps](#real-world-runs).
-> - **Install:** `uses: Guzman0/DappSentinel@v1.1.0` or `npm i -g github:Guzman0/DappSentinel` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U)
+> - **Install:** `uses: Guzman0/DappSentinel@v1.2.0` or `npm i -g github:Guzman0/DappSentinel` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U)
 
 [![Watch the DappSentinel demo video (3:59)](assets/video-thumb.jpg)](https://youtu.be/FiErWhY495U)
 
@@ -79,7 +79,7 @@ Every judging rule, and where to see the proof. All of it is public; nothing nee
 | **Bar: it works end to end** | [Reproduce it yourself](#reproduce-it-yourself), 7 steps, each with a public run. The published action on Lido, used exactly as another repo would: 5 of 5, "Clear to ship" ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44909812956)) |
 | **Bar: Kane caught or proved something** | Kane gives its own verdict on all 7 checks ([who catches what](#who-catches-what-kane-and-dappsentinel)). Two real bugs in code we didn't write: [Spark](#real-world-loop-a-bug-in-code-we-didnt-write) and [Polaris #118](#real-world-loop-2-a-bug-reported-on-polariss-issue-tracker). 6 planted mistakes on the demo ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669)), and 7 new ones it was never tuned for, [8 of 8 on four runs](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) |
 | **Bar: the agent and Kane talk** | Kane's findings go straight to Claude Code, and a Stop hook won't let Claude finish while a check fails ([how the loop works](#how-the-loop-works), [video at 1:52](https://youtu.be/FiErWhY495U?t=112)). On GitHub, Claude gets Kane's report and comments what it changed ([PR #7](https://github.com/Guzman0/DappSentinel/pull/7#issuecomment-7052572418)) |
-| **Ships** (25%) | Claude Code (`/sentinel`), the command line, and a GitHub Action ([`@v1.1.0`](https://github.com/Guzman0/DappSentinel/releases/tag/v1.1.0)). A required check blocks merging a broken pull request ([PR #2](https://github.com/Guzman0/DappSentinel/pull/2)) |
+| **Ships** (25%) | Claude Code (`/sentinel`), the command line, and a GitHub Action ([`@v1.2.0`](https://github.com/Guzman0/DappSentinel/releases/tag/v1.2.0)). A required check blocks merging a broken pull request ([PR #2](https://github.com/Guzman0/DappSentinel/pull/2)) |
 | **Verified** (25%) | Polaris #118: caught, fixed as the issue asks, proven twice ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45015619019)). Spark: caught, fixed, re-checked ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44953030392)). The [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for), with Kane's own screenshots, and [11 live dApps](#real-world-runs) |
 | **Closed loop** (25%) | With no human: Kane fails PR #5 6 of 7, Claude fixes and pushes, the PR passes 7 of 7 ([Kane's output and the fix](evidence/pr5-closed-loop/), [forensic trail](#forensic-trail-the-loop-on-github-step-by-step)). Max 3 rounds; when only a person can decide, Claude [hands over](#when-the-loop-gives-up-a-person-takes-over) ([PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817)). The agent [can't cheat](#the-agent-cant-cheat) ([PR #6](https://github.com/Guzman0/DappSentinel/pull/6)) |
 | **Craft** (25%) | Two commands from any folder ([try it on any dApp](#try-it-on-any-dapp-from-any-folder)), or one line in a workflow ([use it in your own repo](#use-it-in-your-own-repo)). Keys masked in every report ([SECURITY.md](SECURITY.md)). Honest limits in [what DappSentinel doesn't do](#what-dappsentinel-doesnt-do) |
@@ -300,7 +300,7 @@ Add the hosts you trust to `allowedScriptHosts` in `profiles/live/sentinel.confi
 DappSentinel is a GitHub Action. Add your TestMu AI username and access key as repository secrets (`LT_USERNAME`, `LT_ACCESS_KEY`), then add one step to a workflow:
 
 ```yaml
-- uses: Guzman0/DappSentinel@v1.1.0
+- uses: Guzman0/DappSentinel@v1.2.0
   with:
     url: https://staging.yourdapp.xyz
     lt-username: ${{ secrets.LT_USERNAME }}
