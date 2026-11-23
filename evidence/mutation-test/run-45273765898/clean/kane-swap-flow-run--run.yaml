@@ -1,0 +1,33 @@
+evidence: '0.1'
+run_id: a347baa0-5227-4047-873f-b01e28c3b817
+status: finalized
+title: 'Go to http://localhost:4173 and wait until the page has fully loaded.
+  Type 0.5 into the You pay amount field. Assert: the You receive field shows a
+  number greater than 0 and a fee is shown. Click Review swap. Store the amount
+  shown after You pay on the confirmation, exactly as written, as
+  confirm_pay_amount. Assert: the confirmation shows You pay 0.5 ETH. Check this
+  before clicking anything else. Only after that check, click Confirm swap.
+  Assert: the text Swap submitted is visible.'
+started: 2026-11-23T21:53:22.362Z
+environment:
+  producer:
+    name: kane-cli
+    version: 0.10.8
+  surfaces:
+    - http://localhost:4173
+  run_kind: author
+  origin: inline
+  pid: 3103
+  saved: false
+metrics_catalog:
+  id: kane-cli
+  version: 1
+  sha256: 9774e11a8a2240448d765bd4ad8eb1cf6c0444937e72050588b597539c890e77
+  source: bundled
+ended: 2026-11-23T21:54:35.121Z
+totals:
+  tests: 1
+  passed: 1
+  failed: 0
+  broken: 0
+  skipped: 0
