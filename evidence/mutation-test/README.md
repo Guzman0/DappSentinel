@@ -50,7 +50,7 @@ Kane CLI 0.10.8 came out on 22 Nov, and these runs check DappSentinel against it
 
 Kane failed the address check on the swapped-digit copy both times and passed it on the clean site both times, so the verdict is right and repeatable.
 But its written reason was not "these two characters differ". Both times it said its own comparison step had not stored the value it read from the page.
-So we count the verdict, and we don't claim Kane spelled out the swapped characters. The screenshot in `run-44884542975/m3-swapped-digits/screenshots/` shows the wrong address on the page.
+So we count the verdict, and we don't claim Kane spelled out the swapped characters. On later runs (0.10.7 and 0.10.8) Kane did store the wrong address correctly, but its triage still called the value an unresolved placeholder and blamed the test; that is reported as [LambdaTest/kane-cli#245](https://github.com/LambdaTest/kane-cli/issues/245). The screenshot in `run-44884542975/m3-swapped-digits/screenshots/` shows the wrong address on the page.
 
 ## What each variant folder holds (run 2)
 

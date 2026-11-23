@@ -348,7 +348,7 @@ For what DappSentinel collects, masks and uploads, see [SECURITY.md](SECURITY.md
 What building DappSentinel taught us about Kane CLI 0.10.7 and 0.10.8. The top three:
 
 - **A pass can contradict Kane's own reading** on 0.10.8: [#239, confirmed by the Kane team](#confirmed-outside-this-repo).
-- **Kane's triage can blame the test when the app is wrong.** On the swapped-address copy, Kane failed the check correctly, but its triage called it a test configuration bug, 98% confident, on three runs ([record](evidence/mutation-test/run-45175229208/m3-swapped-digits/)). DappSentinel shows Kane's diagnosis labelled as Kane's opinion, warns when it blames the test, and never lets it change the verdict.
+- **Kane's triage can blame the test when the app is wrong.** On the swapped-address copy, Kane failed the check correctly, but its triage called it a test configuration bug, 98% confident, on three runs ([record](evidence/mutation-test/run-45175229208/m3-swapped-digits/)). Reported as [LambdaTest/kane-cli#245](https://github.com/LambdaTest/kane-cli/issues/245). DappSentinel shows Kane's diagnosis labelled as Kane's opinion, warns when it blames the test, and never lets it change the verdict.
 - **Network capture resets at every step, and DevTools can't read sessionStorage.** DappSentinel stores the page's requests in the step that reloads it, and watches sessionStorage itself.
 
 [All 9 findings, each with its run](DETAILS.md#findings-for-the-kane-cli-team).
