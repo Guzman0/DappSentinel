@@ -136,13 +136,7 @@ To be precise: a domain-locked key isn't proof of a leak. The bug is that the pu
 
 ## Real-world loop 2: a bug reported on Polaris's issue tracker
 
-[Polaris](https://github.com/PolarisQ-xyz/polaris-frontend) is an open-source prediction-market dApp. Issue [#118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118) says a production build with a missing setting still builds, and silently points the site at localhost and testnet. [One run](https://github.com/Guzman0/DappSentinel/actions/runs/45015619019), every job green:
-
-1. **Kane caught it.** We built Polaris exactly as the issue describes. Kane failed the page (*"The page tried to get market and account data from a local service"*), and its DevTools assertion against local and testnet requests failed too.
-2. **Claude Code fixed it the way the issue asks.** A production build with a missing setting now stops with an error naming it ([the patch](evidence/realworld-polaris/run-45015619019/fix.patch)).
-3. **Proven twice.** The misconfigured build is refused, naming all three settings, and a correctly configured build passes Kane's DevTools assertion.
-
-The tested fix is offered [on issue #118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118#issuecomment-7079526239) (also readable as [public data](https://api.github.com/repos/PolarisQ-xyz/polaris-frontend/issues/comments/7079526239)). Full record: [`evidence/realworld-polaris/`](evidence/realworld-polaris/).
+[Polaris](https://github.com/PolarisQ-xyz/polaris-frontend) is an open-source prediction-market dApp. Its issue [#118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118) says a production build missing a setting still builds, then silently talks to localhost and testnet. In [one run](https://github.com/Guzman0/DappSentinel/actions/runs/45015619019), Kane failed the build made exactly as the issue describes (*"The page tried to get market and account data from a local service"*). Claude Code then made a production build stop and name the missing setting ([the patch](evidence/realworld-polaris/run-45015619019/fix.patch)), and Kane proved it: the bad build is refused, and a configured build passes Kane's DevTools assertion. What the maintainers did next is in [Confirmed outside this repo](#confirmed-outside-this-repo); the full record is in [`evidence/realworld-polaris/`](evidence/realworld-polaris/).
 
 ## What DappSentinel checks
 
