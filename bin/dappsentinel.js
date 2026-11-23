@@ -554,7 +554,10 @@ async function cmdCheck(args) {
         /* no triage in this pack */
       }
     }
-    console.log(`      → ${res.status === "passed" ? "✅ passed" : res.status === "error" ? "⚠️  error" : "❌ failed"}${res.summary ? ": " + keyLine(res.summary).slice(0, 200) : ""}\n`);
+    if (res.walletCheck && res.walletCheck.status === "passed") console.log(`      ✓ What you see is what you sign: ${res.walletCheck.summary}`);
+    // When the exact check overrules Kane, lead with it, not with Kane's own (passing) summary.
+    const line = res.exactCheck || keyLine(res.summary);
+    console.log(`      → ${res.status === "passed" ? "✅ passed" : res.status === "error" ? "⚠️  error" : "❌ failed"}${line ? ": " + line.slice(0, 200) : ""}\n`);
   }
 
   // Kane's own DevTools verdicts on the hidden checks: one extra Kane run that loads the page and
