@@ -1,0 +1,74 @@
+evidence: '0.1'
+test: go-to-http-localhost-4173-and-wait-until-257489e1
+status: failed
+duration_ms: 70717
+external_id:
+  session_id: 9ca08d24-8f05-47ef-9543-c7954e6fc1b0
+  commit_id: 9ca08d24-8f05-47ef-9543-c7954e6fc1b0
+  test_id: e35bfaea-c7ce-4bc8-a81e-03a0a60f2e25
+  testcase_id: 01M84609176C4RZ9D8CWZM8G3Z
+  project_id: 01M7R0YTPWWNWG8JS3JMSCYY44
+  folder_id: 01M7R0YY3VCR3VZXAF8A8ZZET7
+  org_id: '3439849'
+  user_name: oguziechiagozie
+  user_email: oguziechiagozie@gmail.com
+  sharable_link: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M84609176C4RZ9D8CWZM8G3Z/dashboard/share/US_WI87SD4AFHZ2PLFZ3MAH3V3NIWX5ODIU0JS88ULDN2TUT26W4ZYMR4GY24FGT8J1?type=summary&agentView=true&fqdn=summary-page
+  execution_id: b38d3970-ff61-4e8e-9f89-cffbebb6c20f
+environment:
+  model: v16-alpha
+  os: Linux
+  browser: Chrome
+  browser_version: '158'
+  resolution: 1920x1080
+  platform: Desktop
+  platform_type: web
+  os_version: 7.0.0-1020-azure
+steps:
+  - id: 0-1
+    ordinal: 1
+    status: passed
+    kind: navigate
+    duration_ms: 0
+    action_id: 93e9e532-c741-4e2d-af27-1d4f6ec0b71c
+  - id: 0-2
+    ordinal: 2
+    status: passed
+    kind: wait
+    duration_ms: 7000
+    action_id: 0f05dad8-167e-47b2-a56c-b4d43bb76fe5
+  - id: 0-3
+    ordinal: 3
+    status: passed
+    kind: type
+    duration_ms: 4900
+    action_id: 829fe2eb-30d7-45ff-99ce-abefc772c123
+  - id: 0-4
+    ordinal: 4
+    status: passed
+    kind: analyze
+    duration_ms: 7900
+    action_id: 430cc4e5-4c2b-4eec-bfd0-aee1ea80e69d
+  - id: 0-5
+    ordinal: 5
+    status: passed
+    kind: assert
+    duration_ms: 0
+    action_id: e75f63da-8c63-4794-8317-f812846742b5
+  - id: 0-6
+    ordinal: 6
+    status: passed
+    kind: click
+    duration_ms: 4900
+    action_id: 31bf8a25-cb28-441d-8842-cf83e75fade1
+  - id: 0-7
+    ordinal: 7
+    status: passed
+    kind: analyze
+    duration_ms: 13400
+    action_id: 83251661-1297-4226-9e46-c1dee1d64aef
+  - id: 0-8
+    ordinal: 8
+    status: failed
+    kind: assert
+    duration_ms: 0
+    action_id: 53a6530c-1f22-491c-b44c-b0dd2529cfc3

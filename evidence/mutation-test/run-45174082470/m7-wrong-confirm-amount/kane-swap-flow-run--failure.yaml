@@ -1,0 +1,13 @@
+generated: 2026-11-23T12:28:38.889Z
+totals:
+  failures: 1
+  triaged: 1
+  untriaged: 0
+failures:
+  - test: go-to-http-localhost-4173-and-wait-until-257489e1
+    ordinal: 8
+    step: 0-8
+    status: failed
+    path: tests/go-to-http-localhost-4173-and-wait-until-257489e1/steps/8-0-8/failure.yaml
+    title: Swap confirmation shifts ETH payment decimal
+    triage_status: triaged
