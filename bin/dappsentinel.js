@@ -314,14 +314,15 @@ function writeReport(results, meta, config = {}) {
     for (const r of failed) {
       lines.push(`### ❌ ${r.name} (\`${r.id}\`)`);
       lines.push("");
-      if (r.summary) lines.push(`**${r.kind === "assert" ? "Kane says" : "Finding"}:** ${r.summary}`);
+      // Kane's own verdict comes first; DappSentinel's exact check is shown behind it.
+      if (r.kane) lines.push(`**Kane's own DevTools verdict:** ${r.kane.status === "passed" ? "✅ passed" : r.kane.status === "failed" ? "❌ failed" : "⚠️ inconclusive"}${r.kane.remark ? `: ${r.kane.remark}` : ""}${r.kane.testUrl ? ` ([Kane's run](${r.kane.testUrl}))` : ""}\n\n_${r.agreement}_\n`);
+      if (r.summary) lines.push(`**${r.kind === "assert" ? "Kane says" : "DappSentinel's exact check"}:** ${r.summary}`);
       if (r.kaneTriage && (r.kaneTriage.title || r.kaneTriage.rootCause)) {
         const k = r.kaneTriage;
         const blamesTest = /automation|test|config|flak|environment/i.test(k.category || "");
         lines.push(`\n**Kane's diagnosis** (Kane's own triage, shown as its opinion; it doesn't change the verdict): ${k.title ? `_${k.title}._ ` : ""}${k.rootCause || ""}${k.category ? ` Category: \`${k.category}\`` : ""}${k.confidence ? `, ${Math.round(k.confidence * 100)}% confident` : ""}.`);
         if (blamesTest) lines.push(`\n_Kane's triage blames the test here, but the check failed on what the page showed. Look at the site first: in our mutation test, Kane's triage blamed the test when the site really had a swapped digit._`);
       }
-      if (r.kane) lines.push(`\n**Kane's own DevTools verdict:** ${r.kane.status === "passed" ? "✅ passed" : r.kane.status === "failed" ? "❌ failed" : "⚠️ inconclusive"}${r.kane.remark ? `: ${r.kane.remark}` : ""}${r.kane.testUrl ? ` ([Kane's run](${r.kane.testUrl}))` : ""}\n\n_${r.agreement}_`);
       if (r.findings && r.findings.length) {
         lines.push("");
         r.findings.forEach((f, i) => lines.push(`- \`${f}\`${r.trace && r.trace[i] ? `  (${r.trace[i]})` : ""}`));
@@ -718,7 +719,7 @@ function cmdList(args = {}) {
 
 const args = parseArgs(process.argv.slice(2));
 const cmd = args._[0] || "check";
-module.exports = { hashDir, loadChecks, templateValues, fill, toObjective, traceFindings, landingFromHar, landingFromWatch };
+module.exports = { hashDir, loadChecks, templateValues, fill, toObjective, traceFindings, landingFromHar, landingFromWatch, writeReport };
 
 const HELP = `DappSentinel: a pre-launch safety gate for dApp frontends, run by Kane CLI in a real browser.
 

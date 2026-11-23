@@ -11,7 +11,7 @@
 > - **What:** a pre-launch gate for dApp websites. Kane CLI checks the site in a real browser for mistakes you can't see on screen: leaked RPC keys, testnet endpoints, wrong contracts, wrong chain, untrusted scripts, keys in storage.
 > - **The loop:** Kane catches it → Claude Code fixes it → Kane checks again, until every check passes. The agent can't edit the checks to cheat.
 > - **Real bugs in code we didn't write:** Polaris issue [#118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118), reported on Polaris's own issue tracker: Kane caught it, Claude fixed it, proven twice, fix [offered upstream](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118#issuecomment-7079526239) ([loop](#real-world-loop-2-a-bug-reported-on-polariss-issue-tracker)). Spark's frontend: a hardcoded RPC key that breaks every build outside Spark's domain ([loop](#real-world-loop-a-bug-in-code-we-didnt-write)).
-> - **Kane makes the call:** Kane gives its own verdict on every check, using its DevTools for the hidden ones (they can't read sessionStorage); DappSentinel's exact check runs behind it and catches what Kane misses ([who catches what](#who-catches-what-kane-and-dappsentinel)).
+> - **Kane makes the call on all 7 checks:** on the page by reading and using it, and on the hidden ones with Kane's own DevTools assertions on the traffic and storage it captured. On the demo, Kane's DevTools failed all 4 hidden mistakes by themselves. DappSentinel's exact check runs behind Kane and catches what its DevTools can't see (sessionStorage) or misses ([who catches what](#who-catches-what-kane-and-dappsentinel)).
 > - **Where it runs:** in Claude Code on your machine (`/sentinel`), and on GitHub, where it blocks the merge and fixes the pull request itself ([#5](https://github.com/Guzman0/DappSentinel/pull/5), no human involved).
 > - **Proof, all public:** broken PR blocked ([#2](https://github.com/Guzman0/DappSentinel/pull/2)) · cheating refused ([#6](https://github.com/Guzman0/DappSentinel/pull/6)) · [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) 8 of 8 on four runs · [8 live dApps](#real-world-runs) scanned
 > - **Install:** `uses: Guzman0/DappSentinel@v1.1.0` or `npm i -g github:Guzman0/DappSentinel` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U)
@@ -135,15 +135,15 @@ It blocks the release wherever it runs: Claude Code can't finish its turn while 
 
 These are the mistakes that look fine on screen and cost users money:
 
-| Check | What gets caught | How Kane proves it |
+| Check | What gets caught | Who decides: Kane first, then DappSentinel's exact check |
 |---|---|---|
-| `rpc-key-leak` | RPC provider API keys (Alchemy, Infura, QuickNode…) in network requests | Network log Kane records in the browser |
-| `testnet-rpc` | A mainnet build still calling testnet, staging or localhost endpoints | Network log Kane records in the browser |
-| `unknown-scripts` | Scripts loaded from hosts you didn't approve, the way drainers get injected | Network log Kane records in the browser |
-| `storage-secrets` | Private keys or seed phrases left in localStorage or sessionStorage | Kane drives a Chrome that DappSentinel watches live |
-| `contract-address` | A displayed contract address that doesn't match the real one | Kane asserts on the page |
-| `chain-id` | The app pointing at the wrong chain | Kane asserts on the page |
-| `swap-flow` | The core user flow breaking after the fixes | Kane runs the flow end to end |
+| `rpc-key-leak` | RPC provider API keys (Alchemy, Infura, QuickNode…) in network requests | **Kane's own DevTools assertion** on the requests it captured; then DappSentinel's exact check of Kane's network log |
+| `testnet-rpc` | A mainnet build still calling testnet, staging or localhost endpoints | **Kane's own DevTools assertion** on the requests it captured; then DappSentinel's exact check of Kane's network log |
+| `unknown-scripts` | Scripts loaded from hosts you didn't approve, the way drainers get injected | **Kane's own DevTools assertion** on the scripts it captured; then DappSentinel's exact check of Kane's network log |
+| `storage-secrets` | Private keys or seed phrases left in localStorage or sessionStorage | **Kane's own DevTools assertion** on localStorage; then DappSentinel's watch of localStorage and sessionStorage in the Chrome Kane drives |
+| `contract-address` | A displayed contract address that doesn't match the real one | **Kane's verdict**, reading the page |
+| `chain-id` | The app pointing at the wrong chain | **Kane's verdict**, reading the network badge |
+| `swap-flow` | The core user flow breaking after the fixes | **Kane's verdict**, using the swap end to end; then an exact check on the amount Kane read |
 
 ### Why two kinds of check?
 
@@ -227,13 +227,13 @@ Read .sentinel/report.md for Kane's full findings and fix hints, fix the app in 
 Do not edit checks/ or sentinel.config.json to make a check pass.
 ```
 
-Claude then reads Kane's report, which gives the evidence, Kane's own verdict and the fix (excerpt; the key is masked in every report):
+Claude then reads Kane's report, which gives Kane's own verdict first, then the exact check's evidence and the fix (excerpt; the key is masked in every report):
 
 ```text
 ### ❌ No RPC API keys in network requests (`rpc-key-leak`)
-Finding: Kane's network recording shows 1 request carrying an RPC API key in the URL.
 Kane's own DevTools verdict: ❌ failed: assert: No URL in page_requests contains an RPC provider API key …
 Kane and DappSentinel both found it.
+DappSentinel's exact check: Kane's network recording shows 1 request carrying an RPC API key in the URL.
 - POST https://mainnet.infura.io/v3/3f9c…a65  (first seen in Kane's recording as request 4 of 5)
 How to fix: Remove provider API keys from frontend code. Use a keyless public RPC for read calls,
 or route keyed calls through a server-side proxy. …

@@ -121,9 +121,9 @@ function renderVariants() {
 }
 function checkBody(c) {
   const parts = [];
-  if (c.summary) parts.push(`<div><div class="k">${c.kind === "assert" ? "KANE SAYS" : "FINDING"}</div>${esc(c.summary).replace(/\n/g, "<br>")}</div>`);
-  if (c.kane) parts.push(`<div><div class="k">KANE'S DEVTOOLS VERDICT</div>${ST[c.kane.status] || esc(c.kane.status)}${c.kane.remark ? ": " + esc(c.kane.remark) : ""}${c.agreement ? `<br><em>${esc(c.agreement)}</em>` : ""}</div>`);
-  if (c.findings.length) parts.push(`<div><div class="k">WHAT DAPPSENTINEL FOUND IN KANE'S RECORDING</div>${c.findings.map((f, i) => `<div class="find mono">${esc(f)}${c.trace[i] ? `<br><span style="color:var(--dim)">${esc(c.trace[i])}</span>` : ""}</div>`).join("")}</div>`);
+  if (c.kane) parts.push(`<div><div class="k">KANE'S OWN DEVTOOLS VERDICT</div>${ST[c.kane.status] || esc(c.kane.status)}${c.kane.remark ? ": " + esc(c.kane.remark) : ""}${c.agreement ? `<br><em>${esc(c.agreement)}</em>` : ""}</div>`);
+  if (c.summary) parts.push(`<div><div class="k">${c.kind === "assert" ? "KANE SAYS" : "DAPPSENTINEL'S EXACT CHECK"}</div>${esc(c.summary).replace(/\n/g, "<br>")}</div>`);
+  if (c.findings.length) parts.push(`<div><div class="k">WHAT THE EXACT CHECK FOUND IN KANE'S RECORDING</div>${c.findings.map((f, i) => `<div class="find mono">${esc(f)}${c.trace[i] ? `<br><span style="color:var(--dim)">${esc(c.trace[i])}</span>` : ""}</div>`).join("")}</div>`);
   if (c.finalState && Object.keys(c.finalState).length) parts.push(`<div><div class="k">VALUES KANE READ FROM THE PAGE</div>${Object.entries(c.finalState).map(([k, v]) => `<div class="mono find">${esc(k)}: ${esc(typeof v === "string" ? v : JSON.stringify(v))}</div>`).join("")}</div>`);
   if (c.exactCheck) parts.push(`<div class="warn">${esc(c.exactCheck)}</div>`);
   if (c.triage) {
