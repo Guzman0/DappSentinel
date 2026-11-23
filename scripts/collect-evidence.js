@@ -66,6 +66,15 @@ for (const r of results) {
     fs.writeFileSync(path.join(out, "screenshots", `${label}-${String(i + 1).padStart(2, "0")}${ext}`), e.getData());
   });
 
+  // Kane's own triage and run records (small YAML/JSON text), masked: failure.yaml holds Kane's
+  // diagnosis of a failed run. Kept so the report's "Kane's diagnosis" can be checked against it.
+  for (const e of zip.getEntries()) {
+    const n = e.entryName.replace(/\\/g, "/");
+    if (!/(^|\/)(failure\.yaml|result\.yaml|run\.yaml|run_summary\.json)$/.test(n)) continue;
+    const safe = n.replace(/[^A-Za-z0-9._-]+/g, "__");
+    fs.writeFileSync(path.join(out, `kane-${label}--${safe}`), redact(e.getData().toString("utf8"), config));
+  }
+
   // Network requests Kane recorded, masked.
   const lines = [];
   for (const e of zip.getEntries()) {
