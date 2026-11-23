@@ -1,0 +1,86 @@
+Run 45208847205 · DappSentinel · workflow_dispatch on main · failure · 2026-11-23T15:45:49Z
+https://github.com/Guzman0/DappSentinel/actions/runs/45208847205
+
+== job "gate": failure
+🛡  DappSentinel: 7 checks against http://localhost:4173 (4 Kane runs)
+
+   Serving demo-dapp at http://localhost:4173
+
+[1/7] Displayed contract addresses match the expected ones
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: Let the page fully load.
+      · analyze: ANALYZE(textual_visual, 'the USDC contract address shown on the page is exactly 
+      ✖ assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4
+      → ❌ failed: The USDC contract address displayed in the swap panel ends in B49, while the required address ends in B48. This is not a letter-case difference; it is a different address.
+
+[2/7] The app targets the right chain
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: ANALYZE(textual_visual, 'the network badge at the top of the page shows the netw
+      ✖ assert: the network badge at the top of the page shows chain ID exactly 1 and the networ
+      → ❌ failed: The app could not use its Ethereum mainnet connection because the browser blocked that request, then used a Sepolia connection instead. The badge kept the Ethereum name even though it was on the Sepol
+
+[3/7] No private keys or seed phrases in browser storage
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · type: Typing 1 into the You pay amount field
+      · analyze: ANALYZE(textual_visual, 'The value shown in the You receive field is a number gr
+      · assert: the You receive field shows a number greater than 0
+      ✖ localStorage["wallet_pk"] is named like a secret and holds 0xac…f80
+      ✖ localStorage["session"].wallet_pk is named like a secret and holds 0xac…f80
+      → ❌ failed: While Kane used the page, the site saved 2 items in browser storage, including 2 secrets any script on the page could read.
+
+[4/7] The swap flow works end to end
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · type: Typing 0.5 in You pay amount field
+      · analyze: a fee is shown
+      · assert: the You receive field shows a number greater than 0 and a fee is shown
+      · click: Clicking Review swap button
+      · analyze: ANALYZE(textual_visual, 'the amount shown after You pay on the confirmation, exa
+      · assert: the confirmation shows You pay 0.5 ETH
+      · click: Clicking Confirm swap button
+      · analyze: the text Swap submitted is visible
+      · assert: the text Swap submitted is visible
+      → ✅ passed: Confirmed the swap successfully; the page displayed “Swap submitted.”
+
+[5/8] Kane's own DevTools verdicts on the hidden checks
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: ANALYZE(devtool_network, 'every entry in {{page_requests}} with resource type sc
+      ✖ assert: no URL in {{page_requests}} contains an RPC provider API key, such as a long key
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · wait: PRIMARY: wait for the reloaded page to finish loading
+      · analyze: ANALYZE(devtool_network, 'every entry in page_requests with resource type script
+      · assert: no URL in page_requests goes to a testnet, staging or local endpoint, meaning a 
+      ✖ assert: every entry in page_requests with resource type script was loaded from one of th
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · analyze: ANALYZE(devtool_storage, 'No localStorage value is a private key (64 hexadecimal
+      ✖ assert: no localStorage value is a private key (64 hexadecimal characters, with or witho
+[6/7] No RPC API keys in network requests
+      ✖ POST https://eth-mainnet.g.alchemy.com/v2/aX7k…GuE
+        first seen in Kane's recording as request 5 of 6
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M84HGSAHZK49MHHPCBXA6MAD/dashboard/share/US_5Z11IC81PWZ6GJZRNTOFCFDH1OW9L2P0RFK06SJRED0XLXEMXNW0UKXTIOS2P01T?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 1 request carrying an RPC API key in the URL.
+
+[7/7] No testnet, staging or local endpoints in a mainnet build
+      ✖ POST https://ethereum-sepolia-rpc.publicnode.com/  (matches "sepolia")
+        first seen in Kane's recording as request 6 of 6
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M84HGSAHZK49MHHPCBXA6MAD/dashboard/share/US_5Z11IC81PWZ6GJZRNTOFCFDH1OW9L2P0RFK06SJRED0XLXEMXNW0UKXTIOS2P01T?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 1 request to a testnet, staging or local endpoint.
+
+[8/7] Scripts only load from trusted hosts
+      ✖ https://unpkg.com/dayjs@1.11.13/dayjs.min.js  (from unpkg.com)
+        first seen in Kane's recording as request 3 of 6
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M84HGSAHZK49MHHPCBXA6MAD/dashboard/share/US_5Z11IC81PWZ6GJZRNTOFCFDH1OW9L2P0RFK06SJRED0XLXEMXNW0UKXTIOS2P01T?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 1 script loaded from 1 untrusted host.
+
+   rpc-key-leak: Kane ❌  DappSentinel ❌  Kane and DappSentinel both found it.
+   testnet-rpc: Kane ✅  DappSentinel ❌  DappSentinel's exact check found it; Kane's DevTools assertion passed.
+   unknown-scripts: Kane ❌  DappSentinel ❌  Kane and DappSentinel both found it.
+   storage-secrets: Kane ❌  DappSentinel ❌  Kane and DappSentinel both found it.
+❌ 6 of 7 checks failed. Not safe to ship.
+
+== job "fix": skipped (no log: job skipped)

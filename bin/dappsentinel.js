@@ -402,7 +402,11 @@ async function cmdCheck(args) {
 
   const kaneChecks = checks.filter((c) => c.kind !== "network");
   const networkChecks = checks.filter((c) => c.kind === "network");
-  console.log(`\n🛡  DappSentinel: ${checks.length} checks against ${url} (${kaneChecks.length} Kane runs)\n`);
+  // Every step printed as [n/steps]: the Kane checks, Kane's DevTools run (when on), then the network checks.
+  const hiddenIds = ["rpc-key-leak", "testnet-rpc", "unknown-scripts", "storage-secrets"];
+  const devtoolsOn = process.env.DAPPSENTINEL_KANE_DEVTOOLS !== "off" && checks.some((c) => hiddenIds.includes(c.id));
+  const steps = checks.length + (devtoolsOn ? 1 : 0);
+  console.log(`\n🛡  DappSentinel: ${checks.length} checks against ${url} (${kaneChecks.length + (devtoolsOn ? 1 : 0)} Kane runs)\n`);
 
   const version = await kaneAvailable();
   if (!version) die("kane-cli was not found. Install it with: npm install -g @testmuai/kane-cli   then sign in with: kane-cli login");
@@ -425,7 +429,7 @@ async function cmdCheck(args) {
 
   for (const c of kaneChecks) {
     n++;
-    console.log(`[${n}/${checks.length}] ${c.name}`);
+    console.log(`[${n}/${steps}] ${c.name}`);
     const objective = toObjective(fill(c.body, values));
 
     // Storage: Kane drives a Chrome that DappSentinel started, and DappSentinel watches that
@@ -534,10 +538,9 @@ async function cmdCheck(args) {
   // asserts on the network traffic and localStorage Kane captured itself. DappSentinel's code then
   // reads Kane's recording as a second, exact check, and the report shows both verdicts.
   const devtools = {};
-  const hiddenIds = ["rpc-key-leak", "testnet-rpc", "unknown-scripts", "storage-secrets"];
-  if (process.env.DAPPSENTINEL_KANE_DEVTOOLS !== "off" && checks.some((c) => hiddenIds.includes(c.id))) {
+  if (devtoolsOn) {
     n++;
-    console.log(`[${n}/${checks.length + 1}] Kane's own DevTools verdicts on the hidden checks`);
+    console.log(`[${n}/${steps}] Kane's own DevTools verdicts on the hidden checks`);
     const v = templateValues(config, url);
     const own = analyzers.ownDomain(v.siteHost);
     const hosts = (config.allowedScriptHosts || ["self"]).map((h) => (h === "self" ? own : h)).join(", ");
@@ -579,7 +582,7 @@ async function cmdCheck(args) {
   let forwardNoted = false;
   for (const c of networkChecks) {
     n++;
-    console.log(`[${n}/${checks.length}] ${c.name}`);
+    console.log(`[${n}/${steps}] ${c.name}`);
     const rec = byId[c.recording];
     const recCheck = all.find((x) => x.id === c.recording);
     const ev = rec ? readEvidence(rec.sessionDir) : null;

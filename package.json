@@ -1,6 +1,6 @@
 {
   "name": "dappsentinel",
-  "version": "0.4.0",
+  "version": "1.2.0",
   "description": "A pre-launch safety gate for dApp frontends. Kane CLI catches leaked RPC keys, testnet endpoints, wrong contract addresses, untrusted scripts and keys in storage, and your coding agent fixes them before you ship.",
   "bin": {
     "dappsentinel": "bin/dappsentinel.js"

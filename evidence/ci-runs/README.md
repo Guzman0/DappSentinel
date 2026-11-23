@@ -50,5 +50,6 @@ Runs with their own fuller records are elsewhere: [PR #5](../pr5-closed-loop/), 
 | 2026-11-22 | PR #10: real handover (TradingView ticker) | ❌ 2 of 7 checks failed. Not safe to ship. | [run-45038933982.txt](run-45038933982.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45038933982) |
 | 2026-11-22 | Kane stores the value under the name it was told | ✅ All 7 checks passed. Clear to ship. | [run-45052587659.txt](run-45052587659.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45052587659) |
 | 2026-11-23 | Mutation test on Kane 0.10.8 (m3 triage) | ❌ 1 of 7 checks failed. Not safe to ship. | [run-45174082470.txt](run-45174082470.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45174082470) |
+| 2026-11-23 | Demo with the six mistakes: smoke test of the final code (Kane's DevTools 3 of 4; the exact check caught the testnet request) | ❌ 6 of 7 checks failed. Not safe to ship. | [run-45208847205.txt](run-45208847205.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45208847205) |
 
 The two handover comments, as posted on the pull requests: [PR #10](pr10-handover-comment.md) (Claude explains why a person must decide) and [PR #9](pr9-handover-comment.md) (3 rounds used).

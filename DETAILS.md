@@ -35,7 +35,7 @@ Every check gets a verdict from Kane itself. Kane checks what a user can see by 
 | Keys in browser storage | **Kane**, DevTools localStorage assertion | localStorage and sessionStorage of the browser Kane drove |
 
 **How the two verdicts compare, measured, not claimed:**
-- **Demo with the six mistakes:** Kane's DevTools assertions failed all 4 hidden checks on their own, and DappSentinel agreed on all 4 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45023773746)).
+- **Demo with the six mistakes:** Kane's DevTools assertions failed all 4 hidden checks on their own, and DappSentinel agreed on all 4 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45023773746)). On a later run (23 Nov) they failed 3 of 4: Kane's assertion on testnet requests passed although the page called the Sepolia RPC, and DappSentinel's exact check caught it from Kane's own recording ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45208847205)). The verdict was the same: 6 of 7 failed.
 - **Mutation test, run 4:** Kane's assertions caught 3 of the 4 hidden mistakes by themselves: the Infura key, the Holesky RPC and the jsDelivr script. The fourth, a seed phrase in sessionStorage, is outside what Kane's DevTools can read (they cover localStorage, not sessionStorage), and DappSentinel's exact check caught it. 8 of 8 judged correctly ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45023763082)).
 - **What changed between runs 3 and 4:** Kane's network capture resets at every step, so a script that loads only while the page opens was invisible to an assertion in a later step. Kane now stores the page's requests in the step that reloads it and asserts on that list. That turned Kane's miss on the jsDelivr script into a catch.
 - **No false alarms from Kane:** on the clean site, and on Lido's live site, every Kane DevTools verdict matched DappSentinel's ([Lido run](https://github.com/Guzman0/DappSentinel/actions/runs/45023768462)).
@@ -260,7 +260,7 @@ lib/                  Reads Kane's network log (HAR) and the storage of the Chro
 hooks/                Claude Code hooks: sentinel-stop.js closes the loop, guard-checks.js blocks edits to the rules
 .claude/              Hook settings and the /sentinel command
 profiles/             Ready-made checks for live dApps: live (any site), lido, aave
-action.yml            The GitHub Action: uses: Guzman0/DappSentinel@v1.1.0
+action.yml            The GitHub Action: uses: Guzman0/DappSentinel@v1.2.0
 .github/workflows/    The PR gate and fix job, the mutation test, the install tests, the Spark and Polaris loops
 mutants/, scripts/    The mutation test: the clean site, the 7 planted mistakes, and the scripts that build and judge them
 evidence/             Committed records of the mutation test and the real-world loops

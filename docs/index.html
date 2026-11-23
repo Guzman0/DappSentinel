@@ -233,7 +233,7 @@
         <div class="card"><h3>Untrusted scripts</h3><p>Code loaded from any host you haven't allowed. The BadgerDAO problem.</p><div class="how">Kane's DevTools + its network recording</div></div>
         <div class="card"><h3>Keys in browser storage</h3><p>Private keys or seed phrases saved where any script on the page can read them.</p><div class="how">Kane's DevTools + the browser Kane drives</div></div>
       </div>
-      <p class="note">Plus a seventh check that the main flow still works: Kane runs the swap from start to finish, so a fix can't pass by breaking the page. That run is also the one whose traffic the network checks read. Measured: on the demo, Kane's DevTools failed all 4 hidden checks by themselves; in the mutation test they caught 3 of 4 hidden mistakes by themselves, with no false alarms. The 4th was in sessionStorage, which Kane's DevTools don't read, and DappSentinel's exact check caught it. On a live dApp DappSentinel doesn't know, it runs the five checks that need no inside knowledge: the four above that read traffic and storage, and a check that the page loads.</p>
+      <p class="note">Plus a seventh check that the main flow still works: Kane runs the swap from start to finish, so a fix can't pass by breaking the page. That run is also the one whose traffic the network checks read. Measured: on the demo, Kane's DevTools failed all 4 hidden checks by themselves in one run and 3 of 4 in another, where the exact check caught the testnet request; in the mutation test they caught 3 of 4 hidden mistakes by themselves, with no false alarms. The 4th was in sessionStorage, which Kane's DevTools don't read, and DappSentinel's exact check caught it. On a live dApp DappSentinel doesn't know, it runs the five checks that need no inside knowledge: the four above that read traffic and storage, and a check that the page loads.</p>
     </section>
 
     <section id="loop">
@@ -311,7 +311,7 @@
         <div>
           <h3>In GitHub Actions</h3>
           <p class="lede" style="font-size:17px;margin-top:8px">Add your TestMu AI username and access key as repository secrets, then one step. The pull request fails while any check fails.</p>
-<pre><span class="k">- uses:</span> Guzman0/DappSentinel@v1.1.0
+<pre><span class="k">- uses:</span> Guzman0/DappSentinel@v1.2.0
   <span class="k">with:</span>
     url: https://staging.yourdapp.xyz
     lt-username: ${{ secrets.LT_USERNAME }}
