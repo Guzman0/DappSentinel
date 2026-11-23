@@ -1,0 +1,231 @@
+{
+  "url": "http://localhost:4173",
+  "siteDir": ".mutants/m9-hidden-amount",
+  "kaneVersion": "0.10.8",
+  "startedAt": "2026-11-23T22:13:50.196Z",
+  "finishedAt": "2026-11-23T22:14:40.057Z",
+  "siteHash": "3dac1b62f1f105800b6fba81cc7350d319ac6389c5ba57aedd1a15d748cff491",
+  "results": [
+    {
+      "id": "rpc-key-leak",
+      "name": "No RPC API keys in network requests",
+      "severity": "critical",
+      "kind": "network",
+      "status": "passed",
+      "summary": "None of the 5 recorded requests carries an RPC API key.",
+      "reason": "",
+      "findings": [],
+      "trace": [],
+      "source": "network log (HAR) Kane CLI recorded during the \"swap-flow\" run",
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857JXHJNP03RJBQG34R8Y1Y/dashboard/share/US_W4DJ2EDPCF1WLYS537IPPXUMDNENA81MHLVTN2FXZYYSPYJBB67QR7FQXZ9F76RG?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/cb690f60-96a1-4c71-8bf1-3ae08b0ab193/evidence/834408f8-e8f7-4f39-9b59-3269110867df.evidence",
+      "fix": "Remove provider API keys from frontend code. Use a keyless public RPC for read calls, or route keyed calls through a server-side proxy. Treat any key that was shipped as leaked and rotate it.",
+      "kane": {
+        "status": "error",
+        "remark": "Kane did not report this assertion.",
+        "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857K7M8RXYREA27MC31DFD3/dashboard/share/US_0PGMMQT8MHXJJIQ7ZCOKBZ2GHZ9ZDPI43GINH2H369A07MI16JMQOBQ7YUQFIATW?type=summary&agentView=true&fqdn=summary-page"
+      },
+      "agreement": "Kane's DevTools verdict: error."
+    },
+    {
+      "id": "testnet-rpc",
+      "name": "No testnet, staging or local endpoints in a mainnet build",
+      "severity": "critical",
+      "kind": "network",
+      "status": "passed",
+      "summary": "None of the 5 recorded requests goes to a testnet, staging or local endpoint.",
+      "reason": "",
+      "findings": [],
+      "trace": [],
+      "source": "network log (HAR) Kane CLI recorded during the \"swap-flow\" run",
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857JXHJNP03RJBQG34R8Y1Y/dashboard/share/US_W4DJ2EDPCF1WLYS537IPPXUMDNENA81MHLVTN2FXZYYSPYJBB67QR7FQXZ9F76RG?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/cb690f60-96a1-4c71-8bf1-3ae08b0ab193/evidence/834408f8-e8f7-4f39-9b59-3269110867df.evidence",
+      "fix": "Point every RPC and API call at production endpoints for Ethereum (chain ID 1). Load endpoints from one config per environment so testnet URLs cannot ship to production.",
+      "kane": {
+        "status": "error",
+        "remark": "Kane did not report this assertion.",
+        "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857K7M8RXYREA27MC31DFD3/dashboard/share/US_0PGMMQT8MHXJJIQ7ZCOKBZ2GHZ9ZDPI43GINH2H369A07MI16JMQOBQ7YUQFIATW?type=summary&agentView=true&fqdn=summary-page"
+      },
+      "agreement": "Kane's DevTools verdict: error."
+    },
+    {
+      "id": "contract-address",
+      "name": "Displayed contract addresses match the expected ones",
+      "exactCheck": null,
+      "walletCheck": null,
+      "severity": "critical",
+      "kind": "assert",
+      "status": "failed",
+      "exitCode": 1,
+      "summary": "Credits exhausted: {\"error\":\"insufficient credits\"}",
+      "reason": "Credits exhausted: {\"error\":\"insufficient credits\"}",
+      "findings": [],
+      "source": "Kane CLI assertion in a real browser",
+      "finalState": {},
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857J0714ZH2WV0066KVFV1J/dashboard/share/US_D7G4GJBQFH6QLTINYZW81TQWTXYYUGDFCOAQKF2VR24JEX8BS50INHZGW030L3DI?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/fbbeb5f5-3c35-47bb-b7cf-5fb1857d30df",
+      "credits": 0,
+      "steps": [
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://localhost:4173"
+        },
+        {
+          "step": 3,
+          "status": "failed",
+          "remark": "agent_info: Credits exhausted: {\"error\":\"insufficient credits\"}"
+        }
+      ],
+      "fix": "Use the exact expected contract address for each token, from one verified source of truth. A single wrong character sends users to a different contract.",
+      "objective": "Go to http://localhost:4173 and let the page fully load. Assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48. Compare every character; letter case does not matter.",
+      "kaneTriage": {
+        "title": "",
+        "rootCause": "",
+        "category": "",
+        "confidence": null,
+        "severity": "",
+        "suggestedFix": ""
+      }
+    },
+    {
+      "id": "chain-id",
+      "name": "The app targets the right chain",
+      "exactCheck": null,
+      "walletCheck": null,
+      "severity": "high",
+      "kind": "assert",
+      "status": "failed",
+      "exitCode": 1,
+      "summary": "Credits exhausted: {\"error\":\"insufficient credits\"}",
+      "reason": "Credits exhausted: {\"error\":\"insufficient credits\"}",
+      "findings": [],
+      "source": "Kane CLI assertion in a real browser",
+      "finalState": {},
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857JA2H7F4SNJ9RR3YM10KN/dashboard/share/US_MESYS4YJ9CTZ0FE3KYE1ITLH7XJWPVAWFWZ6TJDTOFUDGP122MU3GV62JOZRCTGR?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/b504a5ca-e51f-43d4-b487-0c46f7d7fc2e",
+      "credits": 0,
+      "steps": [
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://localhost:4173"
+        },
+        {
+          "step": 3,
+          "status": "failed",
+          "remark": "agent_info: Credits exhausted: {\"error\":\"insufficient credits\"}"
+        }
+      ],
+      "fix": "Set the chain ID to 1 (Ethereum) in the app config, and make the network badge read it from that single config.",
+      "objective": "Go to http://localhost:4173 and wait until the page has fully loaded. Assert: the network badge at the top of the page shows chain ID exactly 1 and the network name Ethereum.",
+      "kaneTriage": {
+        "title": "",
+        "rootCause": "",
+        "category": "",
+        "confidence": null,
+        "severity": "",
+        "suggestedFix": ""
+      }
+    },
+    {
+      "id": "unknown-scripts",
+      "name": "Scripts only load from trusted hosts",
+      "severity": "critical",
+      "kind": "network",
+      "status": "passed",
+      "summary": "All 1 scripts came from trusted hosts.",
+      "reason": "",
+      "findings": [],
+      "trace": [],
+      "source": "network log (HAR) Kane CLI recorded during the \"swap-flow\" run",
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857JXHJNP03RJBQG34R8Y1Y/dashboard/share/US_W4DJ2EDPCF1WLYS537IPPXUMDNENA81MHLVTN2FXZYYSPYJBB67QR7FQXZ9F76RG?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/cb690f60-96a1-4c71-8bf1-3ae08b0ab193/evidence/834408f8-e8f7-4f39-9b59-3269110867df.evidence",
+      "fix": "Remove scripts loaded from third-party CDNs, or bundle them with the app. Every script that runs on a dApp page can read and change what the user signs, so drainers are often injected this way.",
+      "kane": {
+        "status": "error",
+        "remark": "Kane did not report this assertion.",
+        "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857K7M8RXYREA27MC31DFD3/dashboard/share/US_0PGMMQT8MHXJJIQ7ZCOKBZ2GHZ9ZDPI43GINH2H369A07MI16JMQOBQ7YUQFIATW?type=summary&agentView=true&fqdn=summary-page"
+      },
+      "agreement": "Kane's DevTools verdict: error."
+    },
+    {
+      "id": "storage-secrets",
+      "name": "No private keys or seed phrases in browser storage",
+      "exactCheck": null,
+      "walletCheck": null,
+      "severity": "critical",
+      "kind": "storage",
+      "status": "passed",
+      "exitCode": 1,
+      "summary": "While Kane used the page, the site saved 1 item in browser storage and none is a private key or seed phrase.",
+      "reason": "",
+      "findings": [],
+      "source": "browser storage, watched live over the Chrome DevTools Protocol in the Chrome that Kane CLI drove",
+      "finalState": {},
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857JKMRY1DF7P84YXBJBNTN/dashboard/share/US_KVDIGFDKSYSOA8LVJCW6NQEPG6US5UIF2C6DN81FD3O2D37K9YLK0ZCV344BKW6X?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/e3a37486-a76b-45d3-9a37-363e4313a856",
+      "credits": 0,
+      "steps": [
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://localhost:4173"
+        },
+        {
+          "step": 3,
+          "status": "failed",
+          "remark": "agent_info: Credits exhausted: {\"error\":\"insufficient credits\"}"
+        }
+      ],
+      "fix": "Never store private keys, seed phrases or signing secrets in localStorage or sessionStorage. Any script on the page can read them. Keep only public data, such as the wallet address, and leave signing to the wallet.",
+      "objective": "Go to http://localhost:4173 and let the page fully load. Type 1 into the You pay amount field. Assert: the You receive field shows a number greater than 0.",
+      "kane": {
+        "status": "error",
+        "remark": "Kane did not report this assertion.",
+        "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857K7M8RXYREA27MC31DFD3/dashboard/share/US_0PGMMQT8MHXJJIQ7ZCOKBZ2GHZ9ZDPI43GINH2H369A07MI16JMQOBQ7YUQFIATW?type=summary&agentView=true&fqdn=summary-page"
+      },
+      "agreement": "Kane's DevTools verdict: error."
+    },
+    {
+      "id": "swap-flow",
+      "name": "The swap flow works end to end",
+      "exactCheck": null,
+      "walletCheck": null,
+      "severity": "high",
+      "kind": "assert",
+      "status": "failed",
+      "exitCode": 1,
+      "summary": "Credits exhausted: {\"error\":\"insufficient credits\"}",
+      "reason": "Credits exhausted: {\"error\":\"insufficient credits\"}",
+      "findings": [],
+      "source": "Kane CLI assertion in a real browser",
+      "finalState": {},
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M857JXHJNP03RJBQG34R8Y1Y/dashboard/share/US_W4DJ2EDPCF1WLYS537IPPXUMDNENA81MHLVTN2FXZYYSPYJBB67QR7FQXZ9F76RG?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/cb690f60-96a1-4c71-8bf1-3ae08b0ab193",
+      "credits": 0,
+      "steps": [
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://localhost:4173"
+        },
+        {
+          "step": 3,
+          "status": "failed",
+          "remark": "agent_info: Credits exhausted: {\"error\":\"insufficient credits\"}"
+        }
+      ],
+      "fix": "Make sure entering an amount shows a quote, Review swap opens the confirmation, and Confirm swap shows the success message. The transaction sent to the wallet must match the confirmation exactly: the same amount, sent only to your trusted swap contract, with no token approvals for addresses you don't trust.",
+      "objective": "Go to http://localhost:4173 and wait until the page has fully loaded. Type 0.5 into the You pay amount field. Assert: the You receive field shows a number greater than 0 and a fee is shown. Click Review swap. Store the amount shown after You pay on the confirmation, exactly as written, as confirm_pay_amount. Assert: the confirmation shows You pay 0.5 ETH. Check this before clicking anything else. Only after that check, click Confirm swap. Assert: the text Swap submitted is visible.",
+      "kaneTriage": {
+        "title": "",
+        "rootCause": "",
+        "category": "",
+        "confidence": null,
+        "severity": "",
+        "suggestedFix": ""
+      }
+    }
+  ]
+}

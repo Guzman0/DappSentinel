@@ -1,0 +1,14 @@
+{
+  "id": "m10-unlimited-approval",
+  "mistake": "Before the swap, the site asks the wallet to let an unknown address spend all of the user's USDC (a classic drainer)",
+  "expect": [
+    "swap-flow"
+  ],
+  "failed": [
+    "contract-address",
+    "chain-id",
+    "swap-flow"
+  ],
+  "unsure": [],
+  "verdict": "false alarm on contract-address, chain-id"
+}

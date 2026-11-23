@@ -1,0 +1,13 @@
+{
+  "id": "m4-polygon-chain",
+  "mistake": "Chain ID 137 (Polygon) under an Ethereum label (the demo uses Sepolia's 11155111)",
+  "expect": [
+    "chain-id"
+  ],
+  "failed": [
+    "chain-id",
+    "swap-flow"
+  ],
+  "unsure": [],
+  "verdict": "false alarm on swap-flow"
+}

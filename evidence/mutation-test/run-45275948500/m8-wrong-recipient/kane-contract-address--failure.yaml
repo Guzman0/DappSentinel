@@ -1,0 +1,11 @@
+generated: 2026-11-23T22:13:53.234Z
+totals:
+  failures: 1
+  triaged: 0
+  untriaged: 1
+failures:
+  - test: go-to-http-localhost-4173-and-let-the-pa-967eb677
+    ordinal: 2
+    step: 0-2
+    status: broken
+    path: tests/go-to-http-localhost-4173-and-let-the-pa-967eb677/steps/2-0-2/failure.yaml

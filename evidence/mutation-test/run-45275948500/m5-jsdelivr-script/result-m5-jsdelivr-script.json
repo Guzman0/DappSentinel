@@ -1,0 +1,13 @@
+{
+  "id": "m5-jsdelivr-script",
+  "mistake": "A script loaded from the jsDelivr CDN (the demo uses unpkg)",
+  "expect": [
+    "unknown-scripts"
+  ],
+  "failed": [
+    "unknown-scripts",
+    "swap-flow"
+  ],
+  "unsure": [],
+  "verdict": "false alarm on swap-flow"
+}

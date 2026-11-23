@@ -1,0 +1,11 @@
+generated: 2026-11-23T22:13:08.126Z
+totals:
+  failures: 1
+  triaged: 0
+  untriaged: 1
+failures:
+  - test: go-to-http-localhost-4173-and-wait-until-823e52c5
+    ordinal: 3
+    step: 0-3
+    status: broken
+    path: tests/go-to-http-localhost-4173-and-wait-until-823e52c5/steps/3-0-3/failure.yaml
