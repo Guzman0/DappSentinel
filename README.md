@@ -4,7 +4,7 @@
 
 **The gate between your dApp and mainnet. Your dApp doesn't ship until Kane says it's safe.**
 
-**For judges, in 60 seconds:** open the [demo site](https://sentinelswap-demo.netlify.app): it looks fine, but has 6 hidden mistakes. Open [PR #5](https://github.com/Guzman0/DappSentinel/pull/5): Kane fails it 6 of 7, Claude Code fixes it, and Kane passes it 7 of 7, with no human. Open [PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817): when the fix needs a person's decision, Claude stops and hands over. Then [Polaris #118](#real-world-loop-2-a-bug-the-maintainers-reported): a real bug its maintainers reported, caught by Kane and fixed. No login needed for any of it.
+**For judges, in 60 seconds:** open the [demo site](https://sentinelswap-demo.netlify.app): it looks fine, but has 6 hidden mistakes. Open [PR #5](https://github.com/Guzman0/DappSentinel/pull/5): Kane fails it 6 of 7, Claude Code fixes it, and Kane passes it 7 of 7, with no human. Open [PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817): when the fix needs a person's decision, Claude stops and hands over. Then [Polaris #118](#real-world-loop-2-a-bug-the-maintainers-reported): a real bug its maintainers reported, caught by Kane and fixed. To see every Kane run step by step, with Kane's screenshots, verdicts and diagnosis, open the [session viewer](https://dappsentinel.netlify.app/dashboard/). No login needed for any of it.
 
 > [!TIP]
 > **TL;DR**
@@ -482,6 +482,8 @@ Cropped from Kane's step screenshots in run 2. The full, uncropped sets are in [
 
 **Honest note on m3:** the verdict is right and repeatable (fail on the swapped address, pass on the clean one, twice each), but Kane never wrote "these two characters differ". Both times it said its own comparison step hadn't stored the value it read. We count the verdict, not the explanation.
 
+**Browse it:** the [session viewer](https://dappsentinel.netlify.app/dashboard/) shows every copy of the site with Kane's steps, screenshots, verdicts and diagnosis, read from these records.
+
 **The full record**, kept in the repo after GitHub's artifacts expire: [`evidence/mutation-test/`](evidence/mutation-test/) has, for every variant, the report, every step Kane took, Kane's screenshots and the masked network log. Run 2's record was committed by the workflow itself. Run it yourself from the **Mutation test (known-answer)** workflow, or one variant at a time with `node scripts/mutants.js build <id>` and `node bin/dappsentinel.js check --site .mutants/<id>`.
 
 ## Real-world runs
@@ -590,7 +592,7 @@ action.yml            The GitHub Action: uses: Guzman0/DappSentinel@v1.1.0
 mutants/, scripts/    The mutation test: the clean site, the 7 planted mistakes, and the scripts that build and judge them
 evidence/             Committed records of the mutation test and the real-world loops
 test/                 npm test: the analyzers on recorded fixtures, no Kane credits needed
-docs/                 The website (dappsentinel.netlify.app) and the list of the demo's planted mistakes
+docs/                 The website (dappsentinel.netlify.app), its session viewer (docs/dashboard, built by scripts/build-dashboard.js) and the list of the demo's planted mistakes
 assets/               Logos, screenshots and GIFs used in this README
 ```
 

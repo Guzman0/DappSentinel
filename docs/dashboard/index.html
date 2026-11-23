@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DappSentinel: every Kane run, step by step</title>
+<meta name="description" content="Browse DappSentinel's recorded mutation test: what Kane CLI did on each copy of the site, what it saw, and what DappSentinel decided.">
+<link rel="icon" href="../img/logo-eye.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800;900&family=Overpass+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#2B2925;--panel:#1F1E1B;--line:#46423A;--ink:#EFEAE0;--soft:#D6D0C4;--dim:#A39C8E;--red:#D7263D;--green:#2FBF71;--amber:#F5B700}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 Overpass,system-ui,sans-serif}
+a{color:var(--amber)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.mono{font-family:"Overpass Mono",ui-monospace,monospace}
+header{max-width:1280px;margin:0 auto;padding:28px 24px 8px}
+.top{display:flex;align-items:center;gap:12px;font-weight:700}
+.top img{width:34px;height:34px}
+.top a{color:var(--ink);text-decoration:none}
+.top .back{margin-left:auto;font-weight:600;color:var(--soft);font-size:15px}
+h1{font-size:44px;line-height:1.08;margin:22px 0 8px;font-weight:900;letter-spacing:-.5px}
+.lede{color:var(--soft);max-width:860px;margin:0}
+.runs{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 4px}
+.runs button{background:none;border:2px solid var(--line);color:var(--ink);font:inherit;font-weight:700;padding:10px 16px;border-radius:8px;cursor:pointer;text-align:left}
+.runs button small{display:block;font-weight:400;color:var(--dim);font-size:14px}
+.runs button[aria-pressed=true]{border-color:var(--amber);background:#33302a}
+.runnote{color:var(--dim);font-size:15px;margin:8px 0 0}
+main{max-width:1280px;margin:0 auto;padding:18px 24px 60px;display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start}
+nav ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+nav button{width:100%;background:var(--panel);border:2px solid var(--line);border-radius:8px;color:var(--ink);font:inherit;text-align:left;padding:12px 14px;cursor:pointer}
+nav button[aria-current=true]{border-color:var(--amber)}
+nav .lbl{font-weight:700;display:block}
+nav .exp{font-size:14px;color:var(--dim)}
+.chip{display:inline-block;font-size:13px;font-weight:700;padding:1px 8px;border-radius:99px;margin-top:6px}
+.chip.correct{background:#173d2a;color:var(--green)}
+.chip.missed{background:#4a1a21;color:#ff8a98}
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:22px 24px}
+.vhead h2{margin:0;font-size:28px;line-height:1.2}
+.vhead p{margin:8px 0 0;color:var(--soft)}
+.outcome{margin-top:14px;padding:12px 16px;border-radius:8px;border-left:6px solid var(--green);background:#22261f}
+.outcome.missed{border-color:var(--red);background:#2c1f20}
+.checks{margin-top:22px;display:grid;gap:10px}
+.check{border:2px solid var(--line);border-radius:8px;overflow:hidden}
+.check>button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:12px 16px;cursor:pointer}
+.check>button:focus-visible{outline:3px solid var(--amber)}
+.dot{width:14px;height:14px;border-radius:50%;margin-left:4px}
+.passed .dot{background:var(--green)}.failed .dot{background:var(--red)}.error .dot{background:var(--amber)}
+.check .nm{font-weight:700}
+.check .who{font-size:14px;color:var(--dim)}
+.check .st{font-weight:700;font-size:15px}
+.passed .st{color:var(--green)}.failed .st{color:#ff8a98}.error .st{color:var(--amber)}
+.body{border-top:2px solid var(--line);padding:16px 18px;display:grid;gap:14px;background:#262420;overflow-wrap:anywhere;min-width:0}
+.body[hidden]{display:none}
+.k{font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--dim);margin-bottom:4px}
+.warn{border-left:5px solid var(--amber);padding:8px 12px;background:#302a1c;color:var(--soft)}
+.find{font-size:14px;word-break:break-all}
+ol.steps{margin:0;padding-left:22px}
+ol.steps li{margin:3px 0;color:var(--soft)}
+ol.steps li.f{color:#ff8a98}
+.shots{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.shots button{border:2px solid var(--line);padding:0;background:#111;border-radius:6px;cursor:pointer;flex:0 0 auto}
+.shots img{display:block;width:190px;height:auto;border-radius:4px}
+.links{font-size:15px;display:flex;flex-wrap:wrap;gap:16px}
+.lb{position:fixed;inset:0;background:rgba(10,9,8,.92);display:grid;place-items:center;padding:24px;z-index:9}
+.lb[hidden]{display:none}
+.lb figure{margin:0;max-width:min(900px,96vw)}
+.lb img{width:100%;border-radius:8px;border:2px solid var(--line)}
+.lb figcaption{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:var(--soft);gap:12px}
+.lb button{background:var(--panel);border:2px solid var(--line);color:var(--ink);font:inherit;padding:6px 14px;border-radius:6px;cursor:pointer}
+footer{max-width:1280px;margin:0 auto;padding:0 24px 40px;color:var(--dim);font-size:14px}
+@media (max-width:860px){main{grid-template-columns:1fr}h1{font-size:34px}}
+@media (prefers-reduced-motion:no-preference){.check>button .st{transition:color .2s}}
+</style>
+</head>
+<body>
+<header>
+  <div class="top"><img src="../img/logo-eye.svg" alt=""><a href="../">DappSentinel</a><a class="back" href="../">Back to the site</a></div>
+  <h1>Every Kane run, step by step</h1>
+  <p class="lede">The recorded mutation test. Each copy of the site has one planted mistake, or none, and must fail exactly its own check. Pick a copy to see what Kane CLI did, what it saw, and what DappSentinel decided. Read from the records in the repo; nothing to install.</p>
+  <div class="runs" id="runs" role="group" aria-label="Recorded runs"></div>
+  <p class="runnote" id="runnote"></p>
+</header>
+<main>
+  <nav aria-label="Copies of the site"><ol id="variants"></ol></nav>
+  <section class="panel" id="panel" aria-live="polite"></section>
+</main>
+<footer>Kane's replay links expire after 7 days; the steps and screenshots here are kept in the repo. Source: <a href="https://github.com/Guzman0/DappSentinel/tree/main/evidence/mutation-test">evidence/mutation-test</a>, built by <span class="mono">scripts/build-dashboard.js</span>.</footer>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Kane's screenshot">
+  <figure><img id="lbimg" alt=""><figcaption><span id="lbcap"></span><span><button id="lbprev">Previous</button> <button id="lbnext">Next</button> <button id="lbclose">Close</button></span></figcaption></figure>
+</div>
+
+<script>
+const LABEL = {
+  "clean": "The fixed site",
+  "m1-infura-key": "An Infura key instead of Alchemy",
+  "m2-holesky-rpc": "Holesky instead of Sepolia",
+  "m3-swapped-digits": "Two digits swapped mid-address",
+  "m4-polygon-chain": "Polygon's chain ID, Ethereum label",
+  "m5-jsdelivr-script": "A script from jsDelivr",
+  "m6-seed-in-session": "A seed phrase in sessionStorage",
+  "m7-wrong-confirm-amount": "The confirmation shows a tenth",
+};
+const WHO = { assert: "Kane's verdict in a real browser", network: "Kane's DevTools verdict and DappSentinel's exact check", storage: "Kane's DevTools verdict and DappSentinel's watch of the browser" };
+const ST = { passed: "Passed", failed: "Failed", error: "Inconclusive" };
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let DATA, run, variant, shots = [], shotAt = 0, lastFocus = null;
+
+function nameOf(id) { const c = variant && variant.checks.find((x) => x.id === id); return c ? c.name : id; }
+
+function renderRuns() {
+  $("#runs").innerHTML = DATA.runs.map((r) => `<button data-run="${r.id}" aria-pressed="${r === run}">${esc(r.title)}<small>Kane CLI ${esc(r.kaneVersion)} · ${r.variants.length} ${r.variants.length === 1 ? "copy" : "copies"}</small></button>`).join("");
+  $("#runnote").innerHTML = `${esc(run.note)} <a href="${run.runUrl}">The GitHub run</a>`;
+}
+function renderVariants() {
+  $("#variants").innerHTML = run.variants.map((v) => `<li><button data-v="${v.id}" aria-current="${v === variant}"><span class="lbl">${esc(LABEL[v.id] || v.id)}</span><span class="exp">${v.expect.length ? "Must fail: " + v.expect.map((x) => esc(x)).join(", ") : "Must pass every check"}</span><br><span class="chip ${v.verdict}">${v.verdict === "correct" ? "Right answer" : "Missed"}</span></button></li>`).join("");
+}
+function checkBody(c) {
+  const parts = [];
+  if (c.summary) parts.push(`<div><div class="k">${c.kind === "assert" ? "KANE SAYS" : "FINDING"}</div>${esc(c.summary).replace(/\n/g, "<br>")}</div>`);
+  if (c.kane) parts.push(`<div><div class="k">KANE'S DEVTOOLS VERDICT</div>${ST[c.kane.status] || esc(c.kane.status)}${c.kane.remark ? ": " + esc(c.kane.remark) : ""}${c.agreement ? `<br><em>${esc(c.agreement)}</em>` : ""}</div>`);
+  if (c.findings.length) parts.push(`<div><div class="k">WHAT DAPPSENTINEL FOUND IN KANE'S RECORDING</div>${c.findings.map((f, i) => `<div class="find mono">${esc(f)}${c.trace[i] ? `<br><span style="color:var(--dim)">${esc(c.trace[i])}</span>` : ""}</div>`).join("")}</div>`);
+  if (c.finalState && Object.keys(c.finalState).length) parts.push(`<div><div class="k">VALUES KANE READ FROM THE PAGE</div>${Object.entries(c.finalState).map(([k, v]) => `<div class="mono find">${esc(k)}: ${esc(typeof v === "string" ? v : JSON.stringify(v))}</div>`).join("")}</div>`);
+  if (c.exactCheck) parts.push(`<div class="warn">${esc(c.exactCheck)}</div>`);
+  if (c.triage) {
+    const blames = /automation|test|config|flak|environment/i.test(c.triage.category || "");
+    parts.push(`<div><div class="k">KANE'S DIAGNOSIS (ITS OWN TRIAGE; NEVER CHANGES THE VERDICT)</div><em>${esc(c.triage.title)}.</em> ${esc(c.triage.rootCause)} <span style="color:var(--dim)">Category: <span class="mono">${esc(c.triage.category)}</span>${c.triage.confidence ? `, ${Math.round(c.triage.confidence * 100)}% confident` : ""}.</span></div>`);
+    if (blames && c.status !== "passed") parts.push(`<div class="warn">Kane's triage blames the test here, but the check failed on what the page showed. Compare with the values Kane read above.</div>`);
+  }
+  if (c.steps.length) parts.push(`<div><div class="k">KANE'S STEPS</div><ol class="steps">${c.steps.map((s) => `<li class="${s.status === "failed" ? "f" : ""}">${s.status === "failed" ? "✗ " : ""}${esc(s.remark)}</li>`).join("")}</ol></div>`);
+  if (c.shots.length) parts.push(`<div><div class="k">KANE'S SCREENSHOTS (${c.shots.length})</div><div class="shots">${c.shots.map((s, i) => `<button data-shots="${c.id}" data-i="${i}" aria-label="Open Kane's screenshot ${i + 1} of ${c.shots.length}"><img loading="lazy" src="${s}" alt="Kane's screenshot ${i + 1}, ${esc(c.name)}"></button>`).join("")}</div></div>`);
+  if (c.kind === "network" && !c.shots.length) parts.push(`<div style="color:var(--dim);font-size:15px">This check reads the network log Kane recorded while it did the swap; see the swap check's steps and screenshots.</div>`);
+  const links = [];
+  if (c.testUrl) links.push(`<a href="${c.testUrl}">Kane's replay (may have expired)</a>`);
+  if (c.triage && c.triage.file) links.push(`<a href="${c.triage.file}">Kane's failure.yaml</a>`);
+  if (links.length) parts.push(`<div class="links">${links.join("")}</div>`);
+  return parts.join("");
+}
+function renderPanel() {
+  const v = variant;
+  const failed = v.checks.filter((c) => c.status !== "passed").map((c) => c.name);
+  const out = v.verdict === "correct"
+    ? (v.expect.length ? `Right answer: exactly <strong>${esc(nameOf(v.expect[0]))}</strong> failed, and every other check passed.` : "Right answer: every check passed.")
+    : `Missed: ${failed.length ? "these failed: " + failed.map(esc).join(", ") : "every check passed, including the one that should have failed"}.`;
+  const open = (c) => c.status !== "passed" || (!failed.length && c.id === "swap-flow");
+  $("#panel").innerHTML = `<div class="vhead"><h2>${esc(LABEL[v.id] || v.id)}</h2><p>${esc(v.mistake)}</p></div>
+    <div class="outcome ${v.verdict}">${out}</div>
+    <div class="checks">${v.checks.map((c) => `<div class="check ${c.status}"><button aria-expanded="${open(c)}" aria-controls="b-${c.id}"><span class="dot"></span><span><span class="nm">${esc(c.name)}</span><br><span class="who">${WHO[c.kind] || ""}</span></span><span class="st">${ST[c.status] || c.status}</span></button><div class="body" id="b-${c.id}" ${open(c) ? "" : "hidden"}>${checkBody(c)}</div></div>`).join("")}</div>
+    <p class="links" style="margin-top:18px"><a href="${v.record}">The full record in the repo</a></p>`;
+}
+function go(runId, vId, push) {
+  run = DATA.runs.find((r) => r.id === runId) || DATA.runs[0];
+  variant = run.variants.find((v) => v.id === vId) || run.variants.find((v) => v.id !== "clean") || run.variants[0];
+  renderRuns(); renderVariants(); renderPanel();
+  if (push) history.replaceState(null, "", `#${run.id}/${variant.id}`);
+}
+function openShot(list, i) { shots = list; shotAt = i; lastFocus = document.activeElement; showShot(); $("#lb").hidden = false; $("#lbclose").focus(); }
+function showShot() { $("#lbimg").src = shots[shotAt]; $("#lbimg").alt = `Kane's screenshot ${shotAt + 1} of ${shots.length}`; $("#lbcap").textContent = `Kane's screenshot ${shotAt + 1} of ${shots.length}`; }
+function closeShot() { $("#lb").hidden = true; if (lastFocus) lastFocus.focus(); }
+
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.run) go(b.dataset.run, null, true);
+  else if (b.dataset.v) { go(run.id, b.dataset.v, true); $("#panel").scrollIntoView({ block: "start" }); }
+  else if (b.dataset.shots) openShot(variant.checks.find((c) => c.id === b.dataset.shots).shots, Number(b.dataset.i));
+  else if (b.id === "lbclose") closeShot();
+  else if (b.id === "lbprev") { shotAt = (shotAt - 1 + shots.length) % shots.length; showShot(); }
+  else if (b.id === "lbnext") { shotAt = (shotAt + 1) % shots.length; showShot(); }
+  else if (b.closest(".check") && b.parentElement.classList.contains("check")) {
+    const body = b.nextElementSibling; const open = body.hidden; body.hidden = !open; b.setAttribute("aria-expanded", String(open));
+  }
+});
+document.addEventListener("keydown", (e) => {
+  if ($("#lb").hidden) return;
+  if (e.key === "Escape") closeShot();
+  if (e.key === "ArrowRight") { shotAt = (shotAt + 1) % shots.length; showShot(); }
+  if (e.key === "ArrowLeft") { shotAt = (shotAt - 1 + shots.length) % shots.length; showShot(); }
+});
+$("#lb").addEventListener("click", (e) => { if (e.target.id === "lb") closeShot(); });
+
+fetch("data.json").then((r) => r.json()).then((d) => {
+  DATA = d;
+  const [r, v] = location.hash.slice(1).split("/");
+  go(r, v, false);
+}).catch(() => { $("#panel").textContent = "Couldn't load the records. Open the evidence folder in the repo instead."; });
+</script>
+</body>
+</html>
