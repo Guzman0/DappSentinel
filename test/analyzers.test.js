@@ -127,3 +127,39 @@ console.log("✅ exact value tests passed");
   assert.strictEqual(Number(yamlField(tri(m7), "confidence")), 0.99);
   console.log("✅ Kane triage tests passed");
 }
+
+// What you see is what you sign: the transactions the site asks DappSentinel's test wallet to sign.
+{
+  const ROUTER = cfg.trustedContracts.SwapRouter;
+  const ATTACKER = "0x9F2c4b7A1e3D5f8C0a6B2d4E7f1A3c5B8d0E2f4A";
+  const half = "0x" + (5n * 10n ** 17n).toString(16);
+  const send = (tx) => ({ method: "eth_sendTransaction", params: [tx] });
+  const accounts = { method: "eth_requestAccounts", params: [] };
+
+  const ok = a.walletMatch([accounts, send({ to: ROUTER, value: half, data: "0x" })], { seenAmount: "0.5 ETH", expectTransaction: true }, cfg);
+  assert.strictEqual(ok.status, "passed", ok.summary);
+
+  const recipient = a.walletMatch([send({ to: ATTACKER, value: half })], { seenAmount: "0.5", expectTransaction: true }, cfg);
+  assert.strictEqual(recipient.status, "failed");
+  assert.ok(recipient.findings[0].includes(ATTACKER.toLowerCase()) && recipient.findings[0].includes("not one of your trusted contracts"), recipient.findings[0]);
+
+  const amount = a.walletMatch([send({ to: ROUTER, value: "0x" + (5n * 10n ** 18n).toString(16) })], { seenAmount: "You pay 0.5 ETH", expectTransaction: true }, cfg);
+  assert.strictEqual(amount.status, "failed");
+  assert.ok(amount.findings[0].includes("0.5") && amount.findings[0].includes("5 ETH"), amount.findings[0]);
+
+  const approval = a.walletMatch(
+    [send({ to: cfg.contracts.USDC, data: "0x095ea7b3" + ATTACKER.slice(2).toLowerCase().padStart(64, "0") + "f".repeat(64) }), send({ to: ROUTER, value: half })],
+    { seenAmount: "0.5", expectTransaction: true },
+    cfg
+  );
+  assert.strictEqual(approval.status, "failed");
+  assert.ok(approval.findings[0].includes("spend all of the token at USDC"), approval.findings[0]);
+
+  // Approving a trusted router for an exact amount is normal.
+  const fine = a.walletMatch([send({ to: cfg.contracts.USDC, data: "0x095ea7b3" + ROUTER.slice(2).toLowerCase().padStart(64, "0") + (10n ** 6n).toString(16).padStart(64, "0") })], {}, cfg);
+  assert.strictEqual(fine.status, "passed", fine.summary);
+
+  assert.strictEqual(a.walletMatch([], { expectTransaction: true }, cfg).status, "error");
+  assert.strictEqual(a.walletMatch([], {}, cfg).status, "passed");
+  console.log("✅ wallet (what you see is what you sign) tests passed");
+}

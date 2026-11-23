@@ -1,5 +1,6 @@
 // SentinelSwap: a small demo swap page (ETH -> USDC) for DappSentinel.
-// The quote and the swap are simulated; no wallet or real transaction is involved.
+// The quote and the swap are simulated. On Confirm, the swap is sent to DappSentinel's test wallet
+// if one is present, never to a real wallet.
 
 const CONFIG = {
   networkName: "Ethereum",
@@ -113,7 +114,53 @@ $("review-btn").addEventListener("click", () => {
 
 $("back-btn").addEventListener("click", () => show("swap-card"));
 
-$("confirm-btn").addEventListener("click", () => {
+// ---- Wallet ----
+// The demo only ever talks to DappSentinel's test wallet, found through EIP-6963 by its name.
+// It never asks a real wallet to sign anything, so nothing can be sent by accident.
+const SWAP_ROUTER = "0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af";
+
+function findTestWallet() {
+  return new Promise((resolve) => {
+    let found = null;
+    const onAnnounce = (e) => {
+      if (e.detail && e.detail.info && e.detail.info.rdns === "app.dappsentinel.testwallet") found = e.detail.provider;
+    };
+    window.addEventListener("eip6963:announceProvider", onAnnounce);
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
+    setTimeout(() => {
+      window.removeEventListener("eip6963:announceProvider", onAnnounce);
+      resolve(found);
+    }, 50);
+  });
+}
+
+function toWeiHex(eth) {
+  const [whole, frac = ""] = String(eth).split(".");
+  const wei = BigInt(whole || "0") * 10n ** 18n + BigInt((frac + "0".repeat(18)).slice(0, 18));
+  return "0x" + wei.toString(16);
+}
+
+async function sendSwap() {
+  const wallet = await findTestWallet();
+  if (!wallet) return; // a normal visitor: the swap stays simulated
+  const [from] = await wallet.request({ method: "eth_requestAccounts" });
+  await wallet.request({
+    method: "eth_sendTransaction",
+    params: [{
+      from,
+      to: SWAP_ROUTER,
+      value: toWeiHex(quote.pay),
+      data: "0x",
+    }],
+  });
+}
+
+$("confirm-btn").addEventListener("click", async () => {
+  try {
+    await sendSwap();
+  } catch {
+    /* the wallet declined: still show the simulated result */
+  }
   $("done-text").textContent = `Swapped ${quote.pay} ETH for ${formatUsdc(quote.receive)} USDC.`;
   show("done-card");
 });

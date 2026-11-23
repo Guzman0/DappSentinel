@@ -110,6 +110,10 @@ function loadChecks() {
           const i = x.indexOf("=");
           return { name: x.slice(0, i).trim(), value: x.slice(i + 1).trim() };
         }).filter((x) => x.name && x.value),
+        // wallet: <stored name>. Kane runs with DappSentinel's test wallet in the page, and what the
+        // site asks the wallet to sign must match what Kane saw (the amount stored under that name)
+        // and go only to trusted contracts.
+        wallet: meta.wallet || "",
         body: m[2].trim(),
       };
     });
@@ -436,9 +440,9 @@ async function cmdCheck(args) {
     // browser's storage live while Kane uses the page.
     let watcher = null;
     let seen = null;
-    if (c.kind === "storage") {
+    if (c.kind === "storage" || c.wallet) {
       try {
-        watcher = await startWatchedChrome({ siteOrigin: new URL(url).origin, headed: Boolean(args.headed) });
+        watcher = await startWatchedChrome({ siteOrigin: new URL(url).origin, headed: Boolean(args.headed), wallet: c.wallet ? { chainId: config.chainId } : null });
       } catch (err) {
         console.log(`      ⚠️  Could not start a watched Chrome: ${err.message}`);
       }
@@ -500,10 +504,29 @@ async function cmdCheck(args) {
       }
     }
 
+    // What you see is what you sign: compare what the site asked DappSentinel's test wallet to
+    // sign with what Kane read on the screen and with the contracts the config trusts.
+    let walletCheck = null;
+    if (c.wallet && status === "passed") {
+      walletCheck = seen
+        ? analyzers.walletMatch(seen.wallet, { seenAmount: stored[c.wallet.toLowerCase()], expectTransaction: true }, config)
+        : { status: "error", summary: "The test wallet could not be started, so what the site asks the wallet to sign was not checked.", findings: [] };
+      if (walletCheck.status !== "passed") {
+        status = walletCheck.status;
+        exact = walletCheck.status === "failed" ? `Kane passed this check, but what the user sees is not what the wallet is asked to sign.` : walletCheck.summary;
+        findings = walletCheck.findings;
+        source = "the transactions the site asked DappSentinel's test wallet to sign while Kane used the swap, compared with what Kane read on the screen";
+        summary = `${exact}\nKane's own summary: ${summary}`;
+        console.log(`      ✖ ${exact}`);
+        for (const f of findings) console.log(`      ✖ ${f.slice(0, 160)}`);
+      }
+    }
+
     byId[c.id] = {
       id: c.id,
       name: c.name,
       exactCheck: exact,
+      walletCheck,
       severity: c.severity,
       kind: c.kind,
       status,

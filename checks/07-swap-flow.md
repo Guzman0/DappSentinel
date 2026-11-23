@@ -2,8 +2,9 @@
 id: swap-flow
 name: The swap flow works end to end
 severity: high
-fix: Make sure entering an amount shows a quote, Review swap opens the confirmation, and Confirm swap shows the success message.
+fix: Make sure entering an amount shows a quote, Review swap opens the confirmation, and Confirm swap shows the success message. The transaction sent to the wallet must match the confirmation exactly: the same amount, sent only to your trusted swap contract, with no token approvals for addresses you don't trust.
 expect: confirm_pay_amount=0.5
+wallet: confirm_pay_amount
 ---
 Go to {{url}} and wait until the page has fully loaded.
 Type 0.5 into the You pay amount field.
