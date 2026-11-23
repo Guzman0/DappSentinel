@@ -9,6 +9,7 @@
 > - **What:** a pre-launch gate for dApp websites. Kane CLI checks the site in a real browser for mistakes you can't see on screen: leaked RPC keys, testnet endpoints, wrong contracts, wrong chain, untrusted scripts, keys in storage.
 > - **The loop:** Kane catches it → Claude Code fixes it → Kane checks again, until every check passes. The agent can't edit the checks to cheat, and after 3 rounds, or when only a person can decide, it hands over.
 > - **Kane makes the call on all 7 checks**, with DevTools assertions for the hidden ones. An exact check runs behind it for what Kane's DevTools can't see ([what it checks](#what-dappsentinel-checks)).
+> - **What you see is what you sign:** a harmless test wallet in the page records the transaction the site asks the user to sign. It must match what Kane read on the screen and go only to contracts you trust ([how](#what-you-see-is-what-you-sign)).
 > - **Real bugs in code we didn't write:** [Polaris #118](#real-world-loop-2-a-bug-reported-on-polariss-issue-tracker) and [Spark](#real-world-loop-a-bug-in-code-we-didnt-write). Plus a [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for), 8 of 8 on four runs, and [11 live dApps](#real-world-runs). And a bug in Kane CLI itself, [confirmed by the Kane team](https://github.com/LambdaTest/kane-cli/issues/239#issuecomment-7098306114).
 > - **Install:** `uses: Guzman0/DappSentinel@v1.2.0` or `npm i -g github:Guzman0/DappSentinel` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U) · **Every Kane run:** [session viewer](https://dappsentinel.netlify.app/dashboard/)
 
@@ -40,6 +41,7 @@ No install at all: open the [live demo dApp](https://sentinelswap-demo.netlify.a
 - [Kane's five jobs](#kanes-five-jobs)
 - [What DappSentinel checks](#what-dappsentinel-checks)
   - [Why two kinds of check?](#why-two-kinds-of-check)
+- [What you see is what you sign](#what-you-see-is-what-you-sign)
 - [Real-world loop: a bug in code we didn't write](#real-world-loop-a-bug-in-code-we-didnt-write)
 - [Real-world loop 2: a bug reported on Polaris's issue tracker](#real-world-loop-2-a-bug-reported-on-polariss-issue-tracker)
 - [Why it matters](#why-it-matters)
@@ -74,7 +76,7 @@ Every judging rule, and where to see the proof. All of it is public; nothing nee
 | **Bar: Kane caught or proved something** | Kane gives its own verdict on all 7 checks ([what it checks](#what-dappsentinel-checks)). Two real bugs in code we didn't write: [Spark](#real-world-loop-a-bug-in-code-we-didnt-write) and [Polaris #118](#real-world-loop-2-a-bug-reported-on-polariss-issue-tracker). 6 planted mistakes on the demo ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44757974669)), and 7 new ones it was never tuned for, [8 of 8 on four runs](#mutation-test-known-answer-mistakes-it-was-never-tuned-for) |
 | **Bar: the agent and Kane talk** | Kane's findings go straight to Claude Code, and a Stop hook won't let Claude finish while a check fails ([how the loop works](#how-the-loop-works), [video at 1:52](https://youtu.be/FiErWhY495U?t=112)). On GitHub, Claude gets Kane's report and comments what it changed ([PR #7](https://github.com/Guzman0/DappSentinel/pull/7#issuecomment-7052572418)) |
 | **Ships** (25%) | Claude Code (`/sentinel`), the command line, and a GitHub Action ([`@v1.2.0`](https://github.com/Guzman0/DappSentinel/releases/tag/v1.2.0)). A required check blocks merging a broken pull request ([PR #2](https://github.com/Guzman0/DappSentinel/pull/2)) |
-| **Verified** (25%) | Polaris #118: caught, fixed as the issue asks, proven twice ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45015619019)). Spark: caught, fixed, re-checked ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44953030392)). The [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for), with Kane's own screenshots, and [11 live dApps](#real-world-runs). It also found a bug in Kane CLI itself, [confirmed by the Kane team](https://github.com/LambdaTest/kane-cli/issues/239#issuecomment-7098306114) with a fix coming |
+| **Verified** (25%) | Polaris #118: caught, fixed as the issue asks, proven twice ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45015619019)). Spark: caught, fixed, re-checked ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44953030392)). The [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for), with Kane's own screenshots, and [11 live dApps](#real-world-runs). A [wallet check](#what-you-see-is-what-you-sign) catches transactions that don't match the screen (3 of 3). It also found a bug in Kane CLI itself, [confirmed by the Kane team](https://github.com/LambdaTest/kane-cli/issues/239#issuecomment-7098306114) with a fix coming |
 | **Closed loop** (25%) | With no human: Kane fails PR #5 6 of 7, Claude fixes and pushes, the PR passes 7 of 7 ([Kane's output and the fix](evidence/pr5-closed-loop/), [forensic trail](DETAILS.md#forensic-trail-the-loop-on-github-step-by-step)). Max 3 rounds; when only a person can decide, Claude [hands over](#when-the-loop-gives-up-a-person-takes-over) ([PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817)). The agent [can't cheat](#the-agent-cant-cheat) ([PR #6](https://github.com/Guzman0/DappSentinel/pull/6)) |
 | **Craft** (25%) | Two commands from any folder, or one line in a workflow ([install and run](#install-and-run)). Keys masked in every report ([SECURITY.md](SECURITY.md)). Honest limits in [what DappSentinel doesn't do](#what-dappsentinel-doesnt-do) |
 | **No account, no credits** | Nothing here needs a TestMu login to check. `git clone https://github.com/Guzman0/DappSentinel && cd DappSentinel && npm install && npm test` runs the unit tests against Kane's real output, including the 0.10.8 miss and Kane's misjudged triage. Browse every Kane session in the [session viewer](https://dappsentinel.netlify.app/dashboard/), and read Kane's own output for every linked run in [`evidence/ci-runs/`](evidence/ci-runs/). PR #5, Spark, Polaris and each mutation-test variant have full records in [`evidence/`](evidence/) |
@@ -116,13 +118,33 @@ These are the mistakes that look fine on screen and cost users money:
 | `storage-secrets` | Private keys or seed phrases in localStorage or sessionStorage | Kane's DevTools assertion (localStorage), then the exact check (both) |
 | `contract-address` | A displayed contract address that doesn't match the real one | Kane, reading the page |
 | `chain-id` | The app pointing at the wrong chain | Kane, reading the network badge |
-| `swap-flow` | The core user flow breaking after the fixes | Kane, using the swap; then an exact check on the amount it read |
+| `swap-flow` | The core user flow breaking, or a transaction that doesn't match the screen | Kane, using the swap; then exact checks on the amount it read and on the transaction sent to the wallet ([below](#what-you-see-is-what-you-sign)) |
 
 ### Why two kinds of check?
 
 Kane reads and uses the page, so the visible checks are its verdicts. For what a user can't see, Kane gives its verdict with its own [DevTools assertions](https://www.testmuai.com/docs/kane-cli-checkpoint-devtools), and DappSentinel's code then checks the same evidence exactly: every request in the network log Kane saves, and localStorage and sessionStorage in the Chrome Kane drives. A check fails if either one finds the problem, so the gate fails closed. The exact check is there because Kane's DevTools can't read sessionStorage and can miss a request. Secrets are masked in every report.
 
 **Measured, not claimed:** on the demo, Kane's DevTools assertions failed all 4 hidden checks by themselves in two of three runs ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45023773746), [run](https://github.com/Guzman0/DappSentinel/actions/runs/45210910500)). In the third they failed 3 of 4: they missed the testnet request, and the exact check caught it ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45208847205)). In mutation test run 4 they caught 3 of 4; the fourth, a seed phrase in sessionStorage (which Kane's DevTools can't read), was caught by the exact check ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45023763082)). Kane raised no false alarms on the clean site or on Lido. Every report shows both verdicts side by side, with a link to Kane's own replay ([full comparison](DETAILS.md#who-catches-what-kane-and-dappsentinel)).
+
+## What you see is what you sign
+
+The costliest attack on a dApp website didn't change what users saw. In the Bybit attack, the screen showed a normal transaction while the wallet was asked to sign a different one. So DappSentinel checks the transaction too.
+
+While Kane uses the swap, DappSentinel puts a harmless **test wallet** into the page ([`lib/browser-watch.js`](lib/browser-watch.js)). It signs nothing; it records what the site asks it to sign. Kane's pass only stands if every transaction:
+
+- goes to a contract you trust (`contracts` and `trustedContracts` in `sentinel.config.json`),
+- sends exactly the amount Kane read on the confirmation screen, and
+- doesn't let an untrusted address spend the user's tokens (an `approve` or `setApprovalForAll` to a stranger is the classic drainer).
+
+**Proven on three new mistakes where the screen looks right** ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45273765898), Kane CLI 0.10.8). Kane completed and passed all three swaps, because the screen was fine. The wallet check failed each one:
+
+| Planted mistake | What DappSentinel reported |
+|---|---|
+| The swap goes to an unknown address | "The site asks the wallet to send 0.5 ETH to 0x9f2c…2f4a, which is not one of your trusted contracts." ([record](evidence/mutation-test/run-45273765898/m8-wrong-recipient/report.md)) |
+| The screen says 0.5 ETH, the transaction sends 5 | "Kane saw "0.5 ETH" on the confirmation, but the transaction sent to the wallet is for 5 ETH." ([record](evidence/mutation-test/run-45273765898/m9-hidden-amount/report.md)) |
+| An unlimited USDC approval to an unknown address, before the swap | "The site asks the wallet to let 0x9f2c…2f4a spend all of the token at USDC…" ([record](evidence/mutation-test/run-45273765898/m10-unlimited-approval/report.md)) |
+
+In the same run the clean site passed, its one transaction matching the screen, and the other copies were judged as before. The demo only ever talks to the test wallet, which it finds by name, so a visitor's real wallet is never asked to sign anything.
 
 ## Real-world loop: a bug in code we didn't write
 
@@ -315,6 +337,8 @@ Two of the swap-flow runs from mutation test run 4, played back from Kane's own 
 </tr>
 </table>
 
+**Run 5** (23 Nov, Kane CLI 0.10.8) added three wallet mistakes and re-ran the clean site, `m1` and `m7` with the wallet check in place: 6 of 6 correct ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45273765898); see [what you see is what you sign](#what-you-see-is-what-you-sign)). A second, full run stopped halfway when the account ran out of Kane credits; it isn't counted.
+
 **On Kane CLI 0.10.8**, Kane once passed the wrong-amount copy while reading 0.05 ETH: that's [issue #239, confirmed by the Kane team](#confirmed-outside-this-repo). A pass now only stands if the amount Kane stored is exactly 0.5.
 
 **Browse it** in the [session viewer](https://dappsentinel.netlify.app/dashboard/). Kane's screenshot of each mistake and the honest notes are in [the full write-up](DETAILS.md#mutation-test-known-answer-mistakes-it-was-never-tuned-for); every record is in [`evidence/mutation-test/`](evidence/mutation-test/).
@@ -339,7 +363,7 @@ For what DappSentinel collects, masks and uploads, see [SECURITY.md](SECURITY.md
 - **A flagged RPC key isn't proof of a leak.** Many dApps ship keys that only work from their own domain. Treat the finding as a prompt to check the key's restrictions. Spark's key is that kind ([the Spark loop](#real-world-loop-a-bug-in-code-we-didnt-write)).
 - **A flagged script host isn't proof of an attack.** It means the host isn't on your allowlist. Look into it, then either trust it in your config or remove the script.
 - **It isn't a smart contract audit.** It checks the website, not the contracts behind it.
-- **It can't catch every frontend compromise.** It sees what the browser does while Kane uses the page. Malicious code that only wakes up for certain wallets or transactions, like the code in the Bybit attack, may stay quiet during a check.
+- **It can't catch every frontend compromise.** It sees what the browser does while Kane uses the page, and the transactions the site asks the test wallet to sign then. Malicious code that only wakes up for certain wallets or transactions, like the code in the Bybit attack, may stay quiet during a check.
 - **Some sites block automated browsers.** When Kane can't reach the real page, DappSentinel reports the network checks as inconclusive, never as clean.
 - **Testing on `localhost` can trip the testnet check.** It matches words like `localhost` anywhere in a request's address, including where a third-party widget sends the page's own address, as in [PR #10](https://github.com/Guzman0/DappSentinel/pull/10). Check a deployed preview to avoid it.
 

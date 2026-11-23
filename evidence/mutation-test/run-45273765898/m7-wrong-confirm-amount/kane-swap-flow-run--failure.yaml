@@ -1,0 +1,13 @@
+generated: 2026-11-23T21:54:23.744Z
+totals:
+  failures: 1
+  triaged: 1
+  untriaged: 0
+failures:
+  - test: go-to-http-localhost-4173-and-wait-until-704fe863
+    ordinal: 8
+    step: 0-8
+    status: failed
+    path: tests/go-to-http-localhost-4173-and-wait-until-704fe863/steps/8-0-8/failure.yaml
+    title: Swap confirmation changes 0.5 ETH to 0.05 ETH
+    triage_status: triaged

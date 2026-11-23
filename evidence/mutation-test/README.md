@@ -33,6 +33,17 @@ Kane CLI 0.10.8 came out on 22 Nov, and these runs check DappSentinel against it
 
 **What we changed.** The swap check now asks Kane to store the amount it reads on the confirmation (`confirm_pay_amount`), and DappSentinel checks it exactly (`expect: confirm_pay_amount=0.5` in [`checks/07-swap-flow.md`](../../checks/07-swap-flow.md)). Kane still makes the call, but a pass only stands if Kane's own reading matches. In run 45052587659 Kane stored `"0.5 ETH"` on the clean site, and the check passed. A unit test replays the real miss: the value `"You pay 0.05 ETH"` must fail (`npm test`).
 
+### Run 5: what you see is what you sign (23 Nov 2026)
+
+The swap check now also compares the transaction the site asks the wallet to sign with what Kane read on the screen ([how it works](../../README.md#what-you-see-is-what-you-sign)). Three new copies plant a wallet mistake while the screen stays right: `m8-wrong-recipient`, `m9-hidden-amount` and `m10-unlimited-approval` ([`mutants.json`](../../mutants/mutants.json)).
+
+| Run | Kane CLI | Variants | Result |
+|---|---|---|---|
+| [45273765898](https://github.com/Guzman0/DappSentinel/actions/runs/45273765898) | 0.10.8 | clean, m1, m7, m8, m9, m10 | 6 of 6 correct. Record: [`run-45273765898/`](run-45273765898/) |
+| [45275948500](https://github.com/Guzman0/DappSentinel/actions/runs/45275948500) | 0.10.8 | all 11 | Not counted: the account ran out of Kane credits halfway, so 6 copies never ran. Before that, clean, m1, m2, m3 and m7 were judged correctly. DappSentinel now stops with a clear message when credits run out, instead of failing every check |
+
+In m8, m9 and m10, Kane passed the swap on its own, because the screen was right; the wallet check failed each one. The summary table of a run lists every variant, so a run of 6 shows the other 5 as "did not run".
+
 ## The matrix
 
 | Variant | Planted mistake | Expected | Run 1 | Run 2 | Run 3 | Run 4 | What Kane found (run 2) |

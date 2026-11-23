@@ -1,0 +1,93 @@
+Run 45273761009 · DappSentinel · workflow_dispatch on wallet-check · failure · 2026-11-23T21:50:42Z
+https://github.com/Guzman0/DappSentinel/actions/runs/45273761009
+
+== job "gate": failure
+🛡  DappSentinel: 7 checks against http://localhost:4173 (5 Kane runs)
+
+   Serving demo-dapp at http://localhost:4173
+
+[1/8] Displayed contract addresses match the expected ones
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1500 ms for the page to fully load
+      · analyze: ANALYZE(textual_visual, 'the USDC contract address shown on the page is exactly 
+      ✖ assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4
+      → ❌ failed: The displayed USDC contract address is configured with the wrong last character.
+
+[2/8] The app targets the right chain
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: ANALYZE(textual_visual, 'The network badge at the top of the page shows the netw
+      ✖ assert: the network badge at the top of the page shows chain ID exactly 1 and the networ
+      → ❌ failed: The page is using Sepolia network information while labeling the network Ethereum, so the badge shows the wrong chain ID.
+
+[3/8] No private keys or seed phrases in browser storage
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · type: Typing 1 into the You pay amount field
+      · analyze: the You receive field shows a number greater than 0
+      · assert: the You receive field shows a number greater than 0
+      ✖ localStorage["wallet_pk"] is named like a secret and holds 0xac…f80
+      ✖ localStorage["session"].wallet_pk is named like a secret and holds 0xac…f80
+      → ❌ failed: While Kane used the page, the site saved 2 items in browser storage, including 2 secrets any script on the page could read.
+
+[4/8] The swap flow works end to end
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · type: Typing 0.5 into the You pay amount field
+      · analyze: a fee is shown
+      · assert: the You receive field shows a number greater than 0 and a fee is shown
+      · click: Clicking Review swap button
+      · wait: PRIMARY: wait for the Confirm swap confirmation to finish loading
+      · analyze: ANALYZE(textual_visual, 'the amount shown after You pay on the confirmation, exa
+      · assert: the confirmation shows You pay 0.5 ETH
+      · click: Clicking Confirm swap button
+      · analyze: the text Swap submitted is visible
+      · assert: the text Swap submitted is visible
+      → ✅ passed: Confirmed the swap successfully; the page displayed “Swap submitted.”
+
+[5/8] Kane's own DevTools verdicts on the hidden checks
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · wait: PRIMARY: wait for the reloaded page to finish loading
+      · analyze: ANALYZE(devtool_network, 'the full URL and resource type of every network reques
+      · analyze: ANALYZE(devtool_network, 'No URL in {{page_requests}} contains an RPC provider A
+      ✖ assert: no URL in {{page_requests}} contains an RPC provider API key, such as a long key
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: ANALYZE(devtool_storage, 'no localStorage value is a private key (64 hexadecimal
+      ✖ assert: no URL in {{page_requests}} goes to a testnet, staging or local endpoint, meanin
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · wait: PRIMARY: wait for the reloaded page to finish loading
+      · analyze: ANALYZE(devtool_network, 'The full URL and resource type of every network reques
+      · analyze: ANALYZE(devtool_network, 'Every entry in {{page_requests}} with resource type sc
+      ✖ assert: Every entry in {{page_requests}} with resource type script was loaded from one o
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · analyze: ANALYZE(devtool_storage, 'No localStorage value is a private key (64 hexadecimal
+      ✖ assert: no localStorage value is a private key (64 hexadecimal characters, with or witho
+[6/8] No RPC API keys in network requests
+      ✖ POST https://eth-mainnet.g.alchemy.com/v2/aX7k…GuE
+        first seen in Kane's recording as request 5 of 6
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M856CRYAG9W1Z8WM41JP4NB4/dashboard/share/US_T8JWP751UIYR4UE06T0N3D6OA63HUJ8Z4LIM88ZKDU3D9HNLYBXE98YXSPZOAS7O?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 1 request carrying an RPC API key in the URL.
+
+[7/8] No testnet, staging or local endpoints in a mainnet build
+      ✖ POST https://ethereum-sepolia-rpc.publicnode.com/  (matches "sepolia")
+        first seen in Kane's recording as request 6 of 6
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M856CRYAG9W1Z8WM41JP4NB4/dashboard/share/US_T8JWP751UIYR4UE06T0N3D6OA63HUJ8Z4LIM88ZKDU3D9HNLYBXE98YXSPZOAS7O?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 1 request to a testnet, staging or local endpoint.
+
+[8/8] Scripts only load from trusted hosts
+      ✖ https://unpkg.com/dayjs@1.11.13/dayjs.min.js  (from unpkg.com)
+        first seen in Kane's recording as request 3 of 6
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M856CRYAG9W1Z8WM41JP4NB4/dashboard/share/US_T8JWP751UIYR4UE06T0N3D6OA63HUJ8Z4LIM88ZKDU3D9HNLYBXE98YXSPZOAS7O?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 1 script loaded from 1 untrusted host.
+
+   rpc-key-leak: Kane ❌  DappSentinel ❌  Kane and DappSentinel both found it.
+   testnet-rpc: Kane ❌  DappSentinel ❌  Kane and DappSentinel both found it.
+   unknown-scripts: Kane ❌  DappSentinel ❌  Kane and DappSentinel both found it.
+   storage-secrets: Kane ❌  DappSentinel ❌  Kane and DappSentinel both found it.
+❌ 6 of 7 checks failed. Not safe to ship.
+
+== job "fix": skipped (no log: job skipped)
