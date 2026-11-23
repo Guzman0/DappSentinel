@@ -52,6 +52,7 @@
 - [Run it in CI](#run-it-in-ci)
 - [Commands](#commands)
 - [What DappSentinel doesn't do](#what-dappsentinel-doesnt-do)
+- [Findings for the Kane CLI team](#findings-for-the-kane-cli-team)
 - [Repository layout](#repository-layout)
 - [Built with](#built-with)
 - [Notes](#notes)
@@ -557,6 +558,19 @@ For what DappSentinel collects, masks and uploads, see [SECURITY.md](SECURITY.md
 - **It can't catch every frontend compromise.** It sees what the browser does while Kane uses the page. Malicious code that only wakes up for certain wallets or transactions, like the code in the Bybit attack, may stay quiet during a check.
 - **Some sites block automated browsers.** When Kane can't reach the real page, DappSentinel reports the network checks as inconclusive, never as clean.
 - **Testing on `localhost` can trip the testnet check.** It matches words like `localhost` anywhere in a request's address, including where a third-party widget sends the page's own address, as in [PR #10](https://github.com/Guzman0/DappSentinel/pull/10). Check a deployed preview to avoid it.
+
+## Findings for the Kane CLI team
+
+What building DappSentinel taught us about Kane CLI (0.10.7 and 0.10.8), each with the run or code that shows it.
+
+- **A pass can contradict Kane's own reading.** On 0.10.8, Kane read "You pay 0.05 ETH", stored it, wrote that it differs from 0.5, and still passed "the confirmation shows You pay 0.5 ETH". Once in 3 runs; the other 2 failed correctly. Reported as [LambdaTest/kane-cli#239](https://github.com/LambdaTest/kane-cli/issues/239). Our workaround: ask Kane to store the value (`store … as confirm_pay_amount`) and check it exactly ([record](evidence/mutation-test/#kane-cli-0108-released-22-nov-2026-and-one-miss)).
+- **Telling Kane what to name a stored value works.** Left to itself, Kane chose its own name (`confirmation_you_pay_amount_check`). Told "store it … as confirm_pay_amount", it used that name, so code can read it reliably ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45052587659)).
+- **Network capture resets at every step.** A script that loads only while the page opens was invisible to a DevTools assertion in a later step, so Kane missed the jsDelivr script in mutation run 3. Storing the requests in the reload step itself ("store … as page_requests") and asserting on that list fixed it in run 4 ([run 3](https://github.com/Guzman0/DappSentinel/actions/runs/44962415067), [run 4](https://github.com/Guzman0/DappSentinel/actions/runs/45023763082)).
+- **DevTools assertions can read localStorage but not sessionStorage.** A seed phrase in sessionStorage is only caught by DappSentinel's own watch of the browser Kane drives ([m6 in the mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for)).
+- **Kane stops at the first failed assertion.** With four checks in one objective, the ones after a failure get no verdict, so DappSentinel re-runs the unreached ones, up to 4 rounds (`bin/dappsentinel.js`).
+- **Read the step from the remark, and expect varied status words.** In `--agent` output the step text we needed was in `remark`, and a passed step's status was not always `passed`. DappSentinel accepts `passed`, `success`, `done`, `completed` and `ok`, and treats anything else as inconclusive, never as a pass.
+- **When Kane can't use a page, it ends "failed".** On Balancer (bot protection) and Sushi (a page that wouldn't scroll), that isn't evidence the site is broken, so DappSentinel reports those as inconclusive ([Balancer](https://github.com/Guzman0/DappSentinel/actions/runs/44951366707), [Sushi](https://github.com/Guzman0/DappSentinel/actions/runs/44951355988)).
+- **Replay share links expire after 7 days.** Judging can outlast them, so every report and record here also keeps Kane's screenshots and steps in the repo.
 
 ## Repository layout
 
