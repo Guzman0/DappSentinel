@@ -35,6 +35,7 @@ Or watch it happen on GitHub with no human: Kane fails [PR #5](https://github.co
 
 - [See it work](#see-it-work)
 - [For judges](#for-judges)
+- [Confirmed outside this repo](#confirmed-outside-this-repo)
 - [Kane's five jobs](#kanes-five-jobs)
 - [Who catches what: Kane and DappSentinel](#who-catches-what-kane-and-dappsentinel)
 - [Real-world loop: a bug in code we didn't write](#real-world-loop-a-bug-in-code-we-didnt-write)
@@ -83,8 +84,17 @@ Every judging rule, and where to see the proof. All of it is public; nothing nee
 | **Verified** (25%) | Polaris #118: caught, fixed as the issue asks, proven twice ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45015619019)). Spark: caught, fixed, re-checked ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44953030392)). The [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for), with Kane's own screenshots, and [11 live dApps](#real-world-runs). It also found a bug in Kane CLI itself, [confirmed by the Kane team](https://github.com/LambdaTest/kane-cli/issues/239#issuecomment-7098306114) with a fix coming |
 | **Closed loop** (25%) | With no human: Kane fails PR #5 6 of 7, Claude fixes and pushes, the PR passes 7 of 7 ([Kane's output and the fix](evidence/pr5-closed-loop/), [forensic trail](#forensic-trail-the-loop-on-github-step-by-step)). Max 3 rounds; when only a person can decide, Claude [hands over](#when-the-loop-gives-up-a-person-takes-over) ([PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817)). The agent [can't cheat](#the-agent-cant-cheat) ([PR #6](https://github.com/Guzman0/DappSentinel/pull/6)) |
 | **Craft** (25%) | Two commands from any folder ([try it on any dApp](#try-it-on-any-dapp-from-any-folder)), or one line in a workflow ([use it in your own repo](#use-it-in-your-own-repo)). Keys masked in every report ([SECURITY.md](SECURITY.md)). Honest limits in [what DappSentinel doesn't do](#what-dappsentinel-doesnt-do) |
-| **Check it without credits** | `npm test`, the [session viewer](https://dappsentinel.netlify.app/dashboard/), and [`evidence/`](evidence/): Kane's own output for every linked run ([`ci-runs/`](evidence/ci-runs/)), PR #5, Spark, Polaris and every mutation-test variant, kept in the repo |
+| **No account, no credits** | Nothing here needs a TestMu login to check. `git clone https://github.com/Guzman0/DappSentinel && cd DappSentinel && npm install && npm test` runs the unit tests against Kane's real output, including the 0.10.8 miss and Kane's misjudged triage. Browse every Kane session in the [session viewer](https://dappsentinel.netlify.app/dashboard/), and read Kane's own output for every linked run in [`evidence/ci-runs/`](evidence/ci-runs/). PR #5, Spark, Polaris and each mutation-test variant have full records in [`evidence/`](evidence/) |
 | **Dates** | First commit `ed622c0`, 18 Nov 2026, after the 12 Nov start |
+
+## Confirmed outside this repo
+
+What DappSentinel found, and what the people who own that code said about it.
+
+| Where | What DappSentinel found | Their response |
+|---|---|---|
+| Kane CLI [#239](https://github.com/LambdaTest/kane-cli/issues/239) | On 0.10.8, Kane read "You pay 0.05 ETH" and still passed a check for 0.5 ETH, once in 3 runs | **Confirmed by the Kane CLI team** ([reply](https://github.com/LambdaTest/kane-cli/issues/239#issuecomment-7098306114)): that run compared the values as whole numbers, so 0.05 and 0.5 both became 0. A fix is in progress, and they called DappSentinel's exact check a good workaround until then |
+| Polaris [#118](https://github.com/PolarisQ-xyz/polaris-frontend/issues/118) | A production build with a missing setting silently calls localhost and testnet. Kane caught it, Claude fixed it, Kane proved the fix ([record](evidence/realworld-polaris/)) | The maintainers labelled it a security issue and assigned it through their contributor program. The pull request now under review, [#208](https://github.com/PolarisQ-xyz/polaris-frontend/pull/208), fixes it the same way: development defaults stay, and a production build stops and names each missing setting |
 
 ## Kane's five jobs
 
