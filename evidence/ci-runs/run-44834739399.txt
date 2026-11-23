@@ -1,0 +1,39 @@
+Run 44834739399 · DappSentinel · workflow_dispatch on main · failure · 2026-11-20T23:10:01Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44834739399
+
+== job "gate (https://stake.lido.fi)": failure
+🛡  DappSentinel: 6 checks against https://stake.lido.fi (3 Kane runs)
+
+[1/6] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after scrolling back up
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 2 items in browser storage and none is a private key or seed phrase.
+
+[2/6] The site loads and Kane can browse it
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: Waiting for the page to finish loading
+      → ❌ failed: The site’s bot-protection service challenged this browser and did not allow the verification to finish. The main page therefore could not load.
+
+[3/6] Kane can use Lido's stake screen and it shows a sane quote
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: Waiting for the security verification to finish
+      → ❌ failed: The website’s bot-protection service challenged the automated browser and did not let it reach the staking page.
+
+[4/6] No RPC API keys in network requests
+      → ⚠️  error: Inconclusive: the "browse" run did not pass (The site’s bot-protection service challenged this browser and did not allow the verification to finish. The main page th), so the recording may not cover the real page.
+
+[5/6] No testnet, staging or local endpoints in a mainnet build
+      → ⚠️  error: Inconclusive: the "browse" run did not pass (The site’s bot-protection service challenged this browser and did not allow the verification to finish. The main page th), so the recording may not cover the real page.
+
+[6/6] Scripts only load from trusted hosts
+      ✖ challenges.cloudflare.com: 3 scripts, e.g. https://challenges.cloudflare.com/turnstile/v0/b/f8df4d4a0cd6/api.js?onload=_
+      → ❌ failed: Kane's network recording shows 3 scripts loaded from 1 untrusted host.
+
+❌ 5 of 6 checks failed. Not safe to ship.
+
+== job "fix": skipped (no log: job skipped)

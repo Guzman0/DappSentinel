@@ -1,0 +1,59 @@
+Run 44794168901 · DappSentinel · pull_request on update-swap-copy · failure · 2026-11-20T18:35:15Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44794168901
+
+== job "gate": failure
+🛡  DappSentinel: 7 checks against http://localhost:4173 (4 Kane runs)
+
+   Serving demo-dapp at http://localhost:4173
+
+[1/7] Displayed contract addresses match the expected ones
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: let the page fully load
+      · analyze: ANALYZE(textual_visual, 'the USDC contract address shown on the page is exactly 
+      ✖ assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4
+      → ❌ failed: The run read the page but did not save the displayed USDC address into the value used by the final check. The check therefore received "{{usdc_contract_address_check}}" rather than page text.
+
+[2/7] The app targets the right chain
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: ANALYZE(textual_visual, 'the network badge at the top of the page shows the netw
+      ✖ assert: the network badge at the top of the page shows chain ID exactly 1 and the networ
+      → ❌ failed: The page could not access its Ethereum mainnet data service and fell back to Sepolia data, while still labeling the badge as Ethereum.
+
+[3/7] No private keys or seed phrases in browser storage
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1000 ms for the Swap page to fully load
+      · type: Typing 1 into the You pay amount field
+      · analyze: the You receive field shows a number greater than 0
+      · assert: the You receive field shows a number greater than 0
+      ✖ localStorage["wallet_pk"] is named like a secret and holds 0xac…f80
+      ✖ localStorage["session"].wallet_pk is named like a secret and holds 0xac…f80
+      → ❌ failed: While Kane used the page, the site saved 2 items in browser storage, including 2 secrets any script on the page could read.
+
+[4/7] The swap flow works end to end
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · type: Typing 0.5 into You pay amount field
+      · analyze: a fee is shown
+      · assert: the You receive field shows a number greater than 0 and a fee is shown
+      · click: Clicking Review swap button
+      · analyze: the confirmation shows You pay 0.5 ETH
+      · assert: the confirmation shows You pay 0.5 ETH
+      · click: Clicking Confirm swap
+      · analyze: the text Swap submitted is visible
+      · assert: the text Swap submitted is visible
+      → ✅ passed: Confirmed the swap successfully; the page displayed “Swap submitted.”
+
+[5/7] No RPC API keys in network requests
+      ✖ POST https://eth-mainnet.g.alchemy.com/v2/aX7k…GuE
+      → ❌ failed: Kane's network recording shows 1 request carrying an RPC API key in the URL.
+
+[6/7] No testnet, staging or local endpoints in a mainnet build
+      ✖ POST https://ethereum-sepolia-rpc.publicnode.com/  (matches "sepolia")
+      → ❌ failed: Kane's network recording shows 1 request to a testnet, staging or local endpoint.
+
+[7/7] Scripts only load from trusted hosts
+      ✖ https://unpkg.com/dayjs@1.11.13/dayjs.min.js  (from unpkg.com)
+      → ❌ failed: Kane's network recording shows 1 script loaded from 1 untrusted host.
+
+❌ 6 of 7 checks failed. Not safe to ship.

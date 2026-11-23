@@ -1,0 +1,56 @@
+Run 44834742720 · DappSentinel · workflow_dispatch on main · failure · 2026-11-20T23:10:03Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44834742720
+
+== job "gate (https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&marketName=proto_mainnet_v3)": failure
+🛡  DappSentinel: 6 checks against https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&marketName=proto_mainnet_v3 (3 Kane runs)
+
+[1/6] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c62
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: the page does not show an error page
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after scrolling back up
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 15 items in browser storage and none is a private key or seed phrase.
+
+[2/6] The site loads and Kane can browse it
+      · navigate: Navigate to https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c62
+      · wait: PRIMARY: wait 1500 ms for the page to fully load
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down
+      · scroll: Scrolling back up
+      · wait: Waiting after returning to the top of the USD Coin reserve overview
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: Confirmed that the main page content was visible and that no error page was shown.
+
+[3/6] Kane can use Aave's USDC market page and it shows the market's numbers
+      · navigate: Navigate to https://app.aave.com/reserve-overview/?underlyingAsset=0xa0b86991c62
+      · wait: PRIMARY: Wait until the page has fully loaded
+      · analyze: A notice banner appears
+      · click: Dismissing the notification banner
+      · wait: Waiting briefly after closing the notification
+      · analyze: the page is about USDC (USD Coin)
+      · assert: the page is about USDC (USD Coin)
+      · analyze: the page shows that this USDC market is on Ethereum
+      · assert: the page shows that this USDC market is on Ethereum
+      · analyze: the page shows a supply APY as a percentage
+      · assert: the page shows a supply APY as a percentage
+      · analyze: the page shows a total supplied amount for USDC
+      · assert: the page shows a total supplied amount for USDC
+      → ✅ passed: Confirmed that the page is for USD Coin (USDC) on Ethereum.
+
+[4/6] No RPC API keys in network requests
+      → ✅ passed: None of the 202 recorded requests carries an RPC API key.
+
+[5/6] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 202 recorded requests goes to a testnet, staging or local endpoint.
+
+[6/6] Scripts only load from trusted hosts
+      ✖ https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092  (from static.cloudfl
+      ✖ app.family.co: 31 scripts, e.g. https://app.family.co/_next/static/chunks/0qtk.9ywc7.g4.js
+      → ❌ failed: Kane's network recording shows 32 scripts loaded from 2 untrusted hosts.
+
+❌ 1 of 6 checks failed. Not safe to ship.
+
+== job "fix": skipped (no log: job skipped)

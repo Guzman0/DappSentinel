@@ -1,0 +1,68 @@
+Run 44759641283 · DappSentinel · workflow_dispatch on main · failure · 2026-11-20T15:04:43Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44759641283
+
+== job "gate (https://app.aave.com)": failure
+🛡  DappSentinel: 5 checks against https://app.aave.com (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://app.aave.com
+      · wait: PRIMARY: wait until the page has fully loaded
+      · scroll: Scrolling to the bottom of the page
+      · scroll: Scrolling back to the top of the page
+      · analyze: the page does not show an error page
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 15 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://app.aave.com
+      · wait: PRIMARY: wait until the page has fully loaded
+      · scroll: Scrolling to the bottom of the page
+      · scroll: Scrolling back to the top of the page
+      · analyze: the page does not show an error page.
+      · assert: the page shows its main content and not an error page.
+      → ✅ passed: Waited for the Aave page to finish loading.
+Scrolled to the bottom of the page and returned to the top as requested.
+Confirmed that the Aave
+
+[3/5] No RPC API keys in network requests
+      → ✅ passed: None of the 218 recorded requests carries an RPC API key.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 218 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      ✖ https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092  (from static.cloudfl
+      ✖ https://app.family.co/_next/static/chunks/0qtk.9ywc7.g4.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/11.btmnove-xu.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0uoft.psp0a9-.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0tkol74l256he.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/turbopack-0b~sszounbnwc.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0rvi.dm-9pdqh.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0d1j5zw67gizu.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0rstsm9eerug..js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0k0gq.t5gkxb1.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0cloplvhkypu8.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0tz.hkg2i45ls.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/176j5t5~5z2zq.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0bakp1ryczib9.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0qz8z0x-gjbzf.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/16h3l2.44pefb.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0cw.p7np1lft_.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0a-i0q6dukdeb.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0ijvm_~dqah1b.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/094wrsciojfj-.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0qi1ep-seqdj4.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/03_w68a8tt_op.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0qq2tvmy9e7u0.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0b-cj0df.glfo.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/09dse1~zld7vj.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0t4l._rdwx-j~.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/07rh-rva4w~en.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0oizqcw5-.hb7.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/0w1~w1fha0u18.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/066lr_ok4auqa.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/09i8vxq~sc752.js  (from app.family.co)
+      ✖ https://app.family.co/_next/static/chunks/14ne~atlwj39n.js  (from app.family.co)
+      → ❌ failed: Kane's network recording shows 33 scripts loaded from an untrusted host.
+
+❌ 1 of 5 checks failed. Not safe to ship.

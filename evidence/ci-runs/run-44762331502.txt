@@ -1,0 +1,46 @@
+Run 44762331502 · DappSentinel · workflow_dispatch on main · failure · 2026-11-20T15:20:45Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44762331502
+
+== job "gate (https://swap.cow.fi)": failure
+🛡  DappSentinel: 5 checks against https://swap.cow.fi (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://swap.cow.fi
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: the page is taller than the window
+      · wait: Waiting skip scrolling because the page fits within the window
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 36 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://swap.cow.fi
+      · wait: PRIMARY: Wait until the page has fully loaded
+      · analyze: the page is taller than the window
+      · wait: Waiting skip scrolling because the page fits within the window
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: Waited for the CoW Swap page to finish loading.
+Confirmed that the main swap content was visible and no error page was shown.
+The page fit w
+
+[3/5] No RPC API keys in network requests
+      ✖ POST https://eth-mainnet.g.alchemy.com/v2/alch…RV_
+      → ❌ failed: Kane's network recording shows 1 request carrying an RPC API key in the URL.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 129 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      ✖ w.appzi.io: 2 scripts, e.g. https://w.appzi.io/bootstrap/bundle.js?token=5ju0G
+      ✖ www.googletagmanager.com: 2 scripts, e.g. https://www.googletagmanager.com/gtm.js?id=GTM-TBX4BV5M
+      ✖ https://www.redditstatic.com/ads/pixel.js  (from www.redditstatic.com)
+      ✖ https://tag.adrsbl.io/p.js?tid=534628e617bd491eaf5d614f7ea067d5  (from tag.adrsbl.io)
+      ✖ https://www.clarity.ms/tag/mqse7dmywa  (from www.clarity.ms)
+      ✖ https://static.ads-twitter.com/uwt.js  (from static.ads-twitter.com)
+      ✖ https://api.hypelab.com/v1/scripts/ha-sdk.js?v=0  (from api.hypelab.com)
+      ✖ https://cdn.spindl.xyz/attribution-1-8-1.js  (from cdn.spindl.xyz)
+      ✖ track.adform.net: 2 scripts, e.g. https://track.adform.net/Serving/TrackPoint/?pm=4155571&ADFPageName=PageView&ord=17951
+      ✖ https://googleads.g.doubleclick.net/pagead/viewthroughconversion/17524343384/?random=1795188156532&cv=11&fst=17951881565
+      ✖ https://scripts.clarity.ms/0.8.80-beta/clarity.js  (from scripts.clarity.ms)
+      → ❌ failed: Kane's network recording shows 14 scripts loaded from 11 untrusted hosts.
+
+❌ 2 of 5 checks failed. Not safe to ship.

@@ -1,0 +1,42 @@
+Run 44952359583 · DappSentinel · workflow_dispatch on main · failure · 2026-11-21T21:35:48Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44952359583
+
+== job "gate (https://app.spark.fi)": failure
+🛡  DappSentinel: 5 checks against https://app.spark.fi (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://app.spark.fi
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: The page fits in the window
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after scrolling back up
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 11 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://app.spark.fi
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down
+      · scroll: Scrolling back up
+      · wait: Waiting after confirming the window is at the top
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: Confirmed that the page displayed its main content without an error page.
+
+[3/5] No RPC API keys in network requests
+      ↪ app.spark.fi forwarded to app.spark.finance; both count as the site itself.
+      ✖ POST https://eth-mainnet.g.alchemy.com/v2/WVOC…-9L
+        first seen in Kane's recording as request 28 of 80, 0.4 s into Kane's run
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M800NS65MDFXYBCD50N53N1B/dashboard/share/US_0S1IJO4O6EEVE57CQCNN182GUEQOVUVRXS7S6XFPADC2HK8UJDZ10OEFX60PPPXL?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 1 request carrying an RPC API key in the URL. (app.spark.fi forwarded to app.spark.finance, which counts as the site itself.)
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 50 recorded requests goes to a testnet, staging or local endpoint. (app.spark.fi forwarded to app.spark.finance, which counts as the site itself.)
+
+[5/5] Scripts only load from trusted hosts
+      → ✅ passed: All 24 scripts came from trusted hosts. (app.spark.fi forwarded to app.spark.finance, which counts as the site itself.)
+
+❌ 1 of 5 checks failed. Not safe to ship.
+
+== job "fix": skipped (no log: job skipped)

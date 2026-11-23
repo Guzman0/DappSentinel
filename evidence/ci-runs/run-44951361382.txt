@@ -1,0 +1,37 @@
+Run 44951361382 · DappSentinel · workflow_dispatch on main · failure · 2026-11-21T21:24:15Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44951361382
+
+== job "gate (https://app.uniswap.org/swap)": failure
+🛡  DappSentinel: 5 checks against https://app.uniswap.org/swap (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://app.uniswap.org/swap
+      · wait: PRIMARY: wait 1500 ms for the page to fully load
+      · analyze: The page is taller than the window.
+      · wait: Waiting skip scrolling because the page fits within the window
+      · assert: the page shows its main content and not an error page.
+      → ✅ passed: While Kane used the page, the site saved 21 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://app.uniswap.org/swap
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: The page does not show an error page.
+      · wait: Waiting page is not scrollable, so skip scrolling
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: Confirmed that the page fit within the browser window, so no scrolling was needed.
+
+[3/5] No RPC API keys in network requests
+      → ✅ passed: None of the 1002 recorded requests carries an RPC API key.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 1002 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      ✖ https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit  (from challenges.cloudflare.com)
+        first seen in Kane's recording as request 52 of 1002, 2.2 s into Kane's run
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M8000BKC0D0XMAWY9B29TXA8/dashboard/share/US_RR8LXBTWCV3DJGNVMI4SDNF5PS7UF0QHJMC4FY1HT9UBRM77F9SQSSQD83XHHE4C?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 1 script loaded from 1 untrusted host.
+
+❌ 1 of 5 checks failed. Not safe to ship.
+
+== job "fix": skipped (no log: job skipped)

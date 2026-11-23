@@ -1,0 +1,42 @@
+Run 44760476608 · DappSentinel · workflow_dispatch on main · failure · 2026-11-20T15:09:43Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44760476608
+
+== job "gate (https://app.aave.com)": failure
+🛡  DappSentinel: 5 checks against https://app.aave.com (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://app.aave.com
+      · wait: PRIMARY: Wait until the page has fully loaded
+      · analyze: the page fits in the window
+      · scroll: Scrolling down
+      · scroll: Scrolling back up
+      · wait: Waiting confirm the page is back at the top after scrolling down and back up
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 15 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://app.aave.com
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down to the bottom of the page
+      · scroll: Scrolling back up to the top of the page
+      · wait: Waiting confirm the page is back at the top after scrolling down and back up
+      · scroll: Scrolling down and back up the page
+      · scroll: Scrolling down and back up the page
+      · analyze: The page does not show an error page.
+      · assert: the page shows its main content and not an error page.
+      → ✅ passed: Waited for the Aave app page to finish loading.
+The page was taller than the browser window, so it was scrolled down and returned to the top
+
+[3/5] No RPC API keys in network requests
+      → ✅ passed: None of the 222 recorded requests carries an RPC API key.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 222 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      ✖ https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092  (from static.cloudfl
+      ✖ app.family.co: 31 scripts, e.g. https://app.family.co/_next/static/chunks/0qtk.9ywc7.g4.js
+      → ❌ failed: Kane's network recording shows 32 scripts loaded from 2 untrusted hosts.
+
+❌ 1 of 5 checks failed. Not safe to ship.

@@ -1,0 +1,28 @@
+Run 44951366707 · DappSentinel · workflow_dispatch on main · failure · 2026-11-21T21:24:19Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44951366707
+
+== job "gate (https://balancer.fi/swap/ethereum)": failure
+🛡  DappSentinel: 5 checks against https://balancer.fi/swap/ethereum (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://balancer.fi/swap/ethereum
+      ✖ wait: Waiting after confirming the page error
+      → ✅ passed: While Kane used the page, the site saved 0 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://balancer.fi/swap/ethereum
+      ✖ wait: Waiting on the browser verification error page
+      → ❌ failed: The site's security service rate-limited or rejected the automated browser, so it showed a verification failure instead of the swap page.
+
+[3/5] No RPC API keys in network requests
+      → ⚠️  error: Inconclusive: the "browse" run did not pass (The site's security service rate-limited or rejected the automated browser, so it showed a verification failure instead ), so the recording may not cover the real page.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ⚠️  error: Inconclusive: the "browse" run did not pass (The site's security service rate-limited or rejected the automated browser, so it showed a verification failure instead ), so the recording may not cover the real page.
+
+[5/5] Scripts only load from trusted hosts
+      → ⚠️  error: Inconclusive: the "browse" run did not pass (The site's security service rate-limited or rejected the automated browser, so it showed a verification failure instead ), so the recording may not cover the real page.
+
+❌ 4 of 5 checks failed. Not safe to ship.
+
+== job "fix": skipped (no log: job skipped)

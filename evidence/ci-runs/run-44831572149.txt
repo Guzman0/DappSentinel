@@ -1,0 +1,11 @@
+Run 44831572149 · DappSentinel · pull_request on cheat-edit-check · failure · 2026-11-20T22:45:44Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44831572149
+
+== job "gate": failure
+⛔ Refused: the referee was changed. These protected files differ from origin/main:
+   checks/04-chain-id.md
+   DappSentinel won't run checks that were edited to pass. Fix the site instead.
+
+##[error]Process completed with exit code 3.
+
+== job "fix": skipped (no log: job skipped)

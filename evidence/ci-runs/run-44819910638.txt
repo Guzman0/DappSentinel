@@ -1,0 +1,56 @@
+Run 44819910638 · DappSentinel · pull_request on rates-note · success · 2026-11-20T21:23:33Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44819910638
+
+== job "gate": success
+🛡  DappSentinel: 7 checks against http://localhost:4173 (4 Kane runs)
+
+   Serving demo-dapp at http://localhost:4173
+
+[1/7] Displayed contract addresses match the expected ones
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait for the page to fully load
+      · analyze: ANALYZE(textual_visual, 'the USDC contract address shown on the page is exactly 
+      · assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4
+      → ✅ passed: Confirmed that the USDC contract address displayed on the page exactly matches 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.
+
+[2/7] The app targets the right chain
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: ANALYZE(textual_visual, 'the network badge at the top of the page shows the netw
+      · assert: the network badge at the top of the page shows chain ID exactly 1 and the networ
+      → ✅ passed: Confirmed that the network badge shows Ethereum with chain ID 1.
+
+[3/7] No private keys or seed phrases in browser storage
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · type: Typing 1 into You pay amount field
+      · analyze: The You receive field shows a number greater than 0.
+      · assert: the You receive field shows a number greater than 0
+      → ✅ passed: While Kane used the page, the site saved 1 item in browser storage and none is a private key or seed phrase.
+
+[4/7] The swap flow works end to end
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · type: Entering pay amount 0.5 in You pay amount field
+      · analyze: a fee is shown.
+      · assert: the You receive field shows a number greater than 0 and a fee is shown.
+      · click: Clicking Review swap button
+      · analyze: the confirmation shows You pay 0.5 ETH.
+      · assert: the confirmation shows You pay 0.5 ETH.
+      · click: Clicking Confirm swap button
+      · analyze: the text Swap submitted is visible.
+      · assert: the text Swap submitted is visible.
+      → ✅ passed: Confirmed the swap successfully; the page displayed “Swap submitted.”
+
+[5/7] No RPC API keys in network requests
+      → ✅ passed: None of the 5 recorded requests carries an RPC API key.
+
+[6/7] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 5 recorded requests goes to a testnet, staging or local endpoint.
+
+[7/7] Scripts only load from trusted hosts
+      → ✅ passed: All 1 scripts came from trusted hosts.
+
+✅ All 7 checks passed. Clear to ship.
+
+== job "fix": skipped (no log: job skipped)

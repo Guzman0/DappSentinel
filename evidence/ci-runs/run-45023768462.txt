@@ -1,0 +1,51 @@
+Run 45023768462 · DappSentinel · workflow_dispatch on main · success · 2026-11-22T12:43:37Z
+https://github.com/Guzman0/DappSentinel/actions/runs/45023768462
+
+== job "gate (https://stake.lido.fi)": success
+🛡  DappSentinel: 5 checks against https://stake.lido.fi (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: Wait until the page has fully loaded
+      · analyze: the page fits in the window
+      · scroll: Scrolling down
+      · scroll: Scrolling back up
+      · wait: Waiting after scrolling back up
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 2 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting confirm the page is back at the top after scrolling up
+      · assert: the page shows its main content and not an error page.
+      → ✅ passed: The requested page-load check was completed on Lido Stake.
+
+[3/6] Kane's own DevTools verdicts on the hidden checks
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: wait until the page has fully loaded
+      · wait: PRIMARY: wait for the reloaded page to finish loading
+      · analyze: ANALYZE(devtool_network, 'the full URL and resource type of every network reques
+      · assert: no URL in {{page_requests}} contains an RPC provider API key, such as a long key
+      · assert: no URL in {{page_requests}} goes to a testnet, staging or local endpoint, meanin
+      · assert: every entry in {{page_requests}} with resource type script was loaded from one o
+      · assert: no localStorage value is a private key (64 hexadecimal characters, with or witho
+[4/5] No RPC API keys in network requests
+      → ✅ passed: None of the 54 recorded requests carries an RPC API key.
+
+[5/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 54 recorded requests goes to a testnet, staging or local endpoint.
+
+[6/5] Scripts only load from trusted hosts
+      → ✅ passed: All 26 scripts came from trusted hosts.
+
+   rpc-key-leak: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+   testnet-rpc: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+   unknown-scripts: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+   storage-secrets: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+✅ All 5 checks passed. Clear to ship.
+
+== job "fix": skipped (no log: job skipped)

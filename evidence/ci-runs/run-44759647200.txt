@@ -1,0 +1,37 @@
+Run 44759647200 · DappSentinel · workflow_dispatch on main · failure · 2026-11-20T15:04:45Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44759647200
+
+== job "gate (https://stake.lido.fi)": failure
+🛡  DappSentinel: 5 checks against https://stake.lido.fi (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: Wait until the page has fully loaded
+      · scroll: Scrolling to the bottom of the page
+      · scroll: Scrolling to the bottom of the page and back to the top
+      · analyze: the page does not show an error page
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 2 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: wait until the page has fully loaded
+      · scroll: Scrolling to the bottom of the page
+      · scroll: Scrolling back to the top of the page
+      · analyze: the page does not show an error page.
+      · assert: the page shows its main content and not an error page.
+      → ✅ passed: The requested page was allowed to finish loading.
+The page was scrolled to the bottom and then returned to the top.
+The Lido Stake page rema
+
+[3/5] No RPC API keys in network requests
+      → ✅ passed: None of the 54 recorded requests carries an RPC API key.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 54 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      ✖ https://matomo.lido.fi/matomo.js  (from matomo.lido.fi)
+      → ❌ failed: Kane's network recording shows 1 script loaded from an untrusted host.
+
+❌ 1 of 5 checks failed. Not safe to ship.

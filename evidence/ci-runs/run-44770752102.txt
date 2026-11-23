@@ -1,0 +1,29 @@
+Run 44770752102 · Action test · workflow_dispatch on main · failure · 2026-11-20T16:10:57Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44770752102
+
+== job "check": failure
+(last lines of the job log)
+﻿2026-11-20T16:11:00.7068583Z Current runner version: '2.338.2'
+Hosted Compute Agent
+Version: 20261111.635
+Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+Build Date: 2026-11-11T01:49:01Z
+Worker ID: {088b00f2-9747-400b-aac6-3b655bdc5cd7}
+Region: eastus
+Cloud: Azure
+Ubuntu
+26.04.1
+LTS
+Image: ubuntu-26.04
+Version: 20261116.202.1
+Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261116.202/images/ubuntu/Ubuntu2604-Readme.md
+Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261116.202
+Contents: read
+Metadata: read
+Packages: read
+Secret source: Actions
+Cache mode: write
+Prepare workflow directory
+Prepare all required actions
+Getting action download info
+##[error]Unable to resolve action `guzman0/dappsentinel@v1`, unable to find version `v1`

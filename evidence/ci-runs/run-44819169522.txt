@@ -1,0 +1,87 @@
+Run 44819169522 · DappSentinel · pull_request on rates-note · failure · 2026-11-20T21:18:40Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44819169522
+
+== job "gate": failure
+🛡  DappSentinel: 7 checks against http://localhost:4173 (4 Kane runs)
+
+   Serving demo-dapp at http://localhost:4173
+
+[1/7] Displayed contract addresses match the expected ones
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · analyze: ANALYZE(textual_visual, 'the USDC contract address shown on the page is exactly 
+      ✖ assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4
+      → ❌ failed: After reviewing the page, the run did not save the displayed USDC address for the final check. The final check therefore compared the expected address with a placeholder.
+
+[2/7] The app targets the right chain
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: ANALYZE(textual_visual, 'the network badge at the top of the page shows the netw
+      ✖ assert: the network badge at the top of the page shows chain ID exactly 1 and the networ
+      → ❌ failed: The page could not get mainnet information because its mainnet request was rejected by the browser. It then showed a Sepolia chain ID while still calling the network Ethereum.
+
+[3/7] No private keys or seed phrases in browser storage
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · type: Typing 1 into You pay amount field
+      · analyze: the You receive field shows a number greater than 0
+      · assert: the You receive field shows a number greater than 0
+      ✖ localStorage["wallet_pk"] is named like a secret and holds 0xac…f80
+      ✖ localStorage["session"].wallet_pk is named like a secret and holds 0xac…f80
+      → ❌ failed: While Kane used the page, the site saved 2 items in browser storage, including 2 secrets any script on the page could read.
+
+[4/7] The swap flow works end to end
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · type: Typing 0.5 into You pay amount field
+      · analyze: a fee is shown.
+      · assert: the You receive field shows a number greater than 0 and a fee is shown.
+      · click: Clicking Review swap button
+      · analyze: the confirmation shows You pay 0.5 ETH.
+      · assert: the confirmation shows You pay 0.5 ETH.
+      · click: Clicking Confirm swap button
+      · analyze: the text Swap submitted is visible.
+      · assert: the text Swap submitted is visible.
+      → ✅ passed: Confirmed the swap successfully; the page displayed “Swap submitted.”
+
+[5/7] No RPC API keys in network requests
+      ✖ POST https://eth-mainnet.g.alchemy.com/v2/aX7k…GuE
+      → ❌ failed: Kane's network recording shows 1 request carrying an RPC API key in the URL.
+
+[6/7] No testnet, staging or local endpoints in a mainnet build
+      ✖ POST https://ethereum-sepolia-rpc.publicnode.com/  (matches "sepolia")
+      → ❌ failed: Kane's network recording shows 1 request to a testnet, staging or local endpoint.
+
+[7/7] Scripts only load from trusted hosts
+      ✖ https://unpkg.com/dayjs@1.11.13/dayjs.min.js  (from unpkg.com)
+      → ❌ failed: Kane's network recording shows 1 script loaded from 1 untrusted host.
+
+❌ 6 of 7 checks failed. Not safe to ship.
+
+== job "fix": success
+(last lines of the job log)
+[rates-note 0b63d8b] [dappsentinel-fix] Round 1: fix what Kane caught
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+To https://github.com/Guzman0/DappSentinel.git
+   2d5c6b3..0b63d8b  HEAD -> rates-note
+# With DAPPSENTINEL_PUSH_TOKEN the push itself starts the pull request's gate.
+# Commits pushed with GitHub's built-in token don't, so start the gate here instead.
+if [ "$HAS_PUSH_TOKEN" != "true" ]; then
+  gh workflow run dappsentinel.yml --ref "$BRANCH" -f base="$BASE"
+fi
+pr=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
+if [ -n "$pr" ]; then
+  gh pr comment "$pr" --body "🛡️ **DappSentinel:** Kane's checks failed, so Claude Code fixed the site (round 1 of 3, only \`demo-dapp/\` changed). Kane is checking again now. [Gate run that failed](https://github.com/Guzman0/DappSentinel/actions/runs/44819169522)"
+fi
+shell: /usr/bin/bash -e {0}
+env:
+  BRANCH: rates-note
+  BASE: main
+  GH_TOKEN: ***
+  HAS_PUSH_TOKEN: true
+https://github.com/Guzman0/DappSentinel/pull/5#issuecomment-7050958783
+##[start-action display=Install Bun;id=__5bd86c0d-b2eb-4fae-950c-c5fdda25ec2d.setup-bun]
+##[end-action id=__5bd86c0d-b2eb-4fae-950c-c5fdda25ec2d.setup-bun;outcome=success;conclusion=success;duration_ms=179]
+git version 2.56.1
+Temporarily overriding HOME='/home/runner/work/_temp/e30344ad-dab6-465b-b4c9-9d3120b8d3b5' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory

@@ -1,0 +1,162 @@
+Run 45052587659 · Mutation test (known-answer) · workflow_dispatch on main · success · 2026-11-22T18:00:30Z
+https://github.com/Guzman0/DappSentinel/actions/runs/45052587659
+
+== job "m7-wrong-confirm-amount": success
+🛡  DappSentinel: 7 checks against http://localhost:4173 (4 Kane runs)
+
+   Serving .mutants/m7-wrong-confirm-amount at http://localhost:4173
+
+[1/7] Displayed contract addresses match the expected ones
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: let the page fully load
+      · analyze: ANALYZE(textual_visual, 'the USDC contract address shown on the page is exactly 
+      · assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4
+      → ✅ passed: The page was allowed to finish loading.
+
+[2/7] The app targets the right chain
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: ANALYZE(textual_visual, 'the network badge at the top of the page shows the netw
+      · assert: the network badge at the top of the page shows chain ID exactly 1 and the networ
+      → ✅ passed: Confirmed that the network badge at the top of the page shows Ethereum with chain ID 1.
+
+[3/7] No private keys or seed phrases in browser storage
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · type: Typing 1 into the You pay amount field
+      · analyze: the You receive field shows a number greater than 0
+      · assert: the You receive field shows a number greater than 0
+      → ✅ passed: While Kane used the page, the site saved 1 item in browser storage and none is a private key or seed phrase.
+
+[4/7] The swap flow works end to end
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · type: Typing 0.5 into the You pay amount field
+      · analyze: a fee is shown
+      · assert: the You receive field shows a number greater than 0 and a fee is shown
+      · click: Clicking Review swap
+      · analyze: the confirmation shows You pay 0.5 ETH
+      ✖ assert: the confirmation shows You pay 0.5 ETH
+      → ❌ failed: The confirmation page displays the payment amount with the decimal point in the wrong place. It shows 0.05 ETH after a 0.5 ETH entry, while the received amount and fee still reflect the larger swap.
+
+[5/8] Kane's own DevTools verdicts on the hidden checks
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1500 ms for the page to fully load
+      · wait: PRIMARY: wait for the reloaded page to finish loading
+      · analyze: ANALYZE(devtool_network, 'The full URL and resource type of every network reques
+      · analyze: ANALYZE(devtool_network, 'No URL in {{page_requests}} contains an RPC provider A
+      · assert: No URL in {{page_requests}} contains an RPC provider API key, such as a long key
+      · analyze: ANALYZE(devtool_network, 'No URL in {{page_requests}} goes to a testnet, staging
+      · assert: No URL in {{page_requests}} goes to a testnet, staging or local endpoint, meanin
+      · analyze: ANALYZE(devtool_network, 'Every entry in {{page_requests}} with resource type sc
+      · assert: Every entry in {{page_requests}} with resource type script was loaded from one o
+      · analyze: ANALYZE(devtool_storage, 'No localStorage value is a private key (64 hexadecimal
+      · assert: No localStorage value is a private key (64 hexadecimal characters, with or witho
+[6/7] No RPC API keys in network requests
+      → ✅ passed: None of the 5 recorded requests carries an RPC API key.
+
+[7/7] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 5 recorded requests goes to a testnet, staging or local endpoint.
+
+[8/7] Scripts only load from trusted hosts
+      → ✅ passed: All 1 scripts came from trusted hosts.
+
+   rpc-key-leak: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+   testnet-rpc: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+   unknown-scripts: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+   storage-secrets: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+❌ 1 of 7 checks failed. Not safe to ship.
+
+== job "clean": success
+🛡  DappSentinel: 7 checks against http://localhost:4173 (4 Kane runs)
+
+   Serving .mutants/clean at http://localhost:4173
+
+[1/7] Displayed contract addresses match the expected ones
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1500 ms for the page to fully load
+      · analyze: ANALYZE(textual_visual, 'the USDC contract address shown on the page is exactly 
+      · assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4
+      → ✅ passed: Confirmed that the displayed USDC contract address is 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.
+
+[2/7] The app targets the right chain
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: ANALYZE(textual_visual, 'the network badge at the top of the page shows the netw
+      · assert: the network badge at the top of the page shows chain ID exactly 1 and the networ
+      → ✅ passed: Confirmed that the network badge at the top of the page shows Ethereum with chain ID 1.
+
+[3/7] No private keys or seed phrases in browser storage
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · type: Typing 1 into You pay amount field
+      · analyze: The You receive field shows a number greater than 0.
+      · assert: the You receive field shows a number greater than 0
+      → ✅ passed: While Kane used the page, the site saved 1 item in browser storage and none is a private key or seed phrase.
+
+[4/7] The swap flow works end to end
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · type: Typing 0.5 into the You pay amount field
+      · analyze: A fee is shown.
+      · assert: the You receive field shows a number greater than 0 and a fee is shown
+      · click: Clicking Review swap button
+      · analyze: ANALYZE(textual_visual, 'The amount shown after You pay on the confirmation, exa
+      · assert: the confirmation shows You pay 0.5 ETH
+      · click: Clicking Confirm swap button
+      · analyze: The text Swap submitted is visible.
+      · assert: the text Swap submitted is visible
+      → ✅ passed: Requested a swap of 0.5 ETH and waited for the swap page to load.
+
+[5/8] Kane's own DevTools verdicts on the hidden checks
+      · navigate: Navigate to http://localhost:4173
+      · wait: PRIMARY: wait until the page has fully loaded
+      · wait: PRIMARY: wait for the reloaded page to finish loading
+      · analyze: ANALYZE(devtool_network, 'Every entry in {{page_requests}} with resource type sc
+      · assert: No URL in {{page_requests}} contains an RPC provider API key, such as a long key
+      · assert: No URL in {{page_requests}} goes to a testnet, staging or local endpoint, meanin
+      · assert: Every entry in {{page_requests}} with resource type script was loaded from one o
+      · analyze: ANALYZE(devtool_storage, 'No localStorage value is a private key (64 hexadecimal
+      · assert: No localStorage value is a private key (64 hexadecimal characters, with or witho
+[6/7] No RPC API keys in network requests
+      → ✅ passed: None of the 5 recorded requests carries an RPC API key.
+
+[7/7] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 5 recorded requests goes to a testnet, staging or local endpoint.
+
+[8/7] Scripts only load from trusted hosts
+      → ✅ passed: All 1 scripts came from trusted hosts.
+
+   rpc-key-leak: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+   testnet-rpc: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+   unknown-scripts: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+   storage-secrets: Kane ✅  DappSentinel ✅  Kane and DappSentinel both passed it.
+✅ All 7 checks passed. Clear to ship.
+
+== job "summary": success
+(last lines of the job log)
+ create mode 100644 evidence/mutation-test/run-45052587659/m7-wrong-confirm-amount/screenshots/swap-flow-run-08.jpg
+ create mode 100644 evidence/mutation-test/run-45052587659/m7-wrong-confirm-amount/screenshots/swap-flow-run-09.jpg
+ create mode 100644 evidence/mutation-test/run-45052587659/m7-wrong-confirm-amount/screenshots/swap-flow-run-10.jpg
+ create mode 100644 evidence/mutation-test/run-45052587659/mutation-results.md
+remote: 
+remote: Create a pull request for 'mutation-evidence-45052587659' on GitHub by visiting:        
+remote:      https://github.com/Guzman0/DappSentinel/pull/new/mutation-evidence-45052587659        
+remote: 
+To https://github.com/Guzman0/DappSentinel
+ * [new branch]      mutation-evidence-45052587659 -> mutation-evidence-45052587659
+git version 2.56.1
+Temporarily overriding HOME='/home/runner/work/_temp/0899ca68-1a77-45e8-93c4-eb5f69ef98a9' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+Removing SSH command configuration
+Removing HTTP extra header
+Removing includeIf entries pointing to credentials config files
+includeif.gitdir:/home/runner/work/DappSentinel/DappSentinel/.git.path
+includeif.gitdir:/home/runner/work/DappSentinel/DappSentinel/.git/worktrees/*.path
+includeif.gitdir:/github/workspace/.git.path
+includeif.gitdir:/github/workspace/.git/worktrees/*.path
+/home/runner/work/_temp/git-credentials-ed70c727-017d-422c-bec5-cbc39e2e23e3.config
+/home/runner/work/_temp/git-credentials-ed70c727-017d-422c-bec5-cbc39e2e23e3.config
+/github/runner_temp/git-credentials-ed70c727-017d-422c-bec5-cbc39e2e23e3.config
+/github/runner_temp/git-credentials-ed70c727-017d-422c-bec5-cbc39e2e23e3.config
+Removing credentials config '/home/runner/work/_temp/git-credentials-ed70c727-017d-422c-bec5-cbc39e2e23e3.config'

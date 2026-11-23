@@ -1,0 +1,47 @@
+Run 44951377736 · DappSentinel · workflow_dispatch on main · failure · 2026-11-21T21:24:27Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44951377736
+
+== job "gate (https://app.spark.fi)": failure
+🛡  DappSentinel: 5 checks against https://app.spark.fi (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://app.spark.fi
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after scrolling back up
+      · assert: the page shows its main content and not an error page
+      → ⚠️  error: The site never loaded in the browser Kane was driving, so storage could not be checked.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://app.spark.fi
+      · wait: PRIMARY: Wait until the page has fully loaded
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after scrolling back up
+      · scroll: Scrolling down to the bottom of the page
+      · scroll: Scrolling back up to the top of the page
+      · analyze: The page does not show an error page.
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: Waited for the Spark Finance page to finish loading.
+
+[3/5] No RPC API keys in network requests
+      ✖ POST https://eth-mainnet.g.alchemy.com/v2/WVOC…-9L
+        first seen in Kane's recording as request 28 of 82, 0.6 s into Kane's run
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M8000YA76B8S9MKYX6C0R71D/dashboard/share/US_FYS0XVIK5Q3KUKQ0K2G44AY0QDAIB044EBOWXJ94MRIRO2G7YZ5S9Y2Z7T8BVF9Z?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 1 request carrying an RPC API key in the URL.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 82 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      ✖ app.spark.finance: 24 scripts, e.g. https://app.spark.finance/scripts/theme-init.js
+        first seen in Kane's recording as request 2 of 82, 0.3 s into Kane's run
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M8000YA76B8S9MKYX6C0R71D/dashboard/share/US_FYS0XVIK5Q3KUKQ0K2G44AY0QDAIB044EBOWXJ94MRIRO2G7YZ5S9Y2Z7T8BVF9Z?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 24 scripts loaded from 1 untrusted host.
+
+❌ 3 of 5 checks failed. Not safe to ship.
+
+== job "fix": skipped (no log: job skipped)

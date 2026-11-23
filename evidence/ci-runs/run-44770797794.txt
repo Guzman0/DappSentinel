@@ -1,0 +1,34 @@
+Run 44770797794 · Action test · workflow_dispatch on main · failure · 2026-11-20T16:11:13Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44770797794
+
+== job "check": failure
+🛡  DappSentinel: 5 checks against https://stake.lido.fi (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down
+      · scroll: Scrolling back up
+      · wait: Waiting after scrolling back up
+      · assert: the page shows its main content and not an error page.
+      → ✅ passed: While Kane used the page, the site saved 2 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: Waiting for the page to finish loading
+      → ❌ failed: The site’s bot-protection service challenged this automated browser and did not allow it through to the page.
+Allow the test environment thr
+
+[3/5] No RPC API keys in network requests
+      → ✅ passed: None of the 17 recorded requests carries an RPC API key.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 17 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      ✖ https://challenges.cloudflare.com/turnstile/v0/b/f8df4d4a0cd6/api.js?onload=_837a10a32effc396812d2600&render=explicit  (
+      ✖ : 3 scripts, e.g. blob:https://stake.lido.fi/53ebc042-0c91-411b-b995-70cfd3aea7b5
+      → ❌ failed: Kane's network recording shows 4 scripts loaded from 2 untrusted hosts.
+
+❌ 2 of 5 checks failed. Not safe to ship.

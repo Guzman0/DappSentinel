@@ -1,0 +1,38 @@
+Run 44951350211 · DappSentinel · workflow_dispatch on main · success · 2026-11-21T21:24:08Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44951350211
+
+== job "gate (https://www.curve.finance/dex/ethereum/swap)": success
+🛡  DappSentinel: 5 checks against https://www.curve.finance/dex/ethereum/swap (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://www.curve.finance/dex/ethereum/swap
+      · wait: PRIMARY: Wait until the page has fully loaded
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting confirm the page has returned to the top
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 5 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://www.curve.finance/dex/ethereum/swap
+      · wait: PRIMARY: wait 1500 ms for the page to fully load
+      · analyze: the page fits in the window
+      · scroll: Scrolling down
+      · scroll: Scrolling back up
+      · wait: Waiting confirm the page has returned to the top
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: Confirmed that the swap page’s main content was visible and that no error page was shown.
+
+[3/5] No RPC API keys in network requests
+      → ✅ passed: None of the 199 recorded requests carries an RPC API key.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 199 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      → ✅ passed: All 177 scripts came from trusted hosts.
+
+✅ All 5 checks passed. Clear to ship.
+
+== job "fix": skipped (no log: job skipped)

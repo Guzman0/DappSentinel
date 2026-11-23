@@ -1,0 +1,36 @@
+Run 44925440855 · npx test · workflow_dispatch on main · success · 2026-11-21T16:35:50Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44925440855
+
+== job "npx": success
+🛡  DappSentinel: 5 checks against https://stake.lido.fi (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: the page does not show an error page.
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after scrolling back up
+      · assert: the page shows its main content and not an error page.
+      → ✅ passed: While Kane used the page, the site saved 2 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: Wait until the page has fully loaded
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after returning to the top of the page
+      · assert: the page shows its main content and not an error page.
+      → ✅ passed: Confirmed that the main Lido staking content was displayed and no error page appeared.
+
+[3/5] No RPC API keys in network requests
+      → ✅ passed: None of the 53 recorded requests carries an RPC API key.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 53 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      → ✅ passed: All 26 scripts came from trusted hosts.
+
+✅ All 5 checks passed. Clear to ship.

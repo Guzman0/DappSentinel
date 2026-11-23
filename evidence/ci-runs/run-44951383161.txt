@@ -1,0 +1,43 @@
+Run 44951383161 · DappSentinel · workflow_dispatch on main · failure · 2026-11-21T21:24:31Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44951383161
+
+== job "gate (https://revoke.cash)": failure
+🛡  DappSentinel: 5 checks against https://revoke.cash (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://revoke.cash
+      · wait: PRIMARY: wait 1500 ms for the page to fully load
+      · analyze: The page does not show an error page.
+      · scroll: Scrolling down
+      · scroll: Scrolling back up
+      · wait: Waiting after scrolling back up
+      · assert: the page shows its main content and not an error page.
+      → ✅ passed: While Kane used the page, the site saved 10 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://revoke.cash
+      · wait: PRIMARY: wait 1000 ms for the page to fully load
+      · analyze: The page fits in the window.
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting confirm the page is at the top after scrolling back up
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: Confirmed that the page extended beyond the visible window and was scrolled down and back up.
+
+[3/5] No RPC API keys in network requests
+      → ✅ passed: None of the 106 recorded requests carries an RPC API key.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 106 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      ✖ https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092  (from static.cloudfl
+        first seen in Kane's recording as request 49 of 106, 0.4 s into Kane's run
+      ✖ https://client.crisp.chat/l.js  (from client.crisp.chat)
+        first seen in Kane's recording as request 72 of 106, 0.6 s into Kane's run
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M8000RK5XDAEEP9HM7HGC61X/dashboard/share/US_62BE4RSN4PZ6LMMCDL2LLNEG1ISVILQ9T06LZHZK6IB7XZQQQ40JIUFH68JAFL5A?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 2 scripts loaded from 2 untrusted hosts.
+
+❌ 1 of 5 checks failed. Not safe to ship.
+
+== job "fix": skipped (no log: job skipped)

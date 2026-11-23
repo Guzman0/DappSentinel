@@ -1,0 +1,49 @@
+Run 44835470086 · DappSentinel · workflow_dispatch on main · success · 2026-11-20T23:15:46Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44835470086
+
+== job "gate (https://stake.lido.fi)": success
+🛡  DappSentinel: 6 checks against https://stake.lido.fi (3 Kane runs)
+
+[1/6] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: Wait until the page has fully loaded
+      · analyze: the page does not show an error page
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after confirming the page is back at the top
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 2 items in browser storage and none is a private key or seed phrase.
+
+[2/6] The site loads and Kane can browse it
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: the page does not show an error page
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after returning to the top of the page
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: Confirmed that the main “Stake Ether” content was visible and that no error page was shown.
+
+[3/6] Kane can use Lido's stake screen and it shows a sane quote
+      · navigate: Navigate to https://stake.lido.fi
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: A notice banner appears.
+      · type: Typing ETH amount MAX into the staking form field
+      · wait: Waiting after confirming the ETH amount field contains 1
+      · assert: The stake screen shows an exchange rate between ETH and stETH of about 1 to 1.
+      · assert: The stake screen shows a reward rate or APR as a percentage.
+      · assert: The page makes clear that staking here happens on Ethereum.
+      → ✅ passed: Confirmed the displayed rate was 1 ETH = 1 stETH.
+
+[4/6] No RPC API keys in network requests
+      → ✅ passed: None of the 54 recorded requests carries an RPC API key.
+
+[5/6] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 54 recorded requests goes to a testnet, staging or local endpoint.
+
+[6/6] Scripts only load from trusted hosts
+      → ✅ passed: All 26 scripts came from trusted hosts.
+
+✅ All 6 checks passed. Clear to ship.
+
+== job "fix": skipped (no log: job skipped)

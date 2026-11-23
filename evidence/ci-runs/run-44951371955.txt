@@ -1,0 +1,43 @@
+Run 44951371955 · DappSentinel · workflow_dispatch on main · failure · 2026-11-21T21:24:23Z
+https://github.com/Guzman0/DappSentinel/actions/runs/44951371955
+
+== job "gate (https://app.ens.domains)": failure
+🛡  DappSentinel: 5 checks against https://app.ens.domains (2 Kane runs)
+
+[1/5] No private keys or seed phrases in browser storage
+      · navigate: Navigate to https://app.ens.domains
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: the page does not show an error page
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after scrolling back up
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: While Kane used the page, the site saved 8 items in browser storage and none is a private key or seed phrase.
+
+[2/5] The site loads and Kane can browse it
+      · navigate: Navigate to https://app.ens.domains
+      · wait: PRIMARY: wait until the page has fully loaded
+      · analyze: the page fits in the window
+      · scroll: Scrolling down the page
+      · scroll: Scrolling back up
+      · wait: Waiting after returning to the top
+      · assert: the page shows its main content and not an error page
+      → ✅ passed: Confirmed that the page displayed its main content without an error.
+
+[3/5] No RPC API keys in network requests
+      → ✅ passed: None of the 134 recorded requests carries an RPC API key.
+
+[4/5] No testnet, staging or local endpoints in a mainnet build
+      → ✅ passed: None of the 134 recorded requests goes to a testnet, staging or local endpoint.
+
+[5/5] Scripts only load from trusted hosts
+      ✖ https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092  (from static.cloudfl
+        first seen in Kane's recording as request 114 of 134, 0.2 s into Kane's run
+      ✖ https://widget.intercom.io/widget/re9q5yti  (from widget.intercom.io)
+        first seen in Kane's recording as request 124 of 134, 0.9 s into Kane's run
+        Watch Kane's run: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M8000VYFP4M5329CN0W1KQAA/dashboard/share/US_3UNTVL2FT5RIWMVV9JKFMA021ABF13XV1GBGRPTR3X05O8OKILCFOYUFCY3J2UMI?type=summary&agentView=true&fqdn=summary-page
+      → ❌ failed: Kane's network recording shows 2 scripts loaded from 2 untrusted hosts.
+
+❌ 1 of 5 checks failed. Not safe to ship.
+
+== job "fix": skipped (no log: job skipped)

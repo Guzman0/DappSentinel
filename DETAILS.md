@@ -1,6 +1,6 @@
 # DappSentinel: the full details
 
-The reference material from the [README](README.md), word for word: every table, run and honest note. The README keeps a short summary of each section, with a link here.
+The reference material from the [README](README.md), word for word: every table, run and honest note. Kane's output for every run linked here is kept in [`evidence/ci-runs/`](evidence/ci-runs/). The README keeps a short summary of each section, with a link here.
 
 - [Who catches what: Kane and DappSentinel](#who-catches-what-kane-and-dappsentinel)
 - [Why Kane CLI, and not Playwright plus a parser](#why-kane-cli-and-not-playwright-plus-a-parser)
