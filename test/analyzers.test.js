@@ -112,3 +112,18 @@ assert.strictEqual(a.valueMatches(undefined, "0.5"), null);
 assert.strictEqual(a.valueMatches("", "0.5"), null);
 assert.strictEqual(a.valueMatches("Ethereum mainnet", "ethereum"), true);
 console.log("✅ exact value tests passed");
+
+// Kane's own triage, read from real failure.yaml files Kane wrote in mutation test run 45174082470.
+{
+  const { yamlField } = require("../lib/evidence");
+  const fs = require("fs");
+  const m3 = fs.readFileSync(path.join(__dirname, "fixtures", "kane-failure-m3.yaml"), "utf8");
+  const m7 = fs.readFileSync(path.join(__dirname, "fixtures", "kane-failure-m7.yaml"), "utf8");
+  const tri = (t) => t.slice(t.indexOf("triage:"));
+  assert.strictEqual(yamlField(m3, "title"), "USDC address assertion uses unresolved placeholder");
+  assert.strictEqual(yamlField(tri(m3), "category"), "automation_bug/config_issue");
+  assert.strictEqual(yamlField(tri(m7), "category"), "application_issue/ui_data_defect");
+  assert.ok(yamlField(tri(m7), "root_cause").startsWith("The confirmation screen is displaying the payment amount"));
+  assert.strictEqual(Number(yamlField(tri(m7), "confidence")), 0.99);
+  console.log("✅ Kane triage tests passed");
+}

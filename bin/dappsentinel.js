@@ -18,7 +18,7 @@ const path = require("path");
 const http = require("http");
 const crypto = require("crypto");
 const analyzers = require("../lib/analyzers");
-const { readEvidence } = require("../lib/evidence");
+const { readEvidence, readTriage } = require("../lib/evidence");
 const { startWatchedChrome } = require("../lib/browser-watch");
 const { tamperCheck } = require("../lib/integrity");
 
@@ -315,6 +315,12 @@ function writeReport(results, meta, config = {}) {
       lines.push(`### ❌ ${r.name} (\`${r.id}\`)`);
       lines.push("");
       if (r.summary) lines.push(`**${r.kind === "assert" ? "Kane says" : "Finding"}:** ${r.summary}`);
+      if (r.kaneTriage && (r.kaneTriage.title || r.kaneTriage.rootCause)) {
+        const k = r.kaneTriage;
+        const blamesTest = /automation|test|config|flak|environment/i.test(k.category || "");
+        lines.push(`\n**Kane's diagnosis** (Kane's own triage, shown as its opinion; it doesn't change the verdict): ${k.title ? `_${k.title}._ ` : ""}${k.rootCause || ""}${k.category ? ` Category: \`${k.category}\`` : ""}${k.confidence ? `, ${Math.round(k.confidence * 100)}% confident` : ""}.`);
+        if (blamesTest) lines.push(`\n_Kane's triage blames the test here, but the check failed on what the page showed. Look at the site first: in our mutation test, Kane's triage blamed the test when the site really had a swapped digit._`);
+      }
       if (r.kane) lines.push(`\n**Kane's own DevTools verdict:** ${r.kane.status === "passed" ? "✅ passed" : r.kane.status === "failed" ? "❌ failed" : "⚠️ inconclusive"}${r.kane.remark ? `: ${r.kane.remark}` : ""}${r.kane.testUrl ? ` ([Kane's run](${r.kane.testUrl}))` : ""}\n\n_${r.agreement}_`);
       if (r.findings && r.findings.length) {
         lines.push("");
@@ -510,6 +516,16 @@ async function cmdCheck(args) {
       objective,
     };
     const res = byId[c.id];
+    // Kane's own triage of a failed run (its diagnosis, category and confidence). Shown in the
+    // report as Kane's opinion; it never changes the verdict.
+    if (c.kind === "assert" && res.status !== "passed") {
+      try {
+        const t = readTriage(res.sessionDir);
+        if (t) res.kaneTriage = t[0];
+      } catch {
+        /* no triage in this pack */
+      }
+    }
     console.log(`      → ${res.status === "passed" ? "✅ passed" : res.status === "error" ? "⚠️  error" : "❌ failed"}${res.summary ? ": " + keyLine(res.summary).slice(0, 200) : ""}\n`);
   }
 
