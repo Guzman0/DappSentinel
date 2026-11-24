@@ -1,0 +1,13 @@
+generated: 2026-11-24T11:06:15.681Z
+totals:
+  failures: 1
+  triaged: 1
+  untriaged: 0
+failures:
+  - test: go-to-http-localhost-4173-and-let-the-pa-c0c706b3
+    ordinal: 4
+    step: 0-4
+    status: broken
+    path: tests/go-to-http-localhost-4173-and-let-the-pa-c0c706b3/steps/4-0-4/failure.yaml
+    title: USDC address assertion resolves to an unreplaced placeholder
+    triage_status: triaged

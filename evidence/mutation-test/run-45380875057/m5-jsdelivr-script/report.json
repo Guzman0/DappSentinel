@@ -1,0 +1,313 @@
+{
+  "url": "http://localhost:4173",
+  "siteDir": ".mutants/m5-jsdelivr-script",
+  "kaneVersion": "0.10.8",
+  "startedAt": "2026-11-24T11:11:03.314Z",
+  "finishedAt": "2026-11-24T11:15:34.631Z",
+  "siteHash": "effd07ff3d1d3eef66da274b542cf1aef596c429de28c088742464f8bc8c0f9c",
+  "results": [
+    {
+      "id": "rpc-key-leak",
+      "name": "No RPC API keys in network requests",
+      "severity": "critical",
+      "kind": "network",
+      "status": "passed",
+      "summary": "None of the 6 recorded requests carries an RPC API key.",
+      "reason": "",
+      "findings": [],
+      "trace": [],
+      "source": "network log (HAR) Kane CLI recorded during the \"swap-flow\" run",
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M4GTFC300FQ7WJJ55RNJD/dashboard/share/US_SP9K3Q26GZ0MXEA2M54SHB34XR48XVV9HAZCQXVXZ1ZWQQFQRBTBM7J43S80VKQF?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/e551df7a-e6bd-4b59-98a5-c4d3f4c3c058/evidence/6da0f36f-1eef-4543-b1d7-8c68fdaf066a.evidence",
+      "fix": "Remove provider API keys from frontend code. Use a keyless public RPC for read calls, or route keyed calls through a server-side proxy. Treat any key that was shipped as leaked and rotate it.",
+      "kane": {
+        "status": "passed",
+        "rawStatus": "done",
+        "remark": "assert: no URL in {{page_requests}} contains an RPC provider API key, such as a long key",
+        "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M6RWPAX7W1CE6NMJRSDXK/dashboard/share/US_NQL3MF79ZEKRS3U76PNLFMH9Y2IQS18M6Z0AKS2OHYOAZUJFE2AL1ZJJ47YRHUUI?type=summary&agentView=true&fqdn=summary-page"
+      },
+      "agreement": "Kane and DappSentinel both passed it."
+    },
+    {
+      "id": "testnet-rpc",
+      "name": "No testnet, staging or local endpoints in a mainnet build",
+      "severity": "critical",
+      "kind": "network",
+      "status": "passed",
+      "summary": "None of the 6 recorded requests goes to a testnet, staging or local endpoint.",
+      "reason": "",
+      "findings": [],
+      "trace": [],
+      "source": "network log (HAR) Kane CLI recorded during the \"swap-flow\" run",
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M4GTFC300FQ7WJJ55RNJD/dashboard/share/US_SP9K3Q26GZ0MXEA2M54SHB34XR48XVV9HAZCQXVXZ1ZWQQFQRBTBM7J43S80VKQF?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/e551df7a-e6bd-4b59-98a5-c4d3f4c3c058/evidence/6da0f36f-1eef-4543-b1d7-8c68fdaf066a.evidence",
+      "fix": "Point every RPC and API call at production endpoints for Ethereum (chain ID 1). Load endpoints from one config per environment so testnet URLs cannot ship to production.",
+      "kane": {
+        "status": "passed",
+        "rawStatus": "done",
+        "remark": "assert: no URL in {{page_requests}} goes to a testnet, staging or local endpoint, meanin",
+        "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M6RWPAX7W1CE6NMJRSDXK/dashboard/share/US_NQL3MF79ZEKRS3U76PNLFMH9Y2IQS18M6Z0AKS2OHYOAZUJFE2AL1ZJJ47YRHUUI?type=summary&agentView=true&fqdn=summary-page"
+      },
+      "agreement": "Kane and DappSentinel both passed it."
+    },
+    {
+      "id": "contract-address",
+      "name": "Displayed contract addresses match the expected ones",
+      "exactCheck": null,
+      "walletCheck": null,
+      "severity": "critical",
+      "kind": "assert",
+      "status": "passed",
+      "exitCode": 0,
+      "summary": "Let the page load and checked the USDC contract address displayed on it.\nThe displayed address exactly matched 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.",
+      "reason": "Objective completed",
+      "findings": [],
+      "source": "Kane CLI assertion in a real browser",
+      "finalState": {
+        "usdc_contract_address_check": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      },
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M14QZ7QPXD5MP8HM7628K/dashboard/share/US_2JXKJK4Y5LX3IQTF350WPKM6RJO24KHNIB9ZKGSAUWEQRLSWWG8M8F0QKPZO801T?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/9d9bb7ce-1699-41d9-995e-938be374f080",
+      "credits": 5.329249999999999,
+      "steps": [
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://localhost:4173"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait 1500 ms for the page to fully load"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'the USDC contract address shown on the page is exactly "
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4"
+        }
+      ],
+      "fix": "Use the exact expected contract address for each token, from one verified source of truth. A single wrong character sends users to a different contract.",
+      "objective": "Go to http://localhost:4173 and let the page fully load. Assert: the USDC contract address shown on the page is exactly 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48. Compare every character; letter case does not matter."
+    },
+    {
+      "id": "chain-id",
+      "name": "The app targets the right chain",
+      "exactCheck": null,
+      "walletCheck": null,
+      "severity": "high",
+      "kind": "assert",
+      "status": "passed",
+      "exitCode": 0,
+      "summary": "Waited for the page to finish loading.\nConfirmed that the network badge at the top of the page showed Ethereum with chain ID 1.\nThe requested page check completed successfully.",
+      "reason": "Objective completed",
+      "findings": [],
+      "source": "Kane CLI assertion in a real browser",
+      "finalState": {
+        "network_badge_chain_id_check": "1",
+        "network_badge_network_name_check": "Ethereum"
+      },
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M258B2BNT43X50RDM56HW/dashboard/share/US_EATDSN82NDQKRD8JHAZU3W49XKHXX2FELEYQW04SE936QTRY5JFZ13ZVJ552KWFC?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/e0555659-3713-415a-9817-eccfc3055faf",
+      "credits": 6.845980000000001,
+      "steps": [
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://localhost:4173"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait until the page has fully loaded"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'the network badge at the top of the page shows the netw"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "assert: the network badge at the top of the page shows chain ID exactly 1 and the networ"
+        }
+      ],
+      "fix": "Set the chain ID to 1 (Ethereum) in the app config, and make the network badge read it from that single config.",
+      "objective": "Go to http://localhost:4173 and wait until the page has fully loaded. Assert: the network badge at the top of the page shows chain ID exactly 1 and the network name Ethereum."
+    },
+    {
+      "id": "unknown-scripts",
+      "name": "Scripts only load from trusted hosts",
+      "severity": "critical",
+      "kind": "network",
+      "status": "failed",
+      "summary": "Kane's network recording shows 1 script loaded from 1 untrusted host.",
+      "reason": "",
+      "findings": [
+        "https://cdn.jsdelivr.net/npm/dayjs@1.11.13/dayjs.min.js  (from cdn.jsdelivr.net)"
+      ],
+      "trace": [
+        "first seen in Kane's recording as request 3 of 6"
+      ],
+      "source": "network log (HAR) Kane CLI recorded during the \"swap-flow\" run",
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M4GTFC300FQ7WJJ55RNJD/dashboard/share/US_SP9K3Q26GZ0MXEA2M54SHB34XR48XVV9HAZCQXVXZ1ZWQQFQRBTBM7J43S80VKQF?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/e551df7a-e6bd-4b59-98a5-c4d3f4c3c058/evidence/6da0f36f-1eef-4543-b1d7-8c68fdaf066a.evidence",
+      "fix": "Remove scripts loaded from third-party CDNs, or bundle them with the app. Every script that runs on a dApp page can read and change what the user signs, so drainers are often injected this way.",
+      "kane": {
+        "status": "failed",
+        "rawStatus": "failed",
+        "remark": "assert: every entry in {{page_requests}} with resource type script was loaded from one o",
+        "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M6RWPAX7W1CE6NMJRSDXK/dashboard/share/US_NQL3MF79ZEKRS3U76PNLFMH9Y2IQS18M6Z0AKS2OHYOAZUJFE2AL1ZJJ47YRHUUI?type=summary&agentView=true&fqdn=summary-page"
+      },
+      "agreement": "Kane and DappSentinel both found it."
+    },
+    {
+      "id": "storage-secrets",
+      "name": "No private keys or seed phrases in browser storage",
+      "exactCheck": null,
+      "walletCheck": null,
+      "severity": "critical",
+      "kind": "storage",
+      "status": "passed",
+      "exitCode": 0,
+      "summary": "While Kane used the page, the site saved 1 item in browser storage and none is a private key or seed phrase.",
+      "reason": "",
+      "findings": [],
+      "source": "browser storage, watched live over the Chrome DevTools Protocol in the Chrome that Kane CLI drove",
+      "finalState": {
+        "you_receive_amount_check": "3140.55"
+      },
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M3CYTYFW3SCHGW5V1V0CD/dashboard/share/US_CCFGRVLCRDGAHDBURH72YAKQ6LDCHVD63MV1MYRJW9M4RQTS1OUHYV8UQWRVWOQS?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/fc1ee7e4-3d64-4b9e-b45c-4e37f33b42a5",
+      "credits": 5.3060599999999996,
+      "steps": [
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://localhost:4173"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait 1000 ms for the page to fully load"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Typing 1 into the You pay amount field"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "analyze: The You receive field shows a number greater than 0."
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "assert: the You receive field shows a number greater than 0."
+        }
+      ],
+      "fix": "Never store private keys, seed phrases or signing secrets in localStorage or sessionStorage. Any script on the page can read them. Keep only public data, such as the wallet address, and leave signing to the wallet.",
+      "objective": "Go to http://localhost:4173 and let the page fully load. Type 1 into the You pay amount field. Assert: the You receive field shows a number greater than 0.",
+      "kane": {
+        "status": "passed",
+        "rawStatus": "done",
+        "remark": "assert: No localStorage value is a private key (64 hexadecimal characters, with or witho",
+        "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M8A1K86KH3XAX6RWGBT0Q/dashboard/share/US_KOTCK7RRIQSJZF5E83G1UABHKXGP166JBMKBRF3FPMLZCJVZJ01Q7Z65HQ0DK4OE?type=summary&agentView=true&fqdn=summary-page"
+      },
+      "agreement": "Kane and DappSentinel both passed it."
+    },
+    {
+      "id": "swap-flow",
+      "name": "The swap flow works end to end",
+      "exactCheck": null,
+      "walletCheck": {
+        "status": "passed",
+        "summary": "The site asked the wallet to sign 1 transaction, and each one matches what Kane saw: a trusted contract, and the amount on the screen.",
+        "findings": [],
+        "transactions": 1
+      },
+      "severity": "high",
+      "kind": "assert",
+      "status": "passed",
+      "exitCode": 0,
+      "summary": "Requested a swap for 0.5 ETH.\nEntered 0.5 in the payment field; the receive amount was 1570.28 and a fee was displayed.\nReviewed the swap confirmation, which showed “You pay 0.5 ETH.”\nConfirmed the swap successfully; the page displayed “Swap submitted.”",
+      "reason": "Objective completed",
+      "findings": [],
+      "source": "Kane CLI assertion in a real browser",
+      "finalState": {
+        "you_receive_amount_greater_than_0": "1570.28",
+        "fee_shown": "true",
+        "confirmation_you_pay_amount": "true",
+        "confirm_pay_amount": "0.5 ETH",
+        "swap_submitted_visible": "true"
+      },
+      "testUrl": "https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86M4GTFC300FQ7WJJ55RNJD/dashboard/share/US_SP9K3Q26GZ0MXEA2M54SHB34XR48XVV9HAZCQXVXZ1ZWQQFQRBTBM7J43S80VKQF?type=summary&agentView=true&fqdn=summary-page",
+      "sessionDir": "/home/runner/.testmuai/kaneai/sessions/e551df7a-e6bd-4b59-98a5-c4d3f4c3c058",
+      "credits": 28.3924875,
+      "steps": [
+        {
+          "step": 2,
+          "status": "done",
+          "remark": "navigate: Navigate to http://localhost:4173"
+        },
+        {
+          "step": 3,
+          "status": "done",
+          "remark": "wait: PRIMARY: wait until the page has fully loaded"
+        },
+        {
+          "step": 4,
+          "status": "done",
+          "remark": "type: Typing 0.5 into You pay amount field"
+        },
+        {
+          "step": 5,
+          "status": "done",
+          "remark": "analyze: a fee is shown"
+        },
+        {
+          "step": 6,
+          "status": "done",
+          "remark": "assert: the You receive field shows a number greater than 0 and a fee is shown"
+        },
+        {
+          "step": 7,
+          "status": "done",
+          "remark": "click: Clicking Review swap button"
+        },
+        {
+          "step": 8,
+          "status": "done",
+          "remark": "analyze: ANALYZE(textual_visual, 'Get the amount shown after You pay on the confirmation,"
+        },
+        {
+          "step": 9,
+          "status": "done",
+          "remark": "assert: the confirmation shows You pay 0.5 ETH"
+        },
+        {
+          "step": 10,
+          "status": "done",
+          "remark": "click: Clicking Confirm swap button"
+        },
+        {
+          "step": 11,
+          "status": "done",
+          "remark": "analyze: the text Swap submitted is visible"
+        },
+        {
+          "step": 12,
+          "status": "done",
+          "remark": "assert: the text Swap submitted is visible"
+        }
+      ],
+      "fix": "Make sure entering an amount shows a quote, Review swap opens the confirmation, and Confirm swap shows the success message. The transaction sent to the wallet must match the confirmation exactly: the same amount, sent only to your trusted swap contract, with no token approvals for addresses you don't trust.",
+      "objective": "Go to http://localhost:4173 and wait until the page has fully loaded. Type 0.5 into the You pay amount field. Assert: the You receive field shows a number greater than 0 and a fee is shown. Click Review swap. Store the amount shown after You pay on the confirmation, exactly as written, as confirm_pay_amount. Assert: the confirmation shows You pay 0.5 ETH. Check this before clicking anything else. Only after that check, click Confirm swap. Assert: the text Swap submitted is visible."
+    }
+  ]
+}
