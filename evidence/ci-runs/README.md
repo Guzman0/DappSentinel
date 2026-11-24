@@ -2,7 +2,7 @@
 
 GitHub keeps Actions logs for a limited time, and judges may not be able to open them. So every run the README and [DETAILS.md](../../DETAILS.md) link to has its DappSentinel output copied here: each step Kane took, Kane's verdict in its own words (the lines starting `→`), the findings, and the final result. Timestamps are removed and secrets are masked the same way as in every report; nothing else is changed.
 
-Runs with their own fuller records are elsewhere: [PR #5](../pr5-closed-loop/), [Spark](../realworld-spark/), [Polaris](../realworld-polaris/) and the [mutation test](../mutation-test/).
+Runs with their own fuller records are elsewhere: [PR #5](../pr5-closed-loop/), [PR #11](../pr11-wallet-loop/), [Spark](../realworld-spark/), [Polaris](../realworld-polaris/) and the [mutation test](../mutation-test/).
 
 | Date | What | Result | Record | On GitHub |
 |---|---|---|---|---|
@@ -54,5 +54,7 @@ Runs with their own fuller records are elsewhere: [PR #5](../pr5-closed-loop/), 
 | 2026-11-23 | Demo with the six mistakes: check of the corrected step counter (Kane's DevTools 4 of 4) | ❌ 6 of 7 checks failed. Not safe to ship. | [run-45210910500.txt](run-45210910500.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45210910500) |
 | 2026-11-23 | The published action `@v1.2.0` on Lido | ✅ All 5 checks passed. Clear to ship. | [run-45211403304.txt](run-45211403304.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45211403304) |
 | 2026-11-23 | Demo with the six mistakes, with the new wallet check in place | ❌ 6 of 7 checks failed. Not safe to ship. | [run-45273761009.txt](run-45273761009.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45273761009) |
+| 2026-11-24 | PR #11: the wallet check fails a transaction to an unknown address, Claude fixes it | ❌ 1 of 7 checks failed. Not safe to ship. | [record](../pr11-wallet-loop/1-kane-fails-1-of-7.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45381084717) |
+| 2026-11-24 | PR #11: Kane re-checks after Claude's fix | ✅ All 7 checks passed. Clear to ship. | [record](../pr11-wallet-loop/3-kane-passes-7-of-7.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45382098297) |
 
 The two handover comments, as posted on the pull requests: [PR #10](pr10-handover-comment.md) (Claude explains why a person must decide) and [PR #9](pr9-handover-comment.md) (3 rounds used).
