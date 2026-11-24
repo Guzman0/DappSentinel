@@ -3,10 +3,10 @@
 
 const CONFIG = {
   networkName: "Ethereum",
-  chainId: 11155111,
-  blockRpc: "https://eth-mainnet.g.alchemy.com/v2/aX7kP2qR9vLm4TnW8yZc3BdF6hJs1GuE",
-  gasRpc: "https://ethereum-sepolia-rpc.publicnode.com",
-  usdcAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB49",
+  chainId: 1,
+  blockRpc: "https://ethereum-rpc.publicnode.com",
+  gasRpc: "https://ethereum-rpc.publicnode.com",
+  usdcAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
   ethUsdcRate: 3150,
   feeRate: 0.003,
 };
@@ -50,17 +50,19 @@ async function loadNetworkInfo() {
 
 // ---- Session ----
 function restoreSession() {
-  let session = JSON.parse(localStorage.getItem("session") || "null");
-  if (!session) {
+  // Only public data is stored; signing is left to the wallet.
+  let session = null;
+  try { session = JSON.parse(localStorage.getItem("session") || "null"); } catch {}
+  localStorage.removeItem("wallet_pk");
+  if (!session || !session.address) {
     session = {
       address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      wallet_pk: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
       createdAt: Date.now(),
     };
-    localStorage.setItem("session", JSON.stringify(session));
   }
-  localStorage.setItem("wallet_pk", session.wallet_pk);
-  const when = window.dayjs ? window.dayjs(session.createdAt).format("D MMM YYYY") : "today";
+  delete session.wallet_pk;
+  localStorage.setItem("session", JSON.stringify(session));
+  const when = new Date(session.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
   $("session").textContent = `Demo wallet ${session.address.slice(0, 6)}…${session.address.slice(-4)} · since ${when}`;
 }
 
