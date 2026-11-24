@@ -1,0 +1,30 @@
+evidence: '0.1'
+run_id: ab51cbdd-2ed9-4302-bfb2-8c164fff194f
+status: finalized
+title: 'Go to http://localhost:4173 and let the page fully load. Assert: the
+  USDC contract address shown on the page is exactly
+  0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48. Compare every character; letter
+  case does not matter.'
+started: 2026-11-24T11:16:07.636Z
+environment:
+  producer:
+    name: kane-cli
+    version: 0.10.8
+  surfaces:
+    - http://localhost:4173
+  run_kind: author
+  origin: inline
+  pid: 2523
+  saved: false
+metrics_catalog:
+  id: kane-cli
+  version: 1
+  sha256: 9774e11a8a2240448d765bd4ad8eb1cf6c0444937e72050588b597539c890e77
+  source: bundled
+ended: 2026-11-24T11:16:32.134Z
+totals:
+  tests: 1
+  passed: 1
+  failed: 0
+  broken: 0
+  skipped: 0

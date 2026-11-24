@@ -40,6 +40,7 @@ The swap check now also compares the transaction the site asks the wallet to sig
 | Run | Kane CLI | Variants | Result |
 |---|---|---|---|
 | [45273765898](https://github.com/Guzman0/DappSentinel/actions/runs/45273765898) | 0.10.8 | clean, m1, m7, m8, m9, m10 | 6 of 6 correct. Record: [`run-45273765898/`](run-45273765898/) |
+| [45380875057](https://github.com/Guzman0/DappSentinel/actions/runs/45380875057) | 0.10.8 | all 11 | **11 of 11 correct.** Record: [`run-45380875057/`](run-45380875057/) (screenshots kept for m8 to m10's swap) |
 | [45275948500](https://github.com/Guzman0/DappSentinel/actions/runs/45275948500) | 0.10.8 | all 11 | Not counted: the account ran out of Kane credits halfway, so 6 copies never ran. Before that, clean, m1, m2, m3 and m7 were judged correctly. DappSentinel now stops with a clear message when credits run out, instead of failing every check |
 
 In m8, m9 and m10, Kane passed the swap on its own, because the screen was right; the wallet check failed each one. The summary table of a run lists every variant, so a run of 6 shows the other 5 as "did not run".

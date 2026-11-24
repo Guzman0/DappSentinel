@@ -10,7 +10,7 @@
 > - **The loop:** Kane catches it → Claude Code fixes it → Kane checks again, until every check passes. The agent can't edit the checks to cheat, and after 3 rounds, or when only a person can decide, it hands over.
 > - **Kane makes the call on all 7 checks**, with DevTools assertions for the hidden ones. An exact check runs behind it for what Kane's DevTools can't see ([what it checks](#what-dappsentinel-checks)).
 > - **What you see is what you sign:** a harmless test wallet in the page records the transaction the site asks the user to sign. It must match what Kane read on the screen and go only to contracts you trust ([how](#what-you-see-is-what-you-sign)).
-> - **Real bugs in code we didn't write:** [Polaris #118](#real-world-loop-2-a-bug-reported-on-polariss-issue-tracker) and [Spark](#real-world-loop-a-bug-in-code-we-didnt-write). Plus a [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for), 8 of 8 on four runs, and [11 live dApps](#real-world-runs). And a bug in Kane CLI itself, [confirmed by the Kane team](https://github.com/LambdaTest/kane-cli/issues/239#issuecomment-7098306114).
+> - **Real bugs in code we didn't write:** [Polaris #118](#real-world-loop-2-a-bug-reported-on-polariss-issue-tracker) and [Spark](#real-world-loop-a-bug-in-code-we-didnt-write). Plus a [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for): 8 of 8 on four runs, then 11 of 11 with three wallet mistakes added, and [11 live dApps](#real-world-runs). And a bug in Kane CLI itself, [confirmed by the Kane team](https://github.com/LambdaTest/kane-cli/issues/239#issuecomment-7098306114).
 > - **Install:** `uses: Guzman0/DappSentinel@v1.2.0` or `npm i -g github:Guzman0/DappSentinel` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U) · **Every Kane run:** [session viewer](https://dappsentinel.netlify.app/dashboard/)
 
 [![Watch the DappSentinel demo video (3:59)](assets/video-thumb.jpg)](https://youtu.be/FiErWhY495U)
@@ -136,7 +136,7 @@ While Kane uses the swap, DappSentinel puts a harmless **test wallet** into the 
 - sends exactly the amount Kane read on the confirmation screen, and
 - doesn't let an untrusted address spend the user's tokens (an `approve` or `setApprovalForAll` to a stranger is the classic drainer).
 
-**Proven on three new mistakes where the screen looks right** ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45273765898), Kane CLI 0.10.8). Kane completed and passed all three swaps, because the screen was fine. The wallet check failed each one:
+**Proven on three new mistakes where the screen looks right** (Kane CLI 0.10.8: [run 5](https://github.com/Guzman0/DappSentinel/actions/runs/45273765898), and [run 6](https://github.com/Guzman0/DappSentinel/actions/runs/45380875057) with all 11 copies, 11 of 11). Kane completed and passed all three swaps, because the screen was fine. The wallet check failed each one:
 
 | Planted mistake | What DappSentinel reported |
 |---|---|
@@ -339,7 +339,7 @@ Two of the swap-flow runs from mutation test run 4, played back from Kane's own 
 </tr>
 </table>
 
-**Run 5** (23 Nov, Kane CLI 0.10.8) added three wallet mistakes and re-ran the clean site, `m1` and `m7` with the wallet check in place: 6 of 6 correct ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45273765898); see [what you see is what you sign](#what-you-see-is-what-you-sign)). A second, full run stopped halfway when the account ran out of Kane credits; it isn't counted.
+**Runs 5 and 6** (23 and 24 Nov, Kane CLI 0.10.8) added three wallet mistakes, `m8` to `m10` ([what you see is what you sign](#what-you-see-is-what-you-sign)). Run 5 checked six copies: 6 of 6 correct ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45273765898)). Run 6 checked all eleven: **11 of 11 correct** ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45380875057), [record](evidence/mutation-test/run-45380875057/)). One run in between stopped halfway when the account ran out of Kane credits; it isn't counted.
 
 **On Kane CLI 0.10.8**, Kane once passed the wrong-amount copy while reading 0.05 ETH: that's [issue #239, confirmed by the Kane team](#confirmed-outside-this-repo). A pass now only stands if the amount Kane stored is exactly 0.5.
 
