@@ -56,5 +56,6 @@ Runs with their own fuller records are elsewhere: [PR #5](../pr5-closed-loop/), 
 | 2026-11-23 | Demo with the six mistakes, with the new wallet check in place | ❌ 6 of 7 checks failed. Not safe to ship. | [run-45273761009.txt](run-45273761009.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45273761009) |
 | 2026-11-24 | PR #11: the wallet check fails a transaction to an unknown address, Claude fixes it | ❌ 1 of 7 checks failed. Not safe to ship. | [record](../pr11-wallet-loop/1-kane-fails-1-of-7.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45381084717) |
 | 2026-11-24 | PR #11: Kane re-checks after Claude's fix | ✅ All 7 checks passed. Clear to ship. | [record](../pr11-wallet-loop/3-kane-passes-7-of-7.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45382098297) |
+| 2026-11-24 | The published action `@v1.3.0` on Lido | ✅ All 5 checks passed. Clear to ship. | [run-45405975163.txt](run-45405975163.txt) | [run](https://github.com/Guzman0/DappSentinel/actions/runs/45405975163) |
 
 The two handover comments, as posted on the pull requests: [PR #10](pr10-handover-comment.md) (Claude explains why a person must decide) and [PR #9](pr9-handover-comment.md) (3 rounds used).
