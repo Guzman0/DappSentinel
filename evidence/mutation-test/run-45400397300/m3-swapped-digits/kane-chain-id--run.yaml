@@ -1,0 +1,29 @@
+evidence: '0.1'
+run_id: 19e54d1c-fc1b-4184-97d5-9612ea2a9f0a
+status: finalized
+title: 'Go to http://localhost:4173 and wait until the page has fully loaded.
+  Assert: the network badge at the top of the page shows chain ID exactly 1 and
+  the network name Ethereum.'
+started: 2026-11-24T13:09:58.256Z
+environment:
+  producer:
+    name: kane-cli
+    version: 0.10.9
+  surfaces:
+    - http://localhost:4173
+  run_kind: author
+  origin: inline
+  pid: 2790
+  saved: false
+metrics_catalog:
+  id: kane-cli
+  version: 1
+  sha256: 9774e11a8a2240448d765bd4ad8eb1cf6c0444937e72050588b597539c890e77
+  source: bundled
+ended: 2026-11-24T13:10:33.122Z
+totals:
+  tests: 1
+  passed: 1
+  failed: 0
+  broken: 0
+  skipped: 0

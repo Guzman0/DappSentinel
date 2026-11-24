@@ -339,7 +339,7 @@ Two of the swap-flow runs from mutation test run 4, played back from Kane's own 
 </tr>
 </table>
 
-**Runs 5 and 6** (23 and 24 Nov, Kane CLI 0.10.8) added three wallet mistakes, `m8` to `m10` ([what you see is what you sign](#what-you-see-is-what-you-sign)). Run 5 checked six copies: 6 of 6 correct ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45273765898)). Run 6 checked all eleven: **11 of 11 correct** ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45380875057), [record](evidence/mutation-test/run-45380875057/)). One run in between stopped halfway when the account ran out of Kane credits; it isn't counted.
+**Runs 5 and 6** (23 and 24 Nov, Kane CLI 0.10.8) added three wallet mistakes, `m8` to `m10` ([what you see is what you sign](#what-you-see-is-what-you-sign)). Run 5 checked six copies: 6 of 6 correct ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45273765898)). Run 6 checked all eleven: **11 of 11 correct** ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45380875057), [record](evidence/mutation-test/run-45380875057/)). One run in between stopped halfway when the account ran out of Kane credits; it isn't counted. **Run 7**, on Kane CLI 0.10.9 (released 24 Nov), checked all eleven again: **11 of 11 correct** ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45400397300), [record](evidence/mutation-test/run-45400397300/)).
 
 **On Kane CLI 0.10.8**, Kane once passed the wrong-amount copy while reading 0.05 ETH: that's [issue #239, confirmed by the Kane team](#confirmed-outside-this-repo). A pass now only stands if the amount Kane stored is exactly 0.5.
 
@@ -374,7 +374,7 @@ For what DappSentinel collects, masks and uploads, see [SECURITY.md](SECURITY.md
 What building DappSentinel taught us about Kane CLI 0.10.7 and 0.10.8. The top three:
 
 - **A pass can contradict Kane's own reading** on 0.10.8: [#239, confirmed by the Kane team](#confirmed-outside-this-repo).
-- **Kane's triage can blame the test when the app is wrong.** On the swapped-address copy, Kane failed the check correctly, but its triage called it a test configuration bug, 98% confident, on three runs ([record](evidence/mutation-test/run-45175229208/m3-swapped-digits/)). Reported as [LambdaTest/kane-cli#245](https://github.com/LambdaTest/kane-cli/issues/245). DappSentinel shows Kane's diagnosis labelled as Kane's opinion, warns when it blames the test, and never lets it change the verdict.
+- **Kane's triage can blame the test when the app is wrong.** On the swapped-address copy, Kane failed the check correctly, but its triage called it a test configuration bug, 98% confident, on three runs ([record](evidence/mutation-test/run-45175229208/m3-swapped-digits/)). Reported as [LambdaTest/kane-cli#245](https://github.com/LambdaTest/kane-cli/issues/245); it still happens on 0.10.9 ([record](evidence/mutation-test/run-45400397300/m3-swapped-digits/)). DappSentinel shows Kane's diagnosis labelled as Kane's opinion, warns when it blames the test, and never lets it change the verdict.
 - **Network capture resets at every step, and DevTools can't read sessionStorage.** DappSentinel stores the page's requests in the step that reloads it, and watches sessionStorage itself.
 
 [All 9 findings, each with its run](DETAILS.md#findings-for-the-kane-cli-team).

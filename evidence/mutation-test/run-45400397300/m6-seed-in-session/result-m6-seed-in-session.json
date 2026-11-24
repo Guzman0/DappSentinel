@@ -1,0 +1,12 @@
+{
+  "id": "m6-seed-in-session",
+  "mistake": "A seed phrase saved in sessionStorage under a harmless-looking name (the demo puts a private key in localStorage)",
+  "expect": [
+    "storage-secrets"
+  ],
+  "failed": [
+    "storage-secrets"
+  ],
+  "unsure": [],
+  "verdict": "correct"
+}

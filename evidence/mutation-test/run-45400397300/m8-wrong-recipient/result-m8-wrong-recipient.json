@@ -1,0 +1,12 @@
+{
+  "id": "m8-wrong-recipient",
+  "mistake": "The swap is sent to an unknown address instead of the swap router; the screen still looks right",
+  "expect": [
+    "swap-flow"
+  ],
+  "failed": [
+    "swap-flow"
+  ],
+  "unsure": [],
+  "verdict": "correct"
+}
