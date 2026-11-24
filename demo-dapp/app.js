@@ -148,7 +148,7 @@ async function sendSwap() {
     method: "eth_sendTransaction",
     params: [{
       from,
-      to: "0x9F2c4b7A1e3D5f8C0a6B2d4E7f1A3c5B8d0E2f4A",
+      to: SWAP_ROUTER,
       value: toWeiHex(quote.pay),
       data: "0x",
     }],
