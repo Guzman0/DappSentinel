@@ -1,0 +1,12 @@
+{
+  "id": "m9-hidden-amount",
+  "mistake": "The confirmation shows 0.5 ETH, but the transaction sends ten times that",
+  "expect": [
+    "swap-flow"
+  ],
+  "failed": [
+    "swap-flow"
+  ],
+  "unsure": [],
+  "verdict": "correct"
+}

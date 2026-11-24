@@ -1,0 +1,50 @@
+evidence: '0.1'
+test: go-to-http-localhost-4173-and-let-the-pa-aa23cabf
+status: passed
+duration_ms: 24414
+external_id:
+  session_id: 2cf45ea7-e730-4720-b353-c31cf5ce9a9d
+  commit_id: 2cf45ea7-e730-4720-b353-c31cf5ce9a9d
+  test_id: c1d05f33-6691-46c9-8653-130c1c40fbdb
+  testcase_id: 01M86V31Y0G7TXXF7M8RK1H3B6
+  project_id: 01M7R0YTPWWNWG8JS3JMSCYY44
+  folder_id: 01M7R0YY3VCR3VZXAF8A8ZZET7
+  org_id: '3439849'
+  user_name: oguziechiagozie
+  user_email: oguziechiagozie@gmail.com
+  sharable_link: https://test-manager.lambdatest.com/projects/01M7R0YTPWWNWG8JS3JMSCYY44/test-cases/01M86V31Y0G7TXXF7M8RK1H3B6/dashboard/share/US_DV3EUJ0YEOWPBX7MXKH1VD3NK8PKBR8L6ZJYDWECDCHF9YFGCEIHMMMS8P8GFALB?type=summary&agentView=true&fqdn=summary-page
+  execution_id: af27536d-8d6b-4817-b861-c80ab0cc6a16
+environment:
+  model: v16-alpha
+  os: Linux
+  browser: Chrome
+  browser_version: '158'
+  resolution: 1920x1080
+  platform: Desktop
+  platform_type: web
+  os_version: 7.0.0-1016-aws
+steps:
+  - id: 0-1
+    ordinal: 1
+    status: passed
+    kind: navigate
+    duration_ms: 0
+    action_id: a1bebb20-dbb6-4e77-91ed-b445c8de28de
+  - id: 0-2
+    ordinal: 2
+    status: passed
+    kind: wait
+    duration_ms: 4400
+    action_id: 7d2424fc-a1ce-4e5c-a7b2-a015d3979674
+  - id: 0-3
+    ordinal: 3
+    status: passed
+    kind: analyze
+    duration_ms: 7200
+    action_id: d7d2c80f-e02a-4d03-91e1-44884855c664
+  - id: 0-4
+    ordinal: 4
+    status: passed
+    kind: assert
+    duration_ms: 0
+    action_id: 405b123f-5aab-4ab9-bf7c-6ea2a682a98a

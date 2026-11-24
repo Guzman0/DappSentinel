@@ -1,0 +1,34 @@
+step: 0-8
+status: failed
+error:
+  message: 'Checkpoint assertion failed: "the confirmation shows You pay 0.5 ETH"'
+page_state:
+  url: http://localhost:4173/
+  screenshot: steps/8-0-8/screenshot.jpg
+console_at_failure:
+  ref: logs/0-console.ndjson
+  step: 0-8
+network_at_failure:
+  ref: logs/0-network.har
+  step: 0-8
+title: Swap confirmation shifts ETH payment decimal place
+triage:
+  status: triaged
+  by:
+    kind: agent
+    id: v16-investigation/terminal
+    at: '2026-11-24T13:18:27.887611+00:00'
+  rca:
+    root_cause: The confirmation screen is showing the payment amount with the decimal
+      point in the wrong place. The quote before review showed 0.5 ETH, but the confirmation
+      showed 0.05 ETH.
+    category: application_issue/ui_data_defect
+    confidence: 0.99
+  verification:
+    status: not_verified
+  severity: major
+  suggested_fix:
+    summary: Fix the confirmation amount formatting or amount conversion so it carries
+      the entered 0.5 ETH value exactly, then add a test that compares the review
+      and confirmation payment amounts.
+  known_bug_id: BUG-8
