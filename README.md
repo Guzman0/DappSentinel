@@ -60,11 +60,13 @@ No install at all: open the [live demo dApp](https://sentinelswap-demo.netlify.a
 - [Real-world runs](#real-world-runs)
 - [Track record](#track-record)
 - [What DappSentinel doesn't do](#what-dappsentinel-doesnt-do)
+- [What's next](#whats-next)
 - [Findings for the Kane CLI team](#findings-for-the-kane-cli-team)
 - [Repository layout](#repository-layout)
 - [Built with](#built-with)
 - [Notes](#notes)
 - [Full details (DETAILS.md)](DETAILS.md)
+- [Roadmap (ROADMAP.md)](ROADMAP.md)
 
 ## For judges
 
@@ -368,6 +370,16 @@ For what DappSentinel collects, masks and uploads, see [SECURITY.md](SECURITY.md
 - **It can't catch every frontend compromise.** It sees what the browser does while Kane uses the page, and the transactions the site asks the test wallet to sign then. Malicious code that only wakes up for certain wallets or transactions, like the code in the Bybit attack, may stay quiet during a check.
 - **Some sites block automated browsers.** When Kane can't reach the real page, DappSentinel reports the network checks as inconclusive, never as clean.
 - **Testing on `localhost` can trip the testnet check.** It matches words like `localhost` anywhere in a request's address, including where a third-party widget sends the page's own address, as in [PR #10](https://github.com/Guzman0/DappSentinel/pull/10). Check a deployed preview to avoid it.
+
+## What's next
+
+The ideas that would make the biggest difference:
+
+- **Catch targeted attacks.** Let the test wallet use your own wallet address, so code that only wakes up for one target, as in the Bybit attack, shows itself during the check.
+- **Watch the live site, not only the release.** Run the check on a schedule and flag any script whose code changes after a known-good day, even from a trusted host.
+- **Use more of Kane CLI.** Kane's verdict policies for the final pass or fail, and locked regression tests with auto-healing off.
+
+The rest, from signature requests to more chains, is in [ROADMAP.md](ROADMAP.md).
 
 ## Findings for the Kane CLI team
 
