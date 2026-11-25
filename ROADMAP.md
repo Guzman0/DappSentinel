@@ -28,3 +28,4 @@ Everything we'd like DappSentinel to do after the hackathon. The [README](README
 
 - **Alerts** in Slack, Discord or email when a live check fails.
 - **A shareable safety report per release**: a page a team can link to, showing users what was checked and when.
+- **A lessons file for the fix loop.** After each fix, Claude writes down what it learned about the site (for example, "the USDC address must end in …3606eB48"), and reads that file before the next fix, so the loop gets better over time instead of starting fresh. It would only hold facts about the site, never anything about the checks or the rules, so the agent can't use it to talk itself into weakening them.
