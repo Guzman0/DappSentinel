@@ -57,7 +57,6 @@ No install at all: open the [live demo dApp](https://sentinelswap-demo.netlify.a
   - [Your own dApp, with Claude Code](#your-own-dapp-with-claude-code)
 - [Mutation test (known-answer): mistakes it was never tuned for](#mutation-test-known-answer-mistakes-it-was-never-tuned-for)
   - [What Kane saw (its own screenshots)](#what-kane-saw-its-own-screenshots)
-- [Real-world runs](#real-world-runs)
 - [Track record](#track-record)
 - [What DappSentinel doesn't do](#what-dappsentinel-doesnt-do)
 - [What's next](#whats-next)
@@ -348,15 +347,16 @@ Two of the swap-flow runs from mutation test run 4, played back from Kane's own 
 
 **Browse it** in the [session viewer](https://dappsentinel.netlify.app/dashboard/). Kane's screenshot of each mistake and the honest notes are in [the full write-up](DETAILS.md#mutation-test-known-answer-mistakes-it-was-never-tuned-for); every record is in [`evidence/mutation-test/`](evidence/mutation-test/).
 
-## Real-world runs
-
-The `live` profile on 11 live mainnet dApps on 20 and 21 Nov 2026, each a public run. Lido, Yearn and Curve passed 5 of 5 ([Lido](https://github.com/Guzman0/DappSentinel/actions/runs/44762327264)), and Kane also used Lido's stake screen and Aave's USDC market. Keyed Alchemy RPC URLs showed up on CoW Swap ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44762331502)) and Spark ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44952359583)). Most other flags were analytics, support-chat or bot-protection scripts that aren't on the allowlist. Balancer and Sushi stopped the automated browser, so they're reported inconclusive, never clean. Running on real sites also removed three false alarms. Kane's output for each is in [`evidence/ci-runs/`](evidence/ci-runs/). [Every dApp, with what Kane's recording showed](DETAILS.md#real-world-runs).
-
 ## Track record
 
-<a name="forensic-trail-the-loop-on-github-step-by-step"></a><a name="reproduce-it-yourself"></a>
-Every CI run so far, unfiltered: same input, same verdict. The broken demo failed 6 of 7 every time, the fixed demo passed 7 of 7, Claude's fixes on GitHub turned red into green both times, and Lido passed 5 of 5 on every run. Kane's output for each is in [`evidence/ci-runs/`](evidence/ci-runs/).
+<a name="real-world-runs"></a><a name="forensic-trail-the-loop-on-github-step-by-step"></a><a name="reproduce-it-yourself"></a>
+Every CI run so far, unfiltered: same input, same verdict. The broken demo failed 6 of 7 every time, the fixed demo passed 7 of 7, Claude's fixes on GitHub turned red into green both times, and Lido passed 5 of 5 on every run.
 
+**On 11 live mainnet dApps** (20 and 21 Nov 2026, each a public run), Lido, Yearn and Curve passed 5 of 5 ([Lido](https://github.com/Guzman0/DappSentinel/actions/runs/44762327264)), and Kane also used Lido's stake screen and Aave's USDC market. Keyed Alchemy RPC URLs showed up on CoW Swap ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44762331502)) and Spark ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44952359583)). Most other flags were analytics, support-chat or bot-protection scripts that aren't on the allowlist. Balancer and Sushi stopped the automated browser, so they're reported inconclusive, never clean. Running on real sites also removed three false alarms.
+
+Kane's output for every run is in [`evidence/ci-runs/`](evidence/ci-runs/).
+
+- [Every dApp, with what Kane's recording showed](DETAILS.md#real-world-runs)
 - [Every run, and the ones not counted and why](DETAILS.md#track-record)
 - [The loop on PR #7, step by step](DETAILS.md#forensic-trail-the-loop-on-github-step-by-step), each step with the job, commit or comment that proves it
 - [Reproduce it yourself](DETAILS.md#reproduce-it-yourself): 7 steps, each with what you should see and a public run where it already happened
