@@ -22,7 +22,7 @@ Everything we'd like DappSentinel to do after the hackathon. The [README](README
 - **More chains.** Solana, and EVM networks beyond Ethereum such as Base, Arbitrum and Polygon, each with its own RPC, explorer and wallet checks.
 - **Ready-made setups for common dApp kits**, such as wagmi, RainbowKit and Web3Modal, so a team is checking its site in minutes.
 - **More coding agents.** Cursor and Codex hooks, alongside Claude Code.
-- **Easier installs.** Publish on npm and the GitHub Marketplace.
+- **Easier installs.** List the action on the GitHub Marketplace (DappSentinel is already [on npm](https://www.npmjs.com/package/dappsentinel)).
 
 ## Make results easier to use
 

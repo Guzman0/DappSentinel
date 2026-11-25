@@ -11,7 +11,7 @@
 > - **Kane makes the call on all 7 checks**, with DevTools assertions for the hidden ones. An exact check runs behind it for what Kane's DevTools can't see ([what it checks](#what-dappsentinel-checks)).
 > - **What you see is what you sign:** a harmless test wallet in the page records the transaction the site asks the user to sign. It must match what Kane read on the screen and go only to contracts you trust ([how](#what-you-see-is-what-you-sign)).
 > - **Real bugs in code we didn't write:** [Polaris #118](#real-world-loop-2-a-bug-reported-on-polariss-issue-tracker) and [Spark](#real-world-loop-a-bug-in-code-we-didnt-write). Plus a [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for): 8 of 8 on four runs, then 11 of 11 with three wallet mistakes added, and [11 live dApps](#real-world-runs). And a bug in Kane CLI itself, [confirmed by the Kane team](https://github.com/LambdaTest/kane-cli/issues/239#issuecomment-7098306114).
-> - **Install:** `uses: Guzman0/DappSentinel@v1.3.0` or `npm i -g github:Guzman0/DappSentinel` · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U) · **Every Kane run:** [session viewer](https://dappsentinel.netlify.app/dashboard/)
+> - **Install:** `uses: Guzman0/DappSentinel@v1.3.0` or `npm i -g dappsentinel` ([npm](https://www.npmjs.com/package/dappsentinel)) · **Site:** [dappsentinel.netlify.app](https://dappsentinel.netlify.app) · **Video:** [3:59](https://youtu.be/FiErWhY495U) · **Every Kane run:** [session viewer](https://dappsentinel.netlify.app/dashboard/)
 
 [![Watch the DappSentinel demo video (3:59)](assets/video-thumb.jpg)](https://youtu.be/FiErWhY495U)
 
@@ -256,11 +256,11 @@ The fix loop never tries forever, and never quietly undoes what a developer mean
 You need Node.js 20+, Chrome, and Kane CLI signed in (`npm i -g @testmuai/kane-cli && kane-cli login`). No clone, no config:
 
 ```bash
-npm install -g github:Guzman0/DappSentinel
+npm install -g dappsentinel
 dappsentinel check --url https://stake.lido.fi
 ```
 
-It runs the 5 checks that need no inside knowledge of the site and writes `.sentinel/report.md`. This exact install, in an empty folder on a fresh GitHub runner, passed Lido 5 of 5 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44925440855)). Third-party scripts are flagged until you trust their hosts in `allowedScriptHosts`.
+It runs the 5 checks that need no inside knowledge of the site and writes `.sentinel/report.md`. DappSentinel is [on npm](https://www.npmjs.com/package/dappsentinel), published from this repo with provenance. This exact install, in an empty folder on a fresh GitHub runner, passed Lido 5 of 5 ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45644791206)). Third-party scripts are flagged until you trust their hosts in `allowedScriptHosts`.
 
 <a name="use-it-in-your-own-repo"></a><a name="run-it-in-ci"></a>
 ### In your repo, as a GitHub Action
