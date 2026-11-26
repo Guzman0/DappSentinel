@@ -4,6 +4,8 @@
 
 **The gate between your dApp and mainnet. Your dApp doesn't ship until Kane says it's safe.**
 
+The page said "Swap 0.5 ETH". Behind it, the site asked the wallet to send 5 ETH, send the money to a stranger, or hand over all the user's USDC. Looking at the page, nothing was wrong. DappSentinel caught all three, because it checks what the wallet is actually asked to sign. ([How](#what-you-see-is-what-you-sign))
+
 > [!TIP]
 > **TL;DR**
 > - **What:** a pre-launch gate for dApp websites. Kane CLI checks the site in a real browser for mistakes you can't see on screen: leaked RPC keys, testnet endpoints, wrong contracts, wrong chain, untrusted scripts, keys in storage.
