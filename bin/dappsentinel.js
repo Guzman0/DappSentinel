@@ -763,6 +763,7 @@ Usage
   dappsentinel check                               Check the site configured in ./sentinel.config.json
   dappsentinel check --config <dir|file>           Use another config (for example profiles/lido)
   dappsentinel list                                List the checks that would run
+  dappsentinel demo                                Replay real archived Kane runs (no account, no credits)
   dappsentinel serve                               Serve the configured site locally
 
 Options
@@ -776,7 +777,8 @@ Report: .sentinel/report.md   More: https://github.com/Guzman0/DappSentinel`;
 if (require.main === module) {
   if (args.help || cmd === "help") { console.log(HELP); process.exit(0); }
   if (cmd === "check") cmdCheck(args);
+  else if (cmd === "demo") require("../demo/replay.js")(process.argv.slice(3));
   else if (cmd === "serve") cmdServe(args);
   else if (cmd === "list") cmdList(args);
-  else die(`Unknown command "${cmd}". Use: check, serve or list.`);
+  else die(`Unknown command "${cmd}". Use: check, demo, serve or list.`);
 }

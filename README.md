@@ -19,7 +19,9 @@
 
 ## See it work
 
-On your machine, with [Node.js 20+](https://nodejs.org), Chrome and a free [TestMu AI](https://www.testmuai.com/kane-cli/) account:
+**Judges, start here, with no account and no credits:** `npx -y dappsentinel demo`. In about 10 seconds it replays real archived runs from this repo: Kane failing PR #5 6 of 7, Claude's fix, Kane passing 7 of 7; the wallet check catching a transaction to an unknown address in PR #11; and the mutation test, 11 of 11. Every line it prints is read from a file in [`evidence/`](evidence/), with the public CI run next to it.
+
+To run it live on your machine, with [Node.js 20+](https://nodejs.org), Chrome and a free [TestMu AI](https://www.testmuai.com/kane-cli/) account:
 
 ```bash
 npm install -g @testmuai/kane-cli && kane-cli login
@@ -80,7 +82,7 @@ Every judging rule, and where to see the proof. All of it is public; nothing nee
 | **Verified** (25%) | Polaris #118: caught, fixed as the issue asks, proven twice ([run](https://github.com/Guzman0/DappSentinel/actions/runs/45015619019)). Spark: caught, fixed, re-checked ([run](https://github.com/Guzman0/DappSentinel/actions/runs/44953030392)). The [mutation test](#mutation-test-known-answer-mistakes-it-was-never-tuned-for), with Kane's own screenshots, and [11 live dApps](#real-world-runs). A [wallet check](#what-you-see-is-what-you-sign) catches transactions that don't match the screen (3 of 3). It also found a bug in Kane CLI itself, [confirmed by the Kane team](https://github.com/LambdaTest/kane-cli/issues/239#issuecomment-7098306114) with a fix coming |
 | **Closed loop** (25%) | With no human: Kane fails PR #5 6 of 7, Claude fixes and pushes, the PR passes 7 of 7 ([Kane's output and the fix](evidence/pr5-closed-loop/), [forensic trail](DETAILS.md#forensic-trail-the-loop-on-github-step-by-step)). Max 3 rounds; when only a person can decide, Claude [hands over](#when-the-loop-gives-up-a-person-takes-over) ([PR #10](https://github.com/Guzman0/DappSentinel/pull/10#issuecomment-7081463817)). The same loop fixed a wallet transaction that didn't match the screen ([PR #11](https://github.com/Guzman0/DappSentinel/pull/11)). The agent [can't cheat](#the-agent-cant-cheat) ([PR #6](https://github.com/Guzman0/DappSentinel/pull/6)) |
 | **Craft** (25%) | Two commands from any folder, or one line in a workflow ([install and run](#install-and-run)). Keys masked in every report ([SECURITY.md](SECURITY.md)). Honest limits in [what DappSentinel doesn't do](#what-dappsentinel-doesnt-do) |
-| **No account, no credits** | Nothing here needs a TestMu login to check. `git clone https://github.com/Guzman0/DappSentinel && cd DappSentinel && npm install && npm test` runs the unit tests against Kane's real output, including the 0.10.8 miss and Kane's misjudged triage. Browse every Kane session in the [session viewer](https://dappsentinel.netlify.app/dashboard/), and read Kane's own output for every linked run in [`evidence/ci-runs/`](evidence/ci-runs/). PR #5, Spark, Polaris and each mutation-test variant have full records in [`evidence/`](evidence/) |
+| **No account, no credits** | Nothing here needs a TestMu login to check. `npx -y dappsentinel demo` replays the real archived runs in about 10 seconds. `git clone https://github.com/Guzman0/DappSentinel && cd DappSentinel && npm install && npm test` runs the unit tests against Kane's real output, including the 0.10.8 miss and Kane's misjudged triage. Browse every Kane session in the [session viewer](https://dappsentinel.netlify.app/dashboard/), and read Kane's own output for every linked run in [`evidence/ci-runs/`](evidence/ci-runs/). PR #5, Spark, Polaris and each mutation-test variant have full records in [`evidence/`](evidence/) |
 | **Dates** | First commit `ed622c0`, 18 Nov 2026, after the 12 Nov start |
 
 ## Confirmed outside this repo

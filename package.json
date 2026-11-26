@@ -1,6 +1,6 @@
 {
   "name": "dappsentinel",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "A pre-launch safety gate for dApp frontends. Kane CLI catches leaked RPC keys, testnet endpoints, wrong contract addresses, untrusted scripts and keys in storage, checks that what users see is what their wallet is asked to sign, and your coding agent fixes it before you ship.",
   "homepage": "https://github.com/Guzman0/DappSentinel#readme",
   "repository": {
@@ -20,7 +20,11 @@
     "checks/",
     "sentinel.config.json",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "demo/",
+    "evidence/pr5-closed-loop/",
+    "evidence/pr11-wallet-loop/",
+    "evidence/mutation-test/run-45400397300/mutation-results.md"
   ],
   "scripts": {
     "demo": "node bin/dappsentinel.js serve",
