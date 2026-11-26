@@ -4,7 +4,7 @@
 
 **The gate between your dApp and mainnet. Your dApp doesn't ship until Kane says it's safe.**
 
-The page said "Swap 0.5 ETH". Behind it, the site asked the wallet to send 5 ETH, send the money to a stranger, or hand over all the user's USDC. Looking at the page, nothing was wrong. DappSentinel caught all three, because it checks what the wallet is actually asked to sign. ([How](#what-you-see-is-what-you-sign))
+The page said "Swap 0.5 ETH". Behind it, the site asked the wallet to send 5 ETH, send the money to a stranger, or hand over all the user's USDC. Looking at the page, nothing was wrong. **DappSentinel caught all three**, because it checks what the wallet is actually asked to sign. ([How](#what-you-see-is-what-you-sign))
 
 > [!TIP]
 > **TL;DR**
