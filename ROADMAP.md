@@ -16,6 +16,7 @@ Everything we'd like DappSentinel to do after the hackathon. The [README](README
 - **Kane's verdict policies** (`kane-cli evidence verdict --policy`), so Kane's own policy engine makes the final pass or fail from DappSentinel's findings.
 - **Locked regression tests** (`kane-cli testmd run --no-adaptive-heal`): once a flow passes, freeze it, so a later change can't be healed away silently.
 - **Kane's bug-confirmation mode** (`--bug-detection continue`), to separate real product bugs from test problems before Claude starts fixing.
+- **Checks designed from the task** (`kane-cli design tests`): when a team adds a new flow, such as staking, Kane writes its own "what you see is what you sign" check from the task before it ships, so new flows don't go out unchecked.
 
 ## Reach more teams
 
